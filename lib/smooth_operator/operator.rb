@@ -1,3 +1,5 @@
+require "smooth_operator/protocol_handler"
+
 module SmoothOperator
   module Operator
 

@@ -1,7 +1,9 @@
+require 'httparty'
+
 module SmoothOperator
   class ProtocolHandler
   
-    include HTTParty
+    include ::HTTParty
     format :json
 
     def self.get_options(options)

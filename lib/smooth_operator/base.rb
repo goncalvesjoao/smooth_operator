@@ -1,3 +1,6 @@
+require "smooth_operator/operator"
+require "smooth_operator/orm"
+
 module SmoothOperator
   class Base < OpenStruct
 
