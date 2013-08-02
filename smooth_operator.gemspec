@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["João Gonçalves"]
   spec.email         = ["goncalves.joao@gmail.com"]
   spec.description   = %q{ActiveResource alternative}
-  spec.summary       = %q{TODO: Write a gem summary}
+  spec.summary       = %q{Simple and fully customizable alternative to ActiveResource, based on httparty gem}
   spec.homepage      = ""
   spec.license       = "MIT"
 
@@ -23,4 +23,5 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency(%q<rails>, [">= 3.0.0"])
   spec.add_dependency(%q<actionpack>, [">= 3.0.0"])
+  spec.add_dependency(%q<httparty>, [">= 0.11.0"])
 end
