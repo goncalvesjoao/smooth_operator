@@ -6,9 +6,9 @@ require 'smooth_operator/version'
 Gem::Specification.new do |spec|
   spec.name          = "smooth_operator"
   spec.version       = SmoothOperator::VERSION
-  spec.authors       = ["goncalvesjoao"]
+  spec.authors       = ["João Gonçalves"]
   spec.email         = ["goncalves.joao@gmail.com"]
-  spec.description   = %q{TODO: Write a gem description}
+  spec.description   = %q{ActiveResource alternative}
   spec.summary       = %q{TODO: Write a gem summary}
   spec.homepage      = ""
   spec.license       = "MIT"
@@ -20,4 +20,7 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler", "~> 1.3"
   spec.add_development_dependency "rake"
+
+  spec.add_dependency(%q<rails>, [">= 3.0.0"])
+  spec.add_dependency(%q<actionpack>, [">= 3.0.0"])
 end
