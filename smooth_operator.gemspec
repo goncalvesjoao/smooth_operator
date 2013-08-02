@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["goncalves.joao@gmail.com"]
   spec.description   = %q{ActiveResource alternative}
   spec.summary       = %q{Simple and fully customizable alternative to ActiveResource, based on httparty gem}
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/goncalvesjoao/smooth_operator"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
