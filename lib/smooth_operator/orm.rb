@@ -88,7 +88,7 @@ module SmoothOperator
 
     def save!
       @last_response = create_or_update
-      import_response_errors(@last_response)
+      assign_attributes(@last_response)
       SmoothOperator::Exceptions.raise_proper_exception(@last_response) unless self.class.successful_response?(@last_response)
       true
     end
@@ -97,7 +97,7 @@ module SmoothOperator
       return true if new_record?
       
       @last_response = self.class.delete(self.id)
-      import_response_errors(@last_response)
+      assign_attributes(@last_response)
       self.class.successful_response?(@last_response)
     end
 
@@ -122,8 +122,16 @@ module SmoothOperator
       !valid?
     end
 
+    def assign_attributes(attributes = {})
+      return if attributes.blank?
+
+      attributes.each do |name, value|
+        send("#{name}=", value)
+      end
+    end
+
     def hash_of_safe_content
-      safe_hash = hash_of_full_content.dup
+      safe_hash = table_to_hash.dup
 
       if self.class.save_attr_white_list.present?
         safe_hash.slice!(*self.class.save_attr_white_list)
@@ -144,11 +152,11 @@ module SmoothOperator
       end
     end
 
-    def import_response_errors(response)
-      if response.present? && response.parsed_response.include?('errors')
-        self.errors = response.parsed_response['errors']
-      end
-    end
+    # def import_response_errors(response)
+    #   if response.present? && response.parsed_response.include?('errors')
+    #     self.errors = response.parsed_response['errors']
+    #   end
+    # end
 
   end
 end

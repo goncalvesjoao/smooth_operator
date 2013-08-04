@@ -7,7 +7,7 @@ module SmoothOperator
     include SmoothOperator::Operator
     include SmoothOperator::ORM
 
-    def hash_of_full_content
+    def table_to_hash
       @table
     end
 
@@ -30,7 +30,7 @@ module SmoothOperator
 
       return nested_object_variable if nested_object_variable.present?
 
-      nested_object_variable = initialize_nested_object_variable(hash_of_full_content[nested_object_symbol], nested_object_class, nested_object_symbol)
+      nested_object_variable = initialize_nested_object_variable(table_to_hash[nested_object_symbol], nested_object_class, nested_object_symbol)
 
       instance_variable_set("@#{nested_object_symbol}", nested_object_variable)
 
