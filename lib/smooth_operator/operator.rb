@@ -1,4 +1,4 @@
-require "smooth_operator/protocol_handler"
+require "smooth_operator/protocol_handlers/*"
 
 module SmoothOperator
   module Operator
@@ -10,6 +10,11 @@ module SmoothOperator
     end
 
     module ClassMethods
+
+      attr_writer :protocol_handler
+      def protocol_handler
+        @protocol_handler ||= SmoothOperator::ProtocolHandlers::HTTParty
+      end
 
       attr_writer :endpoint
       def endpoint
@@ -67,7 +72,7 @@ module SmoothOperator
       def make_the_call(http_verb, relative_path, options = {})
         url = build_url(relative_path)
         options = build_options(options)
-        response = SmoothOperator::ProtocolHandler.send(http_verb, url, options)
+        response = protocol_handler.send(http_verb, url, options)
         response
       end
 
