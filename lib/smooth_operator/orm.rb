@@ -1,5 +1,3 @@
-require "smooth_operator/exceptions"
-
 module SmoothOperator
   module ORM
 
@@ -52,28 +50,12 @@ module SmoothOperator
 
       private #------------------------------------------------ private
 
-      def instantiate_each(objects)
-        objects.map { |object| new(object) }
-      end
-
       def find_each(options)
-        response = get(nil, options)
-        parsed_response = parse_response_or_raise_proper_exception(response)
-        parsed_response.kind_of?(Array) ? instantiate_each(parsed_response) : parsed_response
+        protocol_handler_orm.find_each(options, self.class)
       end
 
       def find_one(id, options)
-        response = get(id, options)
-        parsed_response = parse_response_or_raise_proper_exception(response)
-        new(parsed_response)
-      end
-
-      def parse_response_or_raise_proper_exception(response)
-        if successful_response?(response)
-          response.parsed_response
-        else
-          SmoothOperator::Exceptions.raise_proper_exception(response)
-        end
+        protocol_handler_orm.find_one(id, options, self.class)
       end
 
     end
@@ -87,18 +69,11 @@ module SmoothOperator
     end
 
     def save!
-      @last_response = create_or_update
-      assign_attributes(@last_response)
-      SmoothOperator::Exceptions.raise_proper_exception(@last_response) unless self.class.successful_response?(@last_response)
-      true
+      self.class.protocol_handler_orm.save!
     end
 
     def destroy
-      return true if new_record?
-      
-      @last_response = self.class.delete(self.id)
-      assign_attributes(@last_response)
-      self.class.successful_response?(@last_response)
+      self.class.protocol_handler_orm.destroy
     end
 
     def new_record?
@@ -130,7 +105,7 @@ module SmoothOperator
       end
     end
 
-    def hash_of_safe_content
+    def safe_table_to_hash
       safe_hash = table_to_hash.dup
 
       if self.class.save_attr_white_list.present?
@@ -141,22 +116,6 @@ module SmoothOperator
 
       safe_hash
     end
-
-    private #-------------------------------------- private
-
-    def create_or_update
-      if new_record?
-        self.class.post('', { self.class.model_name_downcase => hash_of_safe_content })
-      else
-        self.class.put(self.id, { self.class.model_name_downcase => hash_of_safe_content })
-      end
-    end
-
-    # def import_response_errors(response)
-    #   if response.present? && response.parsed_response.include?('errors')
-    #     self.errors = response.parsed_response['errors']
-    #   end
-    # end
 
   end
 end

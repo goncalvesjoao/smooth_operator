@@ -3,9 +3,9 @@ module SmoothOperator
 
   	extend self
 
-  	def raise_proper_exception(response)
-  		return nil if CODES_TO_IGNORE.include?(response.code)
-  		exception_to_raise = (CODE_VS_EXCEPTIONS[response.code] || SmoothOperator::Exceptions::Unknown).new(response)
+  	def raise_proper_exception(response, code)
+  		return nil if CODES_TO_IGNORE.include?(code)
+  		exception_to_raise = (CODE_VS_EXCEPTIONS[code] || SmoothOperator::Exceptions::Unknown).new(response)
   		raise exception_to_raise, exception_to_raise.message
   	end
 

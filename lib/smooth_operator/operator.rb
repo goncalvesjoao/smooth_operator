@@ -1,9 +1,9 @@
-require "smooth_operator/protocol_handlers/*"
+require "smooth_operator/protocol_handlers/httparty/base"
+require "smooth_operator/protocol_handlers/httparty/orm"
+#require "smooth_operator/protocol_handlers/typhoeus"
 
 module SmoothOperator
   module Operator
-
-    HTTP_SUCCESS_CODES = [200, 201, 202, 203, 204]
 
     def self.included(base)
       base.extend(ClassMethods)
@@ -13,7 +13,11 @@ module SmoothOperator
 
       attr_writer :protocol_handler
       def protocol_handler
-        @protocol_handler ||= SmoothOperator::ProtocolHandlers::HTTParty
+        @protocol_handler ||= SmoothOperator::ProtocolHandlers::HTTParty::Base
+      end
+
+      def protocol_handler_orm
+        @protocol_handler_orm ||= protocol_handler::ORM
       end
 
       attr_writer :endpoint
@@ -32,48 +36,26 @@ module SmoothOperator
       end
 
       def get(relative_path, options = {})
-        make_the_call(:get, relative_path, SmoothOperator::ProtocolHandler.get_options(options))
+        make_the_call(:get, relative_path, options)
       end
 
       def post(relative_path, options = {})
-        make_the_call(:post, relative_path, SmoothOperator::ProtocolHandler.post_options(options))
+        make_the_call(:post, relative_path, options)
       end
 
       def put(relative_path, options = {})
-        make_the_call(:put, relative_path, SmoothOperator::ProtocolHandler.put_options(options))
+        make_the_call(:put, relative_path, options)
       end
 
       def delete(relative_path, options = {})
-        make_the_call(:delete, relative_path, SmoothOperator::ProtocolHandler.delete_options(options))
+        make_the_call(:delete, relative_path, options)
       end
 
-
-      def safe_get(relative_path, options = {})
-        safe_response(get(relative_path, options)) rescue nil
-      end
-
-      def safe_post(relative_path, options = {})
-        safe_response(post(relative_path, options)) rescue nil
-      end
-
-      def safe_put(relative_path, options = {})
-        safe_response(put(relative_path, options)) rescue nil
-      end
-
-      def safe_delete(relative_path, options = {})
-        safe_response(delete(relative_path, options)) rescue nil
-      end
-
-      def safe_response(response)
-        successful_response?(response) ? response.parsed_response : nil
-      end
-      
+      private ################################ PRIVATE #########################
 
       def make_the_call(http_verb, relative_path, options = {})
         url = build_url(relative_path)
-        options = build_options(options)
-        response = protocol_handler.send(http_verb, url, options)
-        response
+        protocol_handler.send(http_verb, url, (options || {}), get_basic_auth_credentials)
       end
 
       def build_url(relative_path)
@@ -82,21 +64,12 @@ module SmoothOperator
         [endpoint, table_name, slash, relative_path.to_s, extention].join
       end
 
-      def set_basic_auth_credentials(options)
-        if endpoint_user.present? || endpoint_pass.present? && !options.include?(:basic_auth)
-          options.merge({ basic_auth: { username: endpoint_user, password: endpoint_pass } })
+      def get_basic_auth_credentials
+        if endpoint_user.present? || endpoint_pass.present?
+          { username: endpoint_user, password: endpoint_pass }
         else
-          options
+          nil
         end
-      end
-
-      def build_options(options)
-        options = {} if options.blank?
-        set_basic_auth_credentials(options)
-      end
-
-      def successful_response?(response)
-        HTTP_SUCCESS_CODES.include?(response.code) || response.blank?
       end
 
     end
