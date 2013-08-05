@@ -51,11 +51,11 @@ module SmoothOperator
       private #------------------------------------------------ private
 
       def find_each(options)
-        protocol_handler_orm.find_each(options, self.class)
+        protocol_handler_orm.find_each(options, self)
       end
 
       def find_one(id, options)
-        protocol_handler_orm.find_one(id, options, self.class)
+        protocol_handler_orm.find_one(id, options, self)
       end
 
     end
@@ -69,11 +69,11 @@ module SmoothOperator
     end
 
     def save!
-      self.class.protocol_handler_orm.save!
+      self.class.protocol_handler_orm.save!(self, self.class)
     end
 
     def destroy
-      self.class.protocol_handler_orm.destroy
+      self.class.protocol_handler_orm.destroy(self, self.class)
     end
 
     def new_record?

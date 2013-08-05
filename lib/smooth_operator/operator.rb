@@ -13,11 +13,15 @@ module SmoothOperator
 
       attr_writer :protocol_handler
       def protocol_handler
-        @protocol_handler ||= SmoothOperator::ProtocolHandlers::HTTParty::Base
+        @protocol_handler ||= SmoothOperator::ProtocolHandlers::HTTParty
+      end
+
+      def protocol_handler_base
+        protocol_handler::Base
       end
 
       def protocol_handler_orm
-        @protocol_handler_orm ||= protocol_handler::ORM
+        protocol_handler::ORM
       end
 
       attr_writer :endpoint
@@ -55,7 +59,7 @@ module SmoothOperator
 
       def make_the_call(http_verb, relative_path, options = {})
         url = build_url(relative_path)
-        protocol_handler.send(http_verb, url, (options || {}), get_basic_auth_credentials)
+        protocol_handler_base.send(http_verb, url, (options || {}), get_basic_auth_credentials)
       end
 
       def build_url(relative_path)
