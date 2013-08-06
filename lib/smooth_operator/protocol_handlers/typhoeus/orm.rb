@@ -1,5 +1,3 @@
-require "smooth_operator/exceptions"
-
 module SmoothOperator
   module ProtocolHandlers
     module Typhoeus
@@ -7,9 +5,21 @@ module SmoothOperator
       class ORM
 
         def self.find_each(options, caller_class)
+          returning_response = nil
+
+          injected_hydra = options[:hydra]
+          options[:hydra] = injected_hydra || ::Typhoeus::Hydra.hydra
+
           response = caller_class.get(nil, options)
-          parsed_response = parse_response_or_raise_proper_exception(response, caller_class)
-          return_array_of_objects_or_response(parsed_response, caller_class)
+
+          response.request.on_complete do |response|
+            response.set_response response
+            response.response = return_array_of_objects_or_response(response.parsed_response, caller_class)
+          end
+
+          request.run if injected_hydra.blank?
+
+          response
         end
 
         def self.find_one(id, options, caller_class)

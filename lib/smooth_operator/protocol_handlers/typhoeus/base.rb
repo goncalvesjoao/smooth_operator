@@ -49,11 +49,30 @@ module SmoothOperator
         end
 
         def self.make_request(url, options, hydra)
-          returning_response = nil
+          if hydra.present?
+            make_asynchronous_request(url, options, hydra)
+          else
+            make_synchronous_request(url, options)
+          end
+        end
 
+        def self.make_synchronous_request(url, options)
           request = ::Typhoeus::Request.new(url, options)
-          request.on_complete { |response| returning_response = response }
-          hydra.present? ? hydra.queue(request) : request.run
+
+          returning_response = SmoothOperator::Response.new(SmoothOperator::ProtocolHandlers::Typhoeus, request)
+
+          request.on_complete { |response| returning_response.set_response response }
+          request.run
+
+          returning_response
+        end
+
+        def self.make_asynchronous_request(url, options, hydra)
+          request = ::Typhoeus::Request.new(url, options)
+          
+          returning_response = SmoothOperator::Response.new(SmoothOperator::ProtocolHandlers::Typhoeus, request)
+
+          hydra.queue(request)
 
           returning_response
         end

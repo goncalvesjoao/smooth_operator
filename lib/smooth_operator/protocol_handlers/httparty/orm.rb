@@ -1,5 +1,3 @@
-require "smooth_operator/exceptions"
-
 module SmoothOperator
   module ProtocolHandlers
     module HTTParty
