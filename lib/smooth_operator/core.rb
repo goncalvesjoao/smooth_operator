@@ -3,8 +3,7 @@ require "smooth_operator/operator"
 module SmoothOperator
   class Core < OpenStruct
 
-    include SmoothOperator::Operator::Base
-    include SmoothOperator::Operator::ORM
+    include SmoothOperator::Operator
 
     def table_hash
       @table

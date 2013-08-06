@@ -4,10 +4,9 @@ module SmoothOperator
 
       class ORM
 
-        attr_reader :object, :object_class
+        attr_reader :object_class
 
-        def initialize(object, object_class)
-          @object = object
+        def initialize(object_class)
           @object_class = object_class
         end
 

@@ -2,7 +2,9 @@ module SmoothOperator
   module HttpHandlers
     module Typhoeus
 
-      class RemoteCall << SmoothOperator::Operator::RemoteCall
+      class RemoteCall
+
+        include SmoothOperator::Operator::RemoteCall
 
         attr_reader :request
 
@@ -15,7 +17,7 @@ module SmoothOperator
         end
 
         def successful_response?(response)
-          response.blank? || super(response)
+          response.blank? || super(code)
         end
 
       end
