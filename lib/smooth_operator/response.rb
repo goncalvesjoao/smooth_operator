@@ -4,6 +4,7 @@ module SmoothOperator
   class Response
 
     attr_reader :protocol_handler, :request, :raw_response, :parsed_response
+    
     attr_accessor :response
 
     def initialize(protocol_handler, request = nil)

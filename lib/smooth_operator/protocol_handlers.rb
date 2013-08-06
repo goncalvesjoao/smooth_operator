@@ -1,3 +1,5 @@
+require "smooth_operator/reponse"
+
 require "smooth_operator/protocol_handlers/httparty/base"
 require "smooth_operator/protocol_handlers/httparty/orm"
 
