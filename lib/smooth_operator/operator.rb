@@ -1,9 +1,4 @@
-require "smooth_operator/protocol_handlers/httparty/base"
-require "smooth_operator/protocol_handlers/httparty/orm"
-
-require "smooth_operator/protocol_handlers/typhoeus/base"
-require "smooth_operator/protocol_handlers/typhoeus/orm"
-
+require "smooth_operator/protocol_handlers"
 
 module SmoothOperator
   module Operator

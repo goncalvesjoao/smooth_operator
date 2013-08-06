@@ -30,6 +30,10 @@ module SmoothOperator
           make_request(url, options, hydra)
         end
 
+        def self.successful_response?(response)
+          response.blank? || SmoothOperator::ProtocolHandlers.successful_response?(response.code)
+        end
+        
 
         private ###################### PRIVATE ##############
 
@@ -57,11 +61,11 @@ module SmoothOperator
           basic_auth_credentials.blank? ? {} : { userpwd: "#{basic_auth_credentials[:username]}:#{basic_auth_credentials[:password]}" }
         end
         
-        def get_hydra_and_remove_it_from(options)
-          options.delete(:hydra) || Typhoeus::Hydra.hydra
+        def self.get_hydra_and_remove_it_from(options)
+          options.delete(:hydra)
         end
 
-        def make_request(url, options, hydra)
+        def self.make_request(url, options, hydra)
           if hydra.present?
             make_asynchronous_request(url, hydra, options)
           else
@@ -69,18 +73,18 @@ module SmoothOperator
           end
         end
 
-        def make_synchronous_request(url, options)
+        def self.make_synchronous_request(url, options)
           returning_response = nil
 
-          request = Typhoeus::Request.new(url, options)
+          request = ::Typhoeus::Request.new(url, options)
           request.on_complete { |response| returning_response = response }
           request.run
 
           returning_response
         end
 
-        def make_asynchronous_request(url, hydra, options)
-          request = Typhoeus::Request.new(url, options)
+        def self.make_asynchronous_request(url, hydra, options)
+          request = ::Typhoeus::Request.new(url, options)
           hydra.queue(request)
           request
         end

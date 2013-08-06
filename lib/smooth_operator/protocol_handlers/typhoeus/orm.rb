@@ -39,12 +39,16 @@ module SmoothOperator
 
           caller_class.protocol_handler_base.successful_response?(object.last_response)
         end
-        
+
         private #-------------------------------------- private
+
+        def self.parse_response(body)
+          HTTParty::Parser.call(body, :json)
+        end
 
         def self.parse_response_or_raise_proper_exception(response, code, caller_class)
           if caller_class.protocol_handler_base.successful_response?(response)
-            response.parsed_response
+            parse_response(response.body)
           else
             SmoothOperator::Exceptions.raise_proper_exception(response, code)
           end

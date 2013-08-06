@@ -28,7 +28,7 @@ module SmoothOperator
         end
 
         def self.successful_response?(response)
-          response.blank? || HTTP_SUCCESS_CODES.include?(response.code)
+          response.blank? || SmoothOperator::ProtocolHandlers.successful_response?(response.code)
         end
 
         private ################################ PRIVATE ##################
