@@ -5,30 +5,15 @@ module SmoothOperator
       class ORM
 
         def self.find_each(options, caller_class)
-          returning_response = nil
-
-          injected_hydra = options[:hydra]
-          options[:hydra] = injected_hydra || ::Typhoeus::Hydra.hydra
-
-          response = caller_class.get(nil, options)
-
-          response.request.on_complete do |typhoeus_response|
-            response.set_response typhoeus_response
-            response.response = return_array_of_objects_or_response(response.parsed_response, caller_class)
-          end
-
-          if injected_hydra.blank?
-            response.request.run
-            response.response
-          else
-            response
+          find nil, options, caller_class do |remote_call|
+            remote_call.response = return_array_of_objects_or_response(remote_call.parsed_response, caller_class)
           end
         end
 
         def self.find_one(id, options, caller_class)
-          response = caller_class.get(id, options)
-          parsed_response = parse_response_or_raise_proper_exception(response, caller_class)
-          caller_class.new(parsed_response)
+          find id, options, caller_class do |remote_call|
+            remote_call.response = caller_class.new(response.parsed_response)
+          end
         end
 
         def self.save!(object, caller_class)
@@ -54,6 +39,27 @@ module SmoothOperator
         end
 
         private #-------------------------------------- private
+
+        def self.find(id, options, caller_class, &block)
+          returning_response = nil
+
+          injected_hydra = options[:hydra]
+          options[:hydra] = injected_hydra || ::Typhoeus::Hydra.hydra
+
+          remote_call = caller_class.get(id, options)
+
+          remote_call.request.on_complete do |typhoeus_response|
+            remote_call.raw_response = typhoeus_response
+            yield(remote_call)
+          end
+
+          if injected_hydra.blank?
+            remote_call.request.run
+            remote_call.response
+          else
+            remote_call
+          end
+        end
 
         def self.parse_response(response)
           response.blank? ? nil : ::HTTParty::Parser.call(response.body, :json)

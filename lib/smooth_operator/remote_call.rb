@@ -1,7 +1,7 @@
 require "smooth_operator/exceptions"
 
 module SmoothOperator
-  class Response
+  class RemoteCall
 
     attr_reader :protocol_handler, :request, :raw_response, :parsed_response
 
@@ -12,7 +12,7 @@ module SmoothOperator
       @request = request
     end
 
-    def set_response(response)
+    def raw_response=(response)
       @raw_response = response
       @parsed_response = parse_response_or_raise_proper_exception(@raw_response)
     end
