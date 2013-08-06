@@ -1,11 +1,10 @@
 require "smooth_operator/operator"
-require "smooth_operator/orm"
 
 module SmoothOperator
-  class Base < OpenStruct
+  class Core < OpenStruct
 
-    include SmoothOperator::Operator
-    include SmoothOperator::ORM
+    include SmoothOperator::Operator::Base
+    include SmoothOperator::Operator::ORM
 
     def table_hash
       @table

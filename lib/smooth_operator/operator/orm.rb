@@ -51,29 +51,60 @@ module SmoothOperator
       private #------------------------------------------------ private
 
       def find_each(options)
-        protocol_handler_orm.find_each(options, self)
+        http_handler_orm.find_each(options) do |remote_call|
+          remote_call.response = return_array_of_objects_or_response(remote_call.parsed_response)
+        end
       end
 
       def find_one(id, options)
-        protocol_handler_orm.find_one(id, options, self)
+        http_handler_orm.find_one(id, options) do |remote_call|
+          remote_call.response = new(remote_call.parsed_response)
+        end
+      end
+
+      def return_array_of_objects_or_response(parsed_response)
+        if parsed_response.kind_of?(Array)
+          parsed_response.map { |attributes| new(attributes) }
+        else
+          parsed_response
+        end
       end
 
     end
 
-    def save
+    def save(options = {})
       begin
-        save!
+        save!(options)
       rescue Exception => exception
         false
       end
     end
 
-    def save!
-      self.class.protocol_handler_orm.save!(self, self.class)
+    def save!(options = {})
+      if new_record?
+        http_handler_orm.create(options) { |remote_call| after_create_update_or_destroy(remote_call) }
+      else
+        http_handler_orm.update(id, options) { |remote_call| after_create_update_or_destroy(remote_call) }
+      end
     end
 
-    def destroy
-      self.class.protocol_handler_orm.destroy(self, self.class)
+    def destroy(options = {})
+      return true if new_record?
+      
+      http_handler_orm.destroy(id, options) do |remote_call|
+        after_create_update_or_destroy(remote_call)
+      end
+    end
+
+    def after_create_update_or_destroy(remote_call)
+      send("last_response=", remote_call.raw_response)
+
+      assign_attributes(remote_call.parsed_response)
+
+      # if !remote_call.successful_response?
+      #   SmoothOperator::Exceptions.raise_proper_exception(remote_call.raw_response, remote_call.raw_response.code)
+      # end
+      remote_call.response = remote_call.successful_response?
     end
 
     def new_record?

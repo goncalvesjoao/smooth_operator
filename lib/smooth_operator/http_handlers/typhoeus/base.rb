@@ -1,41 +1,25 @@
 require 'typhoeus'
 
 module SmoothOperator
-  module ProtocolHandlers
+  module HttpHandlers
     module Typhoeus
     
       class Base
     
         def self.get(url, options, basic_auth_credentials)
-          hydra = get_hydra_and_remove_it_from options
-          options = { params: options, method: :get }.merge auth_credentials(basic_auth_credentials)
-
-          make_request(url, options, hydra)
+          make_request(url, options, basic_auth_credentials, :get)
         end
 
         def self.post(url, options, basic_auth_credentials)
-          hydra = get_hydra_and_remove_it_from options
-          options = { params: options, method: :post }.merge auth_credentials(basic_auth_credentials)
-
-          make_request(url, options, hydra)
+          make_request(url, options, basic_auth_credentials, :post)
         end
 
         def self.put(url, options, basic_auth_credentials)
-          hydra = get_hydra_and_remove_it_from options
-          options = { params: options, method: :put }.merge auth_credentials(basic_auth_credentials)
-
-          make_request(url, options, hydra)
+          make_request(url, options, basic_auth_credentials, :put)
         end
 
         def self.delete(url, options, basic_auth_credentials)
-          hydra = get_hydra_and_remove_it_from options
-          options = { params: options, method: :delete }.merge auth_credentials(basic_auth_credentials)
-
-          make_request(url, options, hydra)
-        end
-
-        def self.successful_response?(response)
-          response.blank? || SmoothOperator::ProtocolHandlers.successful_response?(response.code)
+          make_request(url, options, basic_auth_credentials, :delete)
         end
         
         private ###################### PRIVATE ##################
@@ -48,7 +32,10 @@ module SmoothOperator
           options.delete(:hydra)
         end
 
-        def self.make_request(url, options, hydra)
+        def self.make_request(url, options, basic_auth_credentials, http_verb)
+          hydra = get_hydra_and_remove_it_from options
+          options = { params: options, method: http_verb }.merge auth_credentials(basic_auth_credentials)
+
           if hydra.present?
             make_asynchronous_request(url, options, hydra)
           else
@@ -59,9 +46,9 @@ module SmoothOperator
         def self.make_synchronous_request(url, options)
           request = ::Typhoeus::Request.new(url, options)
 
-          remote_call = SmoothOperator::RemoteCall.new(SmoothOperator::ProtocolHandlers::Typhoeus, request)
+          remote_call = RemoteCall.new(request)
 
-          request.on_complete { |response| remote_call.response = response }
+          request.on_complete { |response| remote_call.raw_response = response }
           request.run
 
           remote_call
@@ -70,7 +57,7 @@ module SmoothOperator
         def self.make_asynchronous_request(url, options, hydra)
           request = ::Typhoeus::Request.new(url, options)
           
-          remote_call = SmoothOperator::RemoteCall.new(SmoothOperator::ProtocolHandlers::Typhoeus, request)
+          remote_call = RemoteCall.new(request)
 
           hydra.queue(request)
 
