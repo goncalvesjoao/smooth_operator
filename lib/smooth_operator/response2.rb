@@ -1,10 +1,10 @@
 require "smooth_operator/exceptions"
 
 module SmoothOperator
-  class Response
+  class Response2
 
     attr_reader :protocol_handler, :request, :raw_response, :parsed_response
-    
+
     attr_accessor :response
 
     def initialize(protocol_handler, request = nil)
