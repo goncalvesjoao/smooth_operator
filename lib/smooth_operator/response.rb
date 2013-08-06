@@ -1,7 +1,7 @@
 require "smooth_operator/exceptions"
 
 module SmoothOperator
-  class Response2
+  class Response
 
     attr_reader :protocol_handler, :request, :raw_response, :parsed_response
 
@@ -18,11 +18,11 @@ module SmoothOperator
     end
 
     def parse_response(response)
-      @protocol_handler.parse_response(response)
+      @protocol_handler::ORM.parse_response(response)
     end
 
     def parse_response_or_raise_proper_exception(response)
-      if @protocol_handler.successful_response?(response)
+      if @protocol_handler::Base.successful_response?(response)
         parse_response(response)
       else
         SmoothOperator::Exceptions.raise_proper_exception(response, response.code)

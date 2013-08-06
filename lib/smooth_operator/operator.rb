@@ -1,4 +1,3 @@
-require "smooth_operator/reponse"
 require "smooth_operator/protocol_handlers"
 
 module SmoothOperator

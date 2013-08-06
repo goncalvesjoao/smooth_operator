@@ -12,14 +12,17 @@ module SmoothOperator
 
           response = caller_class.get(nil, options)
 
-          response.request.on_complete do |response|
-            response.set_response response
+          response.request.on_complete do |typhoeus_response|
+            response.set_response typhoeus_response
             response.response = return_array_of_objects_or_response(response.parsed_response, caller_class)
           end
 
-          request.run if injected_hydra.blank?
-
-          response
+          if injected_hydra.blank?
+            response.request.run
+            response.response
+          else
+            response
+          end
         end
 
         def self.find_one(id, options, caller_class)
