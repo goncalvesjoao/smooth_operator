@@ -105,8 +105,8 @@ module SmoothOperator
       end
     end
 
-    def safe_table_to_hash
-      safe_hash = table_to_hash.dup
+    def safe_table_hash
+      safe_hash = table_hash.dup
 
       if self.class.save_attr_white_list.present?
         safe_hash.slice!(*self.class.save_attr_white_list)
@@ -115,6 +115,12 @@ module SmoothOperator
       end
 
       safe_hash
+    end
+
+    private ####################### private #################
+
+    def last_response=(response)
+      @last_response = response
     end
 
   end

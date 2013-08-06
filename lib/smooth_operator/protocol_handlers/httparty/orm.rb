@@ -60,9 +60,9 @@ module SmoothOperator
 
         def self.create_or_update(object, caller_class)
           if object.new_record?
-            caller_class.post('', { caller_class.model_name_downcase => object.safe_table_to_hash })
+            caller_class.post('', { caller_class.model_name_downcase => object.safe_table_hash })
           else
-            caller_class.put(object.id, { caller_class.model_name_downcase => object.safe_table_to_hash })
+            caller_class.put(object.id, { caller_class.model_name_downcase => object.safe_table_hash })
           end
         end
         

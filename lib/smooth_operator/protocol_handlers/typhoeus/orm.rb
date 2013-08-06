@@ -8,20 +8,20 @@ module SmoothOperator
 
         def self.find_each(options, caller_class)
           response = caller_class.get(nil, options)
-          parsed_response = parse_response_or_raise_proper_exception(response, response.code, caller_class)
+          parsed_response = parse_response_or_raise_proper_exception(response, caller_class)
           return_array_of_objects_or_response(parsed_response, caller_class)
         end
 
         def self.find_one(id, options, caller_class)
           response = caller_class.get(id, options)
-          parsed_response = parse_response_or_raise_proper_exception(response, response.code, caller_class)
+          parsed_response = parse_response_or_raise_proper_exception(response, caller_class)
           caller_class.new(parsed_response)
         end
 
         def self.save!(object, caller_class)
-          object.last_response = create_or_update(object, caller_class)
+          object.send("last_response=", create_or_update(object, caller_class))
 
-          object.assign_attributes(object.last_response)
+          object.assign_attributes(parse_response(object.last_response))
 
           if !caller_class.protocol_handler_base.successful_response?(object.last_response)
             SmoothOperator::Exceptions.raise_proper_exception(object.last_response, object.last_response.code)
@@ -33,24 +33,24 @@ module SmoothOperator
         def self.destroy(object, caller_class)
           return true if object.new_record?
           
-          object.last_response = caller_class.delete(object.id)
+          object.send("last_response=", caller_class.delete(object.id))
           
-          object.assign_attributes(object.last_response)
+          object.assign_attributes(parse_response(object.last_response))
 
           caller_class.protocol_handler_base.successful_response?(object.last_response)
         end
 
         private #-------------------------------------- private
 
-        def self.parse_response(body)
-          HTTParty::Parser.call(body, :json)
+        def self.parse_response(response)
+          response.blank? ? nil : ::HTTParty::Parser.call(response.body, :json)
         end
 
-        def self.parse_response_or_raise_proper_exception(response, code, caller_class)
+        def self.parse_response_or_raise_proper_exception(response, caller_class)
           if caller_class.protocol_handler_base.successful_response?(response)
-            parse_response(response.body)
+            parse_response(response)
           else
-            SmoothOperator::Exceptions.raise_proper_exception(response, code)
+            SmoothOperator::Exceptions.raise_proper_exception(response, response.code)
           end
         end
 
@@ -64,9 +64,9 @@ module SmoothOperator
 
         def self.create_or_update(object, caller_class)
           if object.new_record?
-            caller_class.post('', { caller_class.model_name_downcase => object.safe_table_to_hash })
+            caller_class.post('', { caller_class.model_name_downcase => object.safe_table_hash })
           else
-            caller_class.put(object.id, { caller_class.model_name_downcase => object.safe_table_to_hash })
+            caller_class.put(object.id, { caller_class.model_name_downcase => object.safe_table_hash })
           end
         end
         
