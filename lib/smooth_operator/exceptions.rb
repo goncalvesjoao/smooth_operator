@@ -6,7 +6,7 @@ module SmoothOperator
   	def raise_proper_exception(response, code)
   		return nil if CODES_TO_IGNORE.include?(code)
   		exception_to_raise = (CODE_VS_EXCEPTIONS[code] || SmoothOperator::Exceptions::Unknown).new(response)
-  		raise exception_to_raise, exception_to_raise.message
+  		#raise exception_to_raise, exception_to_raise.message
   	end
 
 		class Base < StandardError

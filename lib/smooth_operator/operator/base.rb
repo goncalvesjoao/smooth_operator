@@ -8,7 +8,7 @@ module SmoothOperator
       end
 
       def http_handler_orm
-        self.class.http_handler_orm
+        self.class.send(:http_handler_orm)
       end
 
       module ClassMethods

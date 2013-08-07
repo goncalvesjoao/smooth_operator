@@ -60,7 +60,7 @@ module SmoothOperator
 
       attr_writer :save_attr_black_list
       def save_attr_black_list
-        @save_attr_black_list ||= [:id, :created_at, :updated_at]
+        @save_attr_black_list ||= [:id, :created_at, :updated_at, :errors]
       end
 
       attr_writer :save_attr_white_list

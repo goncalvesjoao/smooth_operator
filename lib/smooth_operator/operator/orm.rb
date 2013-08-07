@@ -6,6 +6,7 @@ module SmoothOperator
       def self.included(base)
         base.extend(ClassMethods)
         base.send(:attr_reader, :last_response)
+        base.send(:attr_reader, :exception)
       end
 
       module ClassMethods
@@ -24,6 +25,16 @@ module SmoothOperator
           rescue Exception => exception #exception.response contains the server response
             id == :all ? [] : nil
           end
+        end
+
+        def create(options = {})
+          new_object = new(options)
+
+          http_handler_orm.create({ model_name_downcase => new_object.safe_table_hash }) do |remote_call|
+            new_object.send('after_create_update_or_destroy', remote_call)
+          end
+
+          new_object
         end
 
         private #------------------------------------------------ private
@@ -50,11 +61,14 @@ module SmoothOperator
         begin
           save!(options)
         rescue Exception => exception
+          send("exception=", exception)
           false
         end
       end
 
       def save!(options = {})
+        options = build_options_for_save(options)
+
         if new_record?
           http_handler_orm.create(options) { |remote_call| after_create_update_or_destroy(remote_call) }
         else
@@ -70,16 +84,27 @@ module SmoothOperator
         end
       end
 
+      private ####################### private #################
+
+      def build_options_for_save(options = {})
+        options ||= {}
+        options[self.class.model_name_downcase] ||= safe_table_hash
+        options
+      end
+
       def after_create_update_or_destroy(remote_call)
         send("last_response=", remote_call.raw_response)
+        send("exception=", remote_call.exception)
         assign_attributes(remote_call.parsed_response)
         remote_call.response = remote_call.successful_response?
       end
 
-      private ####################### private #################
-
       def last_response=(response)
         @last_response = response
+      end
+
+      def exception=(exception)
+        @exception = exception
       end
 
     end

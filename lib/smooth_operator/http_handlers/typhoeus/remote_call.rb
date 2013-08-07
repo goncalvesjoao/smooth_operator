@@ -12,12 +12,8 @@ module SmoothOperator
           @request = request
         end
 
-        def parse_response(response)
-          ::HTTParty::Parser.call(response.body, :json)
-        end
-
-        def successful_response?(response)
-          response.blank? || super(code)
+        def parse_response
+          ::HTTParty::Parser.call(@raw_response.body, :json)
         end
 
       end
