@@ -13,7 +13,11 @@ module SmoothOperator
         end
 
         def parse_response
-          ::HTTParty::Parser.call(@raw_response.body, :json)
+          begin
+            ::HTTParty::Parser.call(@raw_response.body, :json)
+          rescue
+            nil
+          end
         end
 
       end
