@@ -15,7 +15,7 @@ module SmoothOperator
       def parse_response # TO BE OVERWRITTEN IF NECESSARY
         @raw_response
       end
-
+      
       def successful_response? # TO BE OVERWRITTEN IF NECESSARY
         @raw_response.blank? || HTTP_SUCCESS_CODES.include?(code)
       end
@@ -23,6 +23,8 @@ module SmoothOperator
       def code # TO BE OVERWRITTEN IF NECESSARY
         @raw_response.code
       end
+
+      def ok?; successful_response?; end
 
       def raw_response=(response)
         @raw_response = response

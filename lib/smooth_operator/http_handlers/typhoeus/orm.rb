@@ -52,13 +52,10 @@ module SmoothOperator
             remote_call.raw_response = typhoeus_response
             yield(remote_call)
           end
+          
+          remote_call.request.run if injected_hydra.blank?
 
-          if injected_hydra.blank?
-            remote_call.request.run
-            remote_call.response
-          else
-            remote_call
-          end
+          remote_call
         end
         
       end

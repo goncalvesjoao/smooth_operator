@@ -15,7 +15,7 @@ module SmoothOperator
 
         attr_writer :http_handler
         def http_handler
-          @http_handler ||= HTTParty
+          @http_handler ||= Typhoeus
         end
 
         attr_writer :endpoint
