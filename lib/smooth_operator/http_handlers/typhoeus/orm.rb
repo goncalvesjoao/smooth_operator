@@ -42,7 +42,7 @@ module SmoothOperator
 
         # THIS SHOULD NOT BE HERE!
         def rollback(id, options, &block)
-          make_the_call(:post, options, id) do |remote_call|
+          make_the_call(:delete, options, id) do |remote_call|
             yield(remote_call)
           end
         end
