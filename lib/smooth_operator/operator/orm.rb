@@ -84,6 +84,13 @@ module SmoothOperator
         end
       end
 
+      # THIS SHOULD NOT BE HERE!
+      def rollback
+        http_handler_orm.destroy(version_id, options) do |remote_call|
+          after_create_update_or_destroy(remote_call)
+        end
+      end
+
       private ####################### private #################
 
       def build_options_for_save(options = {})

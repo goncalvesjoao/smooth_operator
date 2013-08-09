@@ -40,6 +40,13 @@ module SmoothOperator
           end
         end
 
+        # THIS SHOULD NOT BE HERE!
+        def rollback(id, options, &block)
+          make_the_call(:post, options, id) do |remote_call|
+            yield(remote_call)
+          end
+        end
+
         private ############################# private ############################
 
         def make_the_call(http_verb, options, id, &block)
