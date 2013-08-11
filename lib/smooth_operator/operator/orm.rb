@@ -41,17 +41,21 @@ module SmoothOperator
 
         def find_each(options)
           http_handler_orm.find_each(options) do |remote_call|
-            if remote_call.parsed_response.kind_of?(Array)
-              remote_call.response = remote_call.parsed_response.map { |attributes| new(attributes) }
-            else
-              remote_call.response = remote_call.parsed_response
-            end
+            response = remote_call.parsed_response
+
+            objects_list = (response.kind_of?(Hash) ? response[table_name] : nil) || response
+            
+            remote_call.response = objects_list.kind_of?(Array) ? objects_list.map { |attributes| new(attributes) } : objects_list
           end
         end
 
         def find_one(id, options)
           http_handler_orm.find_one(id, options) do |remote_call|
-            remote_call.response = new(remote_call.parsed_response)
+            response = remote_call.parsed_response
+
+            attributes = response.kind_of?(Hash) ? response[model_name_downcase] : response
+
+            remote_call.response = new(attributes)
           end
         end
 
@@ -102,7 +106,8 @@ module SmoothOperator
       def after_create_update_or_destroy(remote_call)
         send("last_response=", remote_call.raw_response)
         send("exception=", remote_call.exception)
-        assign_attributes(remote_call.parsed_response)
+        new_attributes = remote_call.parsed_response.kind_of?(Hash) ? remote_call.parsed_response[self.class.model_name_downcase] : nil
+        assign_attributes(new_attributes)
         remote_call.response = remote_call.successful_response?
       end
 
