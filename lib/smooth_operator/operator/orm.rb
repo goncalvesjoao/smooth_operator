@@ -37,7 +37,7 @@ module SmoothOperator
           new_object
         end
 
-        private #------------------------------------------------ private
+        protected ####################### protected #######################
 
         def find_each(options)
           http_handler_orm.make_the_call(:get, options, '') do |remote_call|
@@ -54,6 +54,14 @@ module SmoothOperator
         def find_one(id, options)
           http_handler_orm.make_the_call(:get, options, id) do |remote_call|
             remote_call.response = new get_attributes(remote_call.parsed_response, model_name_downcase)
+          end
+        end
+
+        def get_attributes(parsed_response, key)
+          if parsed_response.kind_of?(Hash)
+            parsed_response.include?(key) ? parsed_response[key] : parsed_response
+          else
+            parsed_response
           end
         end
 
@@ -86,7 +94,7 @@ module SmoothOperator
         end
       end
 
-      private ####################### private #################
+      private ####################### private #######################
 
       def build_options_for_save(options = {})
         options ||= {}
@@ -112,14 +120,6 @@ module SmoothOperator
 
       def exception=(exception)
         @exception = exception
-      end
-
-      def self.get_attributes(parsed_response, key)
-        if parsed_response.kind_of?(Hash)
-          parsed_response.include?(key) ? parsed_response[key] : parsed_response
-        else
-          parsed_response
-        end
       end
 
     end

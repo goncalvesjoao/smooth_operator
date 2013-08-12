@@ -9,14 +9,6 @@ module SmoothOperator
       @table.as_json(options)
     end
 
-    # def self.nested_objects_classes(hash)
-    #   hash.each do |nested_object_symbol, nested_object_class|
-    #     define_method(nested_object_symbol.to_s) do
-    #       get_nested_object_variable(nested_object_symbol, nested_object_class)
-    #     end
-    #   end
-    # end
-
     def new_record?
       !persisted?
     end
@@ -100,7 +92,15 @@ module SmoothOperator
     end
 
     module ClassMethods
-        
+      
+      def nested_objects_classes(hash)
+        hash.each do |nested_object_symbol, nested_object_class|
+          define_method(nested_object_symbol.to_s) do
+            get_nested_object_variable(nested_object_symbol, nested_object_class)
+          end
+        end
+      end
+
       attr_writer :endpoint
       def endpoint
         @endpoint ||= ENV["API_ENDPOINT"]
