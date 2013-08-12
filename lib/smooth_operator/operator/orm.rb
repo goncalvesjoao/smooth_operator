@@ -30,7 +30,7 @@ module SmoothOperator
         def create(options = {})
           new_object = new(options)
 
-          http_handler_orm.create({ model_name_downcase => new_object.safe_table_hash }) do |remote_call|
+          http_handler_orm.make_the_call(:post, { model_name_downcase => new_object.safe_table_hash }, '') do |remote_call|
             new_object.send('after_create_update_or_destroy', remote_call)
           end
 
@@ -40,7 +40,7 @@ module SmoothOperator
         private #------------------------------------------------ private
 
         def find_each(options)
-          http_handler_orm.find_each(options) do |remote_call|
+          http_handler_orm.make_the_call(:get, options, '') do |remote_call|
             response = remote_call.parsed_response
 
             objects_list = (response.kind_of?(Hash) ? response[table_name] : nil) || response
@@ -50,7 +50,7 @@ module SmoothOperator
         end
 
         def find_one(id, options)
-          http_handler_orm.find_one(id, options) do |remote_call|
+          http_handler_orm.make_the_call(:get, options, id) do |remote_call|
             response = remote_call.parsed_response
 
             attributes = response.kind_of?(Hash) ? response[model_name_downcase] : response
@@ -74,24 +74,17 @@ module SmoothOperator
         options = build_options_for_save(options)
 
         if new_record?
-          http_handler_orm.create(options) { |remote_call| after_create_update_or_destroy(remote_call) }
+          http_handler_orm.make_the_call(:post, options, '') { |remote_call| after_create_update_or_destroy(remote_call) }
         else
-          http_handler_orm.update(id, options) { |remote_call| after_create_update_or_destroy(remote_call) }
+          http_handler_orm.make_the_call(:put, options, id) { |remote_call| after_create_update_or_destroy(remote_call) }
         end
       end
 
       def destroy(options = {})
         return true if new_record?
         
-        http_handler_orm.destroy(id, options) do |remote_call|
+        http_handler_orm.make_the_call(:delete, options, id) do |remote_call|
           after_create_update_or_destroy(remote_call)
-        end
-      end
-
-      # THIS SHOULD NOT BE HERE!
-      def rollback(options = {})
-        http_handler_orm.rollback("#{version_id}/rollback", options) do |remote_call|
-          after_create_update_or_destroy(remote_call, options[:dont_update])
         end
       end
 
@@ -103,15 +96,16 @@ module SmoothOperator
         options
       end
 
-      def after_create_update_or_destroy(remote_call, dont_update = false)
+      def after_create_update_or_destroy(remote_call)
+        new_attributes = remote_call.parsed_response.kind_of?(Hash) ? remote_call.parsed_response[self.class.model_name_downcase] : nil
+        assign_attributes(new_attributes)
+
+        set_raw_response_exception_and_build_proper_response(remote_call)
+      end
+
+      def set_raw_response_exception_and_build_proper_response(remote_call)
         send("last_response=", remote_call.raw_response)
         send("exception=", remote_call.exception)
-        new_attributes = remote_call.parsed_response.kind_of?(Hash) ? remote_call.parsed_response[self.class.model_name_downcase] : nil
-        if dont_update
-          assign_attributes(new_attributes.slice("id", "version_id"))
-        else
-          assign_attributes(new_attributes)
-        end
         remote_call.response = remote_call.successful_response?
       end
 

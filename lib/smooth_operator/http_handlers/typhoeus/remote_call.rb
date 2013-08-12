@@ -1,10 +1,10 @@
+require "smooth_operator/operator/remote_call"
+
 module SmoothOperator
   module HttpHandlers
     module Typhoeus
 
-      class RemoteCall
-
-        include SmoothOperator::Operator::RemoteCall
+      class RemoteCall < SmoothOperator::Operator::RemoteCall
 
         attr_reader :request
 
@@ -14,7 +14,7 @@ module SmoothOperator
 
         def parse_response
           begin
-            ::HTTParty::Parser.call(@raw_response.body, :json)
+            @parse_response ||= ::HTTParty::Parser.call(@raw_response.body, :json)
           rescue
             nil
           end

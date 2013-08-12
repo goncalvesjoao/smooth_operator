@@ -1,14 +1,12 @@
-require "smooth_operator/exceptions"
+require "smooth_operator/operator/exceptions"
 
 module SmoothOperator
   module Operator
 
-    module RemoteCall
+    class RemoteCall
 
-      def self.included(base)
-        base.send(:attr_reader, :protocol_handler, :raw_response, :parsed_response, :exception)
-        base.send(:attr_writer, :response)
-      end
+      attr_reader :protocol_handler, :raw_response, :parsed_response, :exception
+      attr_writer :response
 
       HTTP_SUCCESS_CODES = [200, 201, 202, 203, 204]
 
@@ -60,7 +58,7 @@ module SmoothOperator
       protected ####################### protected ##################
 
       def parse_response_and_set_exception_if_necessary
-        @exception = successful_response? ? nil : SmoothOperator::Exceptions.raise_proper_exception(@raw_response, code)
+        @exception = successful_response? ? nil : SmoothOperator::Operator::Exceptions.raise_proper_exception(@raw_response, code)
         parse_response
       end
 
