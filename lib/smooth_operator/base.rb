@@ -1,4 +1,3 @@
-require "smooth_operator/core"
 require "smooth_operator/operator/base"
 require "smooth_operator/operator/orm"
 
@@ -19,7 +18,7 @@ module SmoothOperator
     end
 
     def self.http_handler_orm
-      SmoothOperator::HttpHandlers::Typhoeus::ORM
+      @http_handler_orm ||= SmoothOperator::HttpHandlers::Typhoeus::ORM.new(self)
     end
 
     def http_handler_orm
