@@ -41,10 +41,10 @@ module SmoothOperator
 
         def find_each(options)
           http_handler_orm.make_the_call(:get, options, '') do |remote_call|
-            objects_list = get_attributes(remote_call.parsed_response, table_name)
+            objects_list = remote_call.get_attributes(table_name)
             
             if objects_list.kind_of?(Array)
-              remote_call.response = objects_list.map { |attributes| new get_attributes(attributes, model_name_downcase) }
+              remote_call.response = objects_list.map { |attributes| new remote_call.get_attributes(model_name_downcase, attributes) }
             else
               remote_call.response = objects_list
             end
@@ -53,15 +53,7 @@ module SmoothOperator
 
         def find_one(id, options)
           http_handler_orm.make_the_call(:get, options, id) do |remote_call|
-            remote_call.response = new get_attributes(remote_call.parsed_response, model_name_downcase)
-          end
-        end
-
-        def get_attributes(parsed_response, key)
-          if parsed_response.kind_of?(Hash)
-            parsed_response.include?(key) ? parsed_response[key] : parsed_response
-          else
-            parsed_response
+            remote_call.response = new remote_call.get_attributes(model_name_downcase)
           end
         end
 
@@ -103,7 +95,7 @@ module SmoothOperator
       end
 
       def after_create_update_or_destroy(remote_call)
-        new_attributes = self.get_attributes(remote_call.parsed_response, self.class.model_name_downcase)
+        new_attributes = remote_call.get_attributes(self.class.model_name_downcase)
         assign_attributes(new_attributes)
         set_raw_response_exception_and_build_proper_response(remote_call)
       end
