@@ -41,21 +41,19 @@ module SmoothOperator
 
         def find_each(options)
           http_handler_orm.make_the_call(:get, options, '') do |remote_call|
-            response = remote_call.parsed_response
-
-            objects_list = (response.kind_of?(Hash) ? response[table_name] : nil) || response
+            objects_list = get_attributes(remote_call.parsed_response, table_name)
             
-            remote_call.response = objects_list.kind_of?(Array) ? objects_list.map { |attributes| new(attributes) } : objects_list
+            if objects_list.kind_of?(Array)
+              remote_call.response = objects_list.map { |attributes| new get_attributes(attributes, model_name_downcase) }
+            else
+              remote_call.response = objects_list
+            end
           end
         end
 
         def find_one(id, options)
           http_handler_orm.make_the_call(:get, options, id) do |remote_call|
-            response = remote_call.parsed_response
-
-            attributes = response.kind_of?(Hash) ? response[model_name_downcase] : response
-
-            remote_call.response = new(attributes)
+            remote_call.response = new get_attributes(remote_call.parsed_response, model_name_downcase)
           end
         end
 
@@ -97,9 +95,8 @@ module SmoothOperator
       end
 
       def after_create_update_or_destroy(remote_call)
-        new_attributes = remote_call.parsed_response.kind_of?(Hash) ? remote_call.parsed_response[self.class.model_name_downcase] : nil
+        new_attributes = self.get_attributes(remote_call.parsed_response, self.class.model_name_downcase)
         assign_attributes(new_attributes)
-
         set_raw_response_exception_and_build_proper_response(remote_call)
       end
 
@@ -115,6 +112,14 @@ module SmoothOperator
 
       def exception=(exception)
         @exception = exception
+      end
+
+      def self.get_attributes(parsed_response, key)
+        if parsed_response.kind_of?(Hash)
+          parsed_response.include?(key) ? parsed_response[key] : parsed_response
+        else
+          parsed_response
+        end
       end
 
     end
