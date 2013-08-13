@@ -29,15 +29,15 @@ module SmoothOperator
         end
 
         def self.make_synchronous_request(url, options)
-          request = ::Typhoeus::Request.new(url, options)
-          remote_call = SmoothOperator::HttpHandlers::Typhoeus::RemoteCall.new(request)
+          hydra = ::Typhoeus::Hydra::hydra
+          remote_call = make_asynchronous_request(url, options, hydra)
 
-          request.on_complete do |response|
+          remote_call.request.on_complete do |response|
             remote_call.raw_response = response
             remote_call.response = remote_call.parsed_response
           end
 
-          request.run
+          hydra.run
           remote_call
         end
 

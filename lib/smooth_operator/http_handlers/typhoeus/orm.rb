@@ -12,9 +12,8 @@ module SmoothOperator
 
         def make_the_call(http_verb, options, id, &block)
           injected_hydra = options[:hydra]
-          options[:hydra] = injected_hydra || ::Typhoeus::Hydra::hydra
-          
-          binding.pry
+          hydra = injected_hydra || ::Typhoeus::Hydra::hydra
+          options[:hydra] = hydra
 
           remote_call = @object_class.make_the_call(http_verb, id, options)
 
@@ -23,7 +22,7 @@ module SmoothOperator
             yield(remote_call)
           end
           
-          options[:hydra].run if injected_hydra.blank?
+          hydra.run if injected_hydra.blank?
 
           remote_call
         end
