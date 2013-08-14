@@ -5,4 +5,3 @@ end
 require "smooth_operator/version"
 require "smooth_operator/core"
 require "smooth_operator/base"
-require "smooth_operator/rollback"
