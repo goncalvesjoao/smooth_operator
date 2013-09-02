@@ -27,7 +27,12 @@ module SmoothOperator
 
         def make_the_call(http_verb, relative_path, options = {})
           url = build_url(relative_path)
-          http_handler_base.make_the_call(http_verb, url, (options || {}), get_basic_auth_credentials)
+          options = query_string(options || {})
+          http_handler_base.make_the_call(http_verb, url, options, get_basic_auth_credentials)
+        end
+
+        def query_string(options)
+          options
         end
 
       end
