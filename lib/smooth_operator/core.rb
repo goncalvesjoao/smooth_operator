@@ -103,17 +103,29 @@ module SmoothOperator
 
       attr_writer :endpoint
       def endpoint
-        @endpoint ||= ENV["API_ENDPOINT"]
+        if defined?(@endpoint)
+          @endpoint
+        else
+          @endpoint = superclass_responds_to?(:endpoint) ? superclass.endpoint : ENV["API_ENDPOINT"]
+        end
       end
 
       attr_writer :endpoint_user
       def endpoint_user
-        @endpoint_user ||= ENV["API_USER"]
+        if defined?(@endpoint_user)
+          @endpoint_user
+        else
+          @endpoint_user = superclass_responds_to?(:endpoint_user) ? superclass.endpoint_user : ENV["API_USER"]
+        end
       end
 
       attr_writer :endpoint_pass
       def endpoint_pass
-        @endpoint_pass ||= ENV["API_PASS"]
+        if defined?(@endpoint_pass)
+          @endpoint_pass
+        else
+          @endpoint_pass = superclass_responds_to?(:endpoint_pass) ? superclass.endpoint_pass : ENV["API_PASS"]
+        end
       end
 
       attr_writer :save_attr_black_list
@@ -141,6 +153,10 @@ module SmoothOperator
       end
 
       private ################################ PRIVATE #########################
+
+      def superclass_responds_to?(method_name)
+        superclass.name.split('::')[0] != 'SmoothOperator' && superclass.respond_to?(method_name)
+      end
 
       def build_url(relative_path)
         slash = '/' if relative_path.present?
