@@ -50,7 +50,6 @@ module SmoothOperator
       safe_hash
     end
 
-
     private ######################### PRIVATE ###############################
 
     def get_nested_object_variable(nested_object_symbol, nested_object_class)
@@ -150,6 +149,21 @@ module SmoothOperator
       attr_writer :table_name
       def table_name
         @table_name ||= model_name_downcase.to_s.pluralize
+      end
+
+      def human_attribute_name(attribute_key_name, options = {})
+        defaults = []
+        defaults << "smooth_operator.attributes.#{name.underscore}.#{attribute_key_name}"
+        defaults << "activerecord.attributes.#{name.underscore}.#{attribute_key_name}".to_sym
+        defaults << options[:default] if options[:default]
+        defaults.flatten!
+        defaults << attribute_key_name.to_s.humanize
+        options[:count] ||= 1
+        I18n.translate(defaults.shift, options.merge(default: defaults))
+      end
+
+      def model_name
+        ActiveModel::Name.new represented_object_class
       end
 
       private ################################ PRIVATE #########################
