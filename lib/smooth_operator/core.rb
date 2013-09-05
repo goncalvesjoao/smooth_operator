@@ -162,10 +162,6 @@ module SmoothOperator
         I18n.translate(defaults.shift, options.merge(default: defaults))
       end
 
-      def model_name
-        ActiveModel::Name.new represented_object_class
-      end
-
       private ################################ PRIVATE #########################
 
       def superclass_responds_to?(method_name)
