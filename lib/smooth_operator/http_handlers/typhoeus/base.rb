@@ -9,8 +9,8 @@ module SmoothOperator
     
         def self.make_the_call(http_verb, url, options, basic_auth_credentials)
           hydra = get_hydra_and_remove_it_from options
-          options = { params: options, method: http_verb }.merge auth_credentials(basic_auth_credentials)
-
+          options = { (http_verb == :get ? :params : :body) => options, :method => http_verb, :headers => { "Content-type" => "application/x-www-form-urlencoded" } }.merge auth_credentials(basic_auth_credentials)
+          
           if hydra.present?
             make_asynchronous_request(url, options, hydra)
           else
