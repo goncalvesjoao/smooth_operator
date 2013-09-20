@@ -13,7 +13,7 @@ module SmoothOperator
 
         def find(id, options = {})
           if id == :all
-            find_each(options)
+            find_each('', options)
           else
             find_one(id, options)
           end
@@ -37,10 +37,8 @@ module SmoothOperator
           new_object
         end
 
-        protected ####################### protected #######################
-
-        def find_each(options)
-          http_handler_orm.make_the_call(:get, options, '') do |remote_call|
+        def find_each(relative_path, options)
+          http_handler_orm.make_the_call(:get, options, relative_path) do |remote_call|
             objects_list = remote_call.get_attributes(table_name)
             
             if objects_list.kind_of?(Array)
@@ -51,8 +49,8 @@ module SmoothOperator
           end
         end
 
-        def find_one(id, options)
-          http_handler_orm.make_the_call(:get, options, id) do |remote_call|
+        def find_one(relative_path, options)
+          http_handler_orm.make_the_call(:get, options, relative_path) do |remote_call|
             remote_call.response = new remote_call.get_attributes(model_name_downcase)
           end
         end

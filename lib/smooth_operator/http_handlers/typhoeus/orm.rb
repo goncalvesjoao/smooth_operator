@@ -10,12 +10,12 @@ module SmoothOperator
           @object_class = object_class
         end
 
-        def make_the_call(http_verb, options, id, &block)
+        def make_the_call(http_verb, options, relative_path, &block)
           injected_hydra = options[:hydra]
           hydra = injected_hydra || ::Typhoeus::Hydra::hydra
           options[:hydra] = hydra
 
-          remote_call = @object_class.make_the_call(http_verb, id, options)
+          remote_call = @object_class.make_the_call(http_verb, relative_path, options)
 
           remote_call.request.on_complete do |typhoeus_response|
             remote_call.raw_response = typhoeus_response
