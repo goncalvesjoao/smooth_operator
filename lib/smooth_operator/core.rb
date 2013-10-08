@@ -87,14 +87,16 @@ module SmoothOperator
       
       return get_nested_object_according_to_options(nested_objects_attributes, nested_object_class_or_options, nested_object_symbol) if nested_object_class_or_options.kind_of?(Hash)
 
-      nested_object_class.new(nested_objects_attributes)
+      nested_object_class_or_options.new(nested_objects_attributes)
     end
 
     def get_nested_object_according_to_options(nested_objects_attributes, options, nested_object_symbol)
+      nested_objects_attributes = options[:parser].call(nested_objects_attributes) if options[:parser].present?
+
       begin
-        nested_object_class_or_options[:class].new(nested_objects_attributes)
+        options[:class].new(nested_objects_attributes)
       rescue
-        nested_object_class_or_options[:default].present? ? nested_object_class_or_options[:default] : nested_objects_attributes
+        options[:default].present? ? options[:default] : nested_objects_attributes
       end
     end
 
@@ -104,6 +106,8 @@ module SmoothOperator
     end
 
     def order_by(list, method, order)
+      return list if method.blank? || order.blank?
+
       if order == :asc
         list.sort { |a, b| a.send(method) <=> b.send(method) }
       elsif order == :desc
