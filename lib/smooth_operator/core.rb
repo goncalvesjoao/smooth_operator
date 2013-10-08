@@ -73,7 +73,7 @@ module SmoothOperator
     end
 
     def get_nested_objects(nested_objects_attributes, nested_object_class_or_options, nested_object_symbol)
-      nested_objects = nested_objects_attributes.map { |attributes| get_nested_object(_attributes, nested_object_class_or_options, nested_object_symbol) }
+      nested_objects = nested_objects_attributes.map { |attributes| get_nested_object(attributes, nested_object_class_or_options, nested_object_symbol) }
 
       if nested_object_class_or_options.kind_of?(Hash)
         nested_objects = order_by(nested_objects, nested_object_class_or_options[:order_by], nested_object_class_or_options[:order])
