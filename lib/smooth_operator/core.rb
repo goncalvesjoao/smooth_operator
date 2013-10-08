@@ -85,8 +85,17 @@ module SmoothOperator
     def get_nested_object(nested_objects_attributes, nested_object_class_or_options, nested_object_symbol)
       return (plural?(nested_object_symbol) ? [] : nil) if nested_objects_attributes.blank?
       
-      nested_object_class = nested_object_class_or_options.kind_of?(Hash) ? nested_object_class_or_options[:class] : nested_object_class_or_options
-      nested_object_class.new(nested_objects_attributes) rescue nested_objects_attributes
+      return get_nested_object_according_to_options(nested_objects_attributes, nested_object_class_or_options, nested_object_symbol) if nested_object_class_or_options.kind_of?(Hash)
+
+      nested_object_class.new(nested_objects_attributes)
+    end
+
+    def get_nested_object_according_to_options(nested_objects_attributes, options, nested_object_symbol)
+      begin
+        nested_object_class_or_options[:class].new(nested_objects_attributes)
+      rescue
+        nested_object_class_or_options[:default].present? ? nested_object_class_or_options[:default] : nested_objects_attributes
+      end
     end
 
     def plural?(string)
