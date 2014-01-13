@@ -22,7 +22,7 @@ module SmoothOperator
       "#{class_name_plural}/#{class_name_plural.singularize}"
     end
 
-    def valid?
+    def valid?(context = nil)
       errors.blank?
     end
 
