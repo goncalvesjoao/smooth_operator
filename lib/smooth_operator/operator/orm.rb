@@ -27,10 +27,12 @@ module SmoothOperator
           end
         end
 
-        def create(options = {})
+        def create(relative_path = {}, options = {})
+          relative_path, options = extract_relative_path_and_options(relative_path, options)
+
           new_object = new(options)
 
-          http_handler_orm.make_the_call(:post, { model_name_downcase => new_object.safe_table_hash }, '') do |remote_call|
+          http_handler_orm.make_the_call(:post, { model_name_downcase => new_object.safe_table_hash }, relative_path) do |remote_call|
             new_object.send('after_create_update_or_destroy', remote_call)
           end
 
@@ -57,22 +59,26 @@ module SmoothOperator
 
       end
 
-      def save(options = {})
+      def save(relative_path = {}, options = {})
+        relative_path, options = extract_relative_path_and_options(relative_path, options)
+
         begin
-          save!(options)
+          save!(relative_path, options)
         rescue Exception => exception
           send("exception=", exception)
           false
         end
       end
 
-      def save!(options = {})
+      def save!(relative_path = {}, options = {})
+        relative_path, options = extract_relative_path_and_options(relative_path, options)
+
         options = build_options_for_save(options)
 
         if new_record?
-          http_handler_orm.make_the_call(:post, options, '') { |remote_call| after_create_update_or_destroy(remote_call) }
+          http_handler_orm.make_the_call(:post, options, relative_path) { |remote_call| after_create_update_or_destroy(remote_call) }
         else
-          http_handler_orm.make_the_call(:put, options, id) { |remote_call| after_create_update_or_destroy(remote_call) }
+          http_handler_orm.make_the_call(:put, options, "#{id}#{relative_path}") { |remote_call| after_create_update_or_destroy(remote_call) }
         end
       end
 
@@ -85,6 +91,18 @@ module SmoothOperator
       end
 
       private ####################### private #######################
+
+      def extract_relative_path_and_options(relative_path, options)
+        options ||= relative_path.is_a?(String) ? {} : relative_path
+
+        if relative_path.blank? || !relative_path.is_a?(String)
+          relative_path = ''
+        elsif relative_path[0] != '/'
+          relative_path = "/#{relative_path}"
+        end
+        
+        [relative_path, options]
+      end
 
       def build_options_for_save(options = {})
         options ||= {}
