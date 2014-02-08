@@ -58,7 +58,7 @@ module SmoothOperator
         end
         
         def extract_relative_path_and_options(relative_path, options)
-          options ||= relative_path.is_a?(String) ? {} : relative_path
+          options = relative_path if options.blank? && !relative_path.is_a?(String)
 
           if relative_path.blank? || !relative_path.is_a?(String)
             relative_path = ''
