@@ -56,11 +56,23 @@ module SmoothOperator
             remote_call.response = new remote_call.get_attributes(model_name_downcase)
           end
         end
+        
+        def extract_relative_path_and_options(relative_path, options)
+          options ||= relative_path.is_a?(String) ? {} : relative_path
+
+          if relative_path.blank? || !relative_path.is_a?(String)
+            relative_path = ''
+          elsif relative_path[0] != '/'
+            relative_path = "/#{relative_path}"
+          end
+          
+          [relative_path, options]
+        end
 
       end
 
       def save(relative_path = {}, options = {})
-        relative_path, options = extract_relative_path_and_options(relative_path, options)
+        relative_path, options = self.class.extract_relative_path_and_options(relative_path, options)
 
         begin
           save!(relative_path, options)
@@ -71,7 +83,7 @@ module SmoothOperator
       end
 
       def save!(relative_path = {}, options = {})
-        relative_path, options = extract_relative_path_and_options(relative_path, options)
+        relative_path, options = self.class.extract_relative_path_and_options(relative_path, options)
 
         options = build_options_for_save(options)
 
@@ -91,18 +103,6 @@ module SmoothOperator
       end
 
       private ####################### private #######################
-
-      def extract_relative_path_and_options(relative_path, options)
-        options ||= relative_path.is_a?(String) ? {} : relative_path
-
-        if relative_path.blank? || !relative_path.is_a?(String)
-          relative_path = ''
-        elsif relative_path[0] != '/'
-          relative_path = "/#{relative_path}"
-        end
-        
-        [relative_path, options]
-      end
 
       def build_options_for_save(options = {})
         options ||= {}
