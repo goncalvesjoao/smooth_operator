@@ -12,6 +12,10 @@ module SmoothOperator
           @request = request
         end
 
+        def timed_out?
+          request.response.timed_out?
+        end
+
         def parse_response
           begin
             @parse_response ||= ::HTTParty::Parser.call(@raw_response.body, :json)
