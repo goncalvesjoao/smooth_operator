@@ -1,5 +1,7 @@
 require "smooth_operator/version"
 
+require 'active_model'
+
 require "smooth_operator/attribute_assignment"
 require "smooth_operator/delegation"
 require "smooth_operator/helpers"
