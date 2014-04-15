@@ -59,6 +59,7 @@ module SmoothOperator
       end
     end
 
+    # TODO: THE RESOURCE SHOULD BE COMING FROM SOME SORT OF SCHEMA
     def find_or_create_resource_for(attribute_symbol)
       OpenStruct
     end
