@@ -15,8 +15,9 @@ module SmoothOperator
   class Base
 
     include AttributeAssignment
-    include Record
+    # include Record
     include Serialization
+    include Delegation::MissingMethods
 
     extend Naming
     extend Delegation

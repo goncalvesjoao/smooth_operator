@@ -4,7 +4,7 @@ module SmoothOperator
 
     def attributes
       exposed_attributes = @internal_data.keys
-
+      
       if self.class.attributes_white_list.present?
         exposed_attributes = self.class.attributes_white_list
 
@@ -13,7 +13,7 @@ module SmoothOperator
       end
 
       exposed_attributes.reduce({}) do |hash, exposed_attribute|
-        hash[exposed_attribute.to_s] = read_attribute_for_serialization(exposed_attribute)
+        hash[exposed_attribute] = read_attribute_for_serialization(exposed_attribute)
         hash
       end
     end
@@ -27,7 +27,7 @@ module SmoothOperator
     end
 
     def read_attribute_for_serialization(attribute)
-      @internal_data[attribute]
+      send(attribute)
     end
 
     def self.included(base)
@@ -38,18 +38,22 @@ module SmoothOperator
     module ClassMethods
       
       def attributes_white_list
-        @internal_data_white_list ||= (zuper_method(:attributes_white_list) || [])
+        @internal_data_white_list ||= (zuper_method(:attributes_white_list) || []).dup
       end
 
       def attributes_white_list_add(*getters)
+        getters = getters.map(&:to_s)
+
         attributes_white_list.push(*getters) unless attributes_white_list.include?(getters)
       end
 
       def attributes_black_list
-        @internal_data_black_list ||= (zuper_method(:attributes_black_list) || [])
+        @internal_data_black_list ||= (zuper_method(:attributes_black_list) || []).dup
       end
 
       def attributes_black_list_add(*getters)
+        getters = getters.map(&:to_s)
+
         attributes_black_list.push(*getters) unless attributes_black_list.include?(getters)
       end
 

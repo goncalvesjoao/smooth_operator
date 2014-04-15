@@ -7,11 +7,11 @@ module SmoothOperator
     end
   
     def new_record?
-      Helpers.try_or_return(represented_object, :new_record?, true)
+      # Helpers.try_or_return(represented_object, :new_record?, true)
     end
 
     def persisted?
-      Helpers.try_or_return(represented_object, :persisted?, false)
+      # Helpers.try_or_return(represented_object, :persisted?, false)
     end
 
     def save

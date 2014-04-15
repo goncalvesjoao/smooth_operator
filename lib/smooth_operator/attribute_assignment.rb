@@ -1,3 +1,5 @@
+require 'active_support/core_ext'
+
 module SmoothOperator
 
   module AttributeAssignment
@@ -34,14 +36,14 @@ module SmoothOperator
             resource ||= find_or_create_resource_for(name)
             resource.new(attributes)
           else
-            attributes.dup
+            attributes.duplicable? ? attributes.dup : attributes
           end
         end
       when Hash
         resource = find_or_create_resource_for(name)
         resource.new(value)
       else
-        value.dup
+        value.duplicable? ? value.dup : value
       end
     end
 
