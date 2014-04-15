@@ -56,7 +56,7 @@ module SmoothOperator
       end
 
       def get_attributes(key, attributes = nil)
-        attributes ||= @parsed_response
+        attributes = attributes.nil? ? @parsed_response : attributes
         
         if attributes.kind_of?(Hash)
           attributes.include?(key) ? attributes[key] : attributes
