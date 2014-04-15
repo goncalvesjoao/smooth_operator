@@ -2,7 +2,7 @@ module PostWhiteListed
   
   class Father < SmoothOperator::Base
 
-    attributes_white_list_add :id
+    attributes_white_list_add "id"
 
   end
 

@@ -1,4 +1,4 @@
-require 'active_model'
+# require 'active_model'
 
 require "smooth_operator/naming"
 require "smooth_operator/helpers"
@@ -14,9 +14,10 @@ module SmoothOperator
   
   class Base
 
-    extend Naming
+    extend Naming if defined? ActiveModel
+    extend Translation if defined? I18n
+
     extend Delegation
-    extend Translation
     extend FinderMethods
 
     include Persistence

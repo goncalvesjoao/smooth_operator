@@ -3,7 +3,7 @@ module SmoothOperator
   module Validations
 
     def valid?(context = nil)
-      internal_data['errors'].blank?
+      Helpers.blank?(internal_data["errors"])
     end
 
     def invalid?

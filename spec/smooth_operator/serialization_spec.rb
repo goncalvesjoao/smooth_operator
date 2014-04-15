@@ -9,7 +9,7 @@ describe SmoothOperator::Serialization do
 
     context "when there are no changes to attributes's white and black list" do
       it 'it should return all attributes' do
-        expect(smooth_operator_instance.to_json).to eq(initializer_hash.to_json)
+        expect(smooth_operator_instance.to_hash).to eq(initializer_hash)
       end
     end
 
@@ -17,7 +17,7 @@ describe SmoothOperator::Serialization do
       subject(:white_listed_instance) { PostWhiteListed::Son.new(initializer_hash) }
 
       it 'it should return only the white listed' do
-        expect(white_listed_instance.to_json).to eq(filtered_response.to_json)
+        expect(white_listed_instance.to_hash).to eq(filtered_response)
       end
     end
 
@@ -25,7 +25,7 @@ describe SmoothOperator::Serialization do
       subject(:black_listed_instance) { PostBlackListed::Son.new(initializer_hash) }
 
       it 'it should not return the black listed' do
-        expect(black_listed_instance.to_json).to eq(filtered_response.to_json)
+        expect(black_listed_instance.to_hash).to eq(filtered_response)
       end
     end
 
@@ -33,7 +33,7 @@ describe SmoothOperator::Serialization do
       subject(:options_with_only) { { only: [:id, :first_name] } }
 
       it 'it should only return the filtered options' do
-        expect(smooth_operator_instance.to_json(options_with_only)).to eq(filtered_response.to_json)
+        expect(smooth_operator_instance.to_hash(options_with_only)).to eq(filtered_response)
       end
     end
 
@@ -41,7 +41,7 @@ describe SmoothOperator::Serialization do
       subject(:options_with_except) { { except: [:last_name, :admin] } }
 
       it 'it should return all fields except for the filtered options' do
-        expect(smooth_operator_instance.to_json(options_with_except)).to eq(filtered_response.to_json)
+        expect(smooth_operator_instance.to_hash(options_with_except)).to eq(filtered_response)
       end
     end
 
@@ -50,7 +50,7 @@ describe SmoothOperator::Serialization do
       let(:attributes_with_methods) { initializer_hash.merge(method1: 'method1') }
 
       it 'it should return all fields including the expected method and its returning value' do
-        expect(smooth_operator_instance.to_json(options_with_method)).to eq(attributes_with_methods.to_json)
+        expect(smooth_operator_instance.to_hash(options_with_method)).to eq(attributes_with_methods)
       end
     end
 

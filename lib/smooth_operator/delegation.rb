@@ -12,7 +12,7 @@ module SmoothOperator
         if Helpers.setter_method?(method)
           internal_data[method.to_s[0..-1]] = args.first
         else
-          internal_data.fetch(method, args.first)
+          internal_data[method.to_s]
         end
       end
 

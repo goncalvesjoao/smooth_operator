@@ -1,5 +1,3 @@
-require 'active_support/core_ext'
-
 module SmoothOperator
 
   module AttributeAssignment
@@ -19,10 +17,12 @@ module SmoothOperator
     end
 
     def internal_data
-      @internal_data ||= {}.with_indifferent_access
+      @internal_data ||= {}
     end
 
     def push_to_internal_data(attribute_name, attribute_value)
+      attribute_name = attribute_name.to_s
+
       return nil unless allowed_attribute(attribute_name)
       
       internal_data[attribute_name] = parse_attribute(attribute_name, attribute_value)
@@ -48,14 +48,14 @@ module SmoothOperator
             resource ||= find_or_create_resource_for(name)
             resource.new(attributes)
           else
-            attributes.duplicable? ? attributes.dup : attributes
+            Helpers.duplicate(attributes)
           end
         end
       when Hash
         resource = find_or_create_resource_for(name)
         resource.new(value)
       else
-        value.duplicable? ? value.dup : value
+        Helpers.duplicate(value)
       end
     end
 

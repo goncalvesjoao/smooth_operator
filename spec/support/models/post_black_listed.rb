@@ -2,7 +2,7 @@ module PostBlackListed
   
   class Father < SmoothOperator::Base
 
-    attributes_black_list_add :last_name
+    attributes_black_list_add "last_name"
 
   end
 

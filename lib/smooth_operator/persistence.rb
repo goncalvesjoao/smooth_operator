@@ -15,7 +15,7 @@ module SmoothOperator
     end
 
     def new_record?
-      @new_record ||= internal_data["id"].blank?
+      @new_record ||= Helpers.blank?(internal_data["id"])
     end
     
     def destroyed?

@@ -5,10 +5,10 @@ module SmoothOperator
     def attributes
       exposed_attributes = internal_data.keys
       
-      if self.class.attributes_white_list.present?
+      if !self.class.attributes_white_list.empty?
         exposed_attributes = self.class.attributes_white_list
 
-      elsif self.class.attributes_black_list.present?
+      elsif !self.class.attributes_black_list.empty?
         exposed_attributes = exposed_attributes - self.class.attributes_black_list
       end
 
@@ -18,20 +18,39 @@ module SmoothOperator
       end
     end
 
-    def to_hash(options = {})
-      serializable_hash(options)
+    def to_hash(options = nil)
+      Helpers.symbolyze_keys serializable_hash(options)
     end
 
-    def to_json(options = {})
-      serializable_hash(options).to_json
+    def to_json(options = nil)
+      JSON serializable_hash(options)
     end
 
     def read_attribute_for_serialization(attribute)
       send(attribute)
     end
 
+    def serializable_hash(options = nil)
+      options ||= {}
+
+      attribute_names = attributes.keys.sort
+
+      if only = options[:only]
+        attribute_names &= [*only].map(&:to_s)
+      elsif except = options[:except]
+        attribute_names -= [*except].map(&:to_s)
+      end
+
+      hash = {}
+      attribute_names.each { |n| hash[n] = read_attribute_for_serialization(n) }
+
+      method_names = [*options[:methods]].select { |n| respond_to?(n) }
+      method_names.each { |method_name| hash[method_name.to_s] = send(method_name) }
+
+      hash
+    end
+
     def self.included(base)
-      base.class_eval { include ActiveModel::Serialization }
       base.extend(ClassMethods)
     end
 
