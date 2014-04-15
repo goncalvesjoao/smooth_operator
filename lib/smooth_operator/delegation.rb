@@ -5,14 +5,14 @@ module SmoothOperator
     module MissingMethods
 
       def respond_to?(method)
-        @internal_data.keys.include?(method.to_sym) ? true : super
+        internal_data.keys.include?(method.to_sym) ? true : super
       end
 
       def method_missing(method, *args, &block)
         if Helpers.setter_method?(method)
-          @internal_data[method.to_s[0..-1]] = args.first
+          internal_data[method.to_s[0..-1]] = args.first
         else
-          @internal_data.fetch(method, args.first)
+          internal_data.fetch(method, args.first)
         end
       end
 

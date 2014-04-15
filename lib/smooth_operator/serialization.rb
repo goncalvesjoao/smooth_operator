@@ -3,7 +3,7 @@ module SmoothOperator
   module Serialization
 
     def attributes
-      exposed_attributes = @internal_data.keys
+      exposed_attributes = internal_data.keys
       
       if self.class.attributes_white_list.present?
         exposed_attributes = self.class.attributes_white_list

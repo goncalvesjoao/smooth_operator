@@ -15,9 +15,17 @@ module SmoothOperator
     def assign_attributes(attributes = {})
       raise ArgumentError, "expected an attributes Hash, got #{attributes.inspect}" unless attributes.is_a?(Hash)
       
-      @internal_data ||= {}.with_indifferent_access
+      attributes.each { |name, value| push_to_internal_data(name, value) }
+    end
 
-      attributes.each { |name, value| @internal_data[name] = parse_attribute(name, value) }
+    def internal_data
+      @internal_data ||= {}.with_indifferent_access
+    end
+
+    def push_to_internal_data(attribute_name, attribute_value)
+      return nil unless allowed_attribute(attribute_name)
+      
+      internal_data[attribute_name] = parse_attribute(attribute_name, attribute_value)
     end
 
 
@@ -26,6 +34,10 @@ module SmoothOperator
     def before_initialize(attributes); end
 
     def after_initialize(attributes); end
+
+    def allowed_attribute(attribute)
+      true
+    end
 
     def parse_attribute(name, value)
       case value
