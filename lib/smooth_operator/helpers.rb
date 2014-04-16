@@ -29,6 +29,10 @@ module SmoothOperator
         object.nil?
       end
     end
+
+    def present?(object)
+      !blank?(object)
+    end
     
   end
   
