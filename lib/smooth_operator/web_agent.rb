@@ -1,4 +1,5 @@
 require 'faraday'
+require 'faraday_middleware'
 # require 'typhoeus'
 # require 'typhoeus/adapters/faraday'
 
@@ -24,8 +25,9 @@ module SmoothOperator
 
     def generate_connection(adapter = :net_http)
       Faraday.new(url: endpoint) do |faraday|
-        faraday.request  :url_encoded
         faraday.adapter  adapter
+        faraday.request  :url_encoded
+        # faraday.response :json, :content_type => /\bjson$/
       end
     end
 

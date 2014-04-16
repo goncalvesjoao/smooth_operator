@@ -7,7 +7,7 @@ describe SmoothOperator::WebAgent do
     context "...", current: true do
 
       it 'it should..' do
-        # response = Post.get
+        remote_call = Post.get
         binding.pry
         # expect(smooth_operator_instance.to_hash).to eq(initializer_hash)
       end

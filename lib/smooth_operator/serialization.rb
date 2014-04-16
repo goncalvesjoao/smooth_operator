@@ -23,7 +23,9 @@ module SmoothOperator
     end
 
     def to_json(options = nil)
-      JSON serializable_hash(options)
+      require 'json' unless defined?(::JSON)
+
+      JSON(serializable_hash(options))
     end
 
     def read_attribute_for_serialization(attribute)
