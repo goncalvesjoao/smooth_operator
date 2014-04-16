@@ -7,7 +7,7 @@ Bundler.setup
 
 require 'rspec'
 require 'pry'
-require 'webmock/rspec'
+# require 'webmock/rspec'
 require 'smooth_operator'
 
 Dir.chdir("spec/") do

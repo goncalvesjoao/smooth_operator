@@ -1,3 +1,7 @@
+require 'faraday'
+# require 'typhoeus'
+# require 'typhoeus/adapters/faraday'
+
 module SmoothOperator
 
   module WebAgent
@@ -7,16 +11,12 @@ module SmoothOperator
     OPTIONS = [:endpoint, :endpoint_user, :endpoint_pass, :timeout]
 
 
-    def self.extended(base)
-      base.class_eval do
-        attr_writer *OPTIONS
+    attr_writer *OPTIONS
 
-        OPTIONS.each do |option| define_method(option) { get_option(option) } }
+    OPTIONS.each { |option| define_method(option) { get_option(option) } }
 
-        HTTP_VERBS.each { |http_verb| define_http_verb_method http_verb }
-      end
-    end
-    
+    HTTP_VERBS.each { |http_verb| define_method(http_verb) { |relative_path = '', params = {}, options = {}| make_the_call(http_verb, relative_path, params, options) } }
+
 
     def generate_parallel_connection
       generate_connection(:typhoeus)
@@ -32,17 +32,16 @@ module SmoothOperator
 
     protected ################ PROTECTED ################
 
-    def make_the_call(http_verb, relative_path, params = {}, options = {})
+    def make_the_call(http_verb, relative_path = '', params = {}, options = {})
       connection, options = strip_options(options)
 
       response = connection.send(http_verb) do |request|
-        request.params params
         request.url relative_path
+        params.each { |key, value| request.params[key] = value }
         options.each { |key, value| request.options.send("#{key}=", value) }
       end
 
-      # RemoteCall.new(response)
-      response
+      RemoteCall.new(response)
     end
 
 
@@ -51,7 +50,7 @@ module SmoothOperator
     def strip_options(options)
       options ||= {}
 
-      options[:timeout] ||= timeout
+      options[:timeout] ||= timeout unless timeout == ''
       connection = (options.delete(:connection) || generate_connection)
 
       [connection, options]
@@ -62,14 +61,8 @@ module SmoothOperator
 
       return instance_var unless instance_var.nil?
 
-      (zuper_method(option) || ENV["API_#{option.upcase}"]).dup.tap do |instance_var|
+      (zuper_method(option) || ENV["API_#{option.upcase}"] || '').dup.tap do |instance_var|
         instance_variable_set("@#{option}", instance_var)
-      end
-    end
-
-    def define_http_verb_method(http_verb)
-      define_method(http_verb) do |relative_path = '', params = {}, options = {}|
-        make_the_call(http_verb, relative_path, params, options)
       end
     end
 
