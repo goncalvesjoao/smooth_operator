@@ -1,10 +1,8 @@
 #!/usr/bin/env ruby
 
+$LOAD_PATH << './'
 $LOAD_PATH << './lib'
 
-require 'smooth_operator'
-require 'pry'
-
-# test = SmoothOperator::Base.new
+require "spec/spec_helper"
 
 binding.pry

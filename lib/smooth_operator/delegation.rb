@@ -5,7 +5,7 @@ module SmoothOperator
     module MissingMethods
 
       def respond_to?(method)
-        internal_data.keys.include?(method.to_sym) ? true : super
+        known_attributes.include?(method.to_s) ? true : super
       end
 
       def method_missing(method, *args, &block)

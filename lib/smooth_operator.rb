@@ -8,6 +8,7 @@ require "smooth_operator/remote_call"
 require "smooth_operator/persistence"
 require "smooth_operator/validations"
 require "smooth_operator/translation"
+require "smooth_operator/model_schema"
 require "smooth_operator/serialization"
 require "smooth_operator/finder_methods"
 require "smooth_operator/attribute_assignment"
@@ -23,8 +24,9 @@ module SmoothOperator
     extend Delegation
     extend FinderMethods
 
-    include Persistence
     include Validations
+    include ModelSchema
+    include Persistence
     include Serialization
     include AttributeAssignment
     include Delegation::MissingMethods

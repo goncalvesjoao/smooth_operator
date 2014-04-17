@@ -1,30 +1,46 @@
 module SmoothOperator
 
-  class RemoteCall
+  module RemoteCall
 
-    extend Forwardable
+    class Base
 
-    attr_reader :response
+      extend Forwardable
 
-    def initialize(response)
-      @response = response
-    end
+      attr_reader :response
 
-    def_delegators :response, :success?, :status, :headers, :body
-
-    
-    def error?
-      !success?
-    end
-
-    def data
-      require 'json' unless defined?(::JSON)
-
-      begin
-        JSON.parse(body)
-      rescue JSON::ParserError
-        nil
+      def initialize(response)
+        @response = response
       end
+
+      def_delegators :response, :success?, :status, :headers, :body
+
+      
+      def error?
+        !success?
+      end
+
+      def data
+        require 'json' unless defined?(::JSON)
+
+        begin
+          JSON.parse(body)
+        rescue JSON::ParserError
+          nil
+        end
+      end
+
+    end
+
+    class ConnectionFailed
+
+      attr_reader :data, :status, :headers, :body
+
+      def status; 0; end
+
+      def error?; true; end
+
+      def success?; false; end
+
     end
 
   end

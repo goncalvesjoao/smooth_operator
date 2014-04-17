@@ -4,7 +4,8 @@ source 'https://rubygems.org'
 gemspec
 
 group :development, :test do
-  gem "rspec", "~> 2.11"
   gem "pry"
-  gem 'webmock'
+  # gem 'webmock'
+  gem "rspec", "~> 2.11"
+  gem "factory_girl", "~> 4.0"
 end

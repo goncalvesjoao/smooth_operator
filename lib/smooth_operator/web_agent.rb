@@ -1,5 +1,5 @@
 require 'faraday'
-require 'faraday_middleware'
+# require 'faraday_middleware'
 # require 'typhoeus'
 # require 'typhoeus/adapters/faraday'
 
@@ -27,7 +27,6 @@ module SmoothOperator
       Faraday.new(url: endpoint) do |faraday|
         faraday.adapter  adapter
         faraday.request  :url_encoded
-        # faraday.response :json, :content_type => /\bjson$/
       end
     end
 
@@ -37,13 +36,18 @@ module SmoothOperator
     def make_the_call(http_verb, relative_path = '', params = {}, options = {})
       connection, options = strip_options(options)
 
-      response = connection.send(http_verb) do |request|
-        request.url relative_path
-        params.each { |key, value| request.params[key] = value }
-        options.each { |key, value| request.options.send("#{key}=", value) }
-      end
+      begin
+        response = connection.send(http_verb) do |request|
+          request.url relative_path
+          params.each { |key, value| request.params[key] = value }
+          options.each { |key, value| request.options.send("#{key}=", value) }
+        end
 
-      RemoteCall.new(response)
+        RemoteCall::Base.new(response)
+        
+      rescue Faraday::ConnectionFailed
+        RemoteCall::ConnectionFailed.new
+      end
     end
 
 
