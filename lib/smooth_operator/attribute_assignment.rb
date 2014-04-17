@@ -25,7 +25,7 @@ module SmoothOperator
 
       return nil unless allowed_attribute(attribute_name)
       
-      push_to_known_attributes(attribute_name)
+      known_attributes.add attribute_name
       
       internal_data[attribute_name] = parse_attribute(attribute_name, attribute_value)
     end

@@ -2,15 +2,7 @@ module User
 
   class Base < SmoothOperator::Base
 
-    self.endpoint = 'http://localhost:3000/api/v0/patient_medicines/'
-
-  end
-
-  class WithMyMethod < SmoothOperator::Base
-
-    def my_method
-      'my_method'
-    end
+    endpoint = 'http://localhost:3000/api/v0/patient_medicines/'
 
   end
 
@@ -44,6 +36,33 @@ module User
 
     end
 
+  end
+
+  class WithMyMethod < SmoothOperator::Base
+
+    def my_method
+      'my_method'
+    end
+
+  end
+
+  module WithAddressAndPosts
+    
+    class Father < SmoothOperator::Base
+
+      schema(
+        posts: Post,
+        address: Address
+      )
+
+    end
+
+    class Son < Father
+
+      schema manager: :bool
+
+    end
+    
   end
 
 end

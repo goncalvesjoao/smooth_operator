@@ -4,8 +4,15 @@ module SmoothOperator
 
     extend self
 
+    def stringify_keys(hash)
+      hash.keys.reduce({}) do |acc, key|
+        acc[key.to_s] = hash[key]
+        acc
+      end
+    end
+
     def symbolyze_keys(hash)
-      hash.keys.reduce({ }) do |acc, key|
+      hash.keys.reduce({}) do |acc, key|
         acc[key.to_sym] = hash[key]
         acc
       end
