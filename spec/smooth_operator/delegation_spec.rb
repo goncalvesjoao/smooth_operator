@@ -3,24 +3,38 @@ require "spec_helper"
 describe SmoothOperator::Delegation do
 
   describe "#respond_to?" do
+    let(:initial_attributes_keys) { attributes_for(:user).keys }
 
     context "when there is no declared schema" do
-      subject(:user) { User::Base.new(attributes_for(:user)) }
-      let(:initial_attributes_keys) { attributes_for(:user).keys }
+      subject(:user) { User::WithMyMethod.new(attributes_for(:user)) }
 
       it 'it should return true for every attribute used uppon initialization' do
         initial_attributes_keys.each do |attribute|
           expect(user.respond_to?(attribute)).to eq(true)
         end
       end
+
+      it 'it should return false in for unknown attributes/methods' do
+        expect(user.respond_to?(:unknown)).to eq(false)
+      end
+
+      it 'it should return true for any existing method' do
+        expect(user.respond_to?(:my_method)).to eq(true)
+      end
     end
 
     context "when there is a known schema" do
       subject(:user) { User::WithAddressAndPosts::Son.new(attributes_for(:user)) }
-      let(:initial_attribute_and_known_schema) { attributes_for(:user).keys | [:posts, :address, :manager] }
+      let(:known_schema_attributes) { ["posts", "address", "manager"] }
 
-      it 'it should return true for every initialized attribute and known schema attributes' do
-        initial_attribute_and_known_schema.each do |attribute|
+      it 'it should return true for every attribute used uppon initialization' do
+        initial_attributes_keys.each do |attribute|
+          expect(user.respond_to?(attribute)).to eq(true)
+        end
+      end
+
+      it 'it should return true for known schema attributes' do
+        known_schema_attributes.each do |attribute|
           expect(user.respond_to?(attribute)).to eq(true)
         end
       end
@@ -49,7 +63,7 @@ describe SmoothOperator::Delegation do
       end
     end
 
-    context "when setting a new and schema unknown attribute" do
+    context "when setting a new attribute not declared on schema" do
       before { user.unknown_attribute = 'unknown_value' }
 
       it "#known_attributes must reflect that new attribute" do
