@@ -58,9 +58,13 @@ module SmoothOperator
 
     module ClassMethods
 
-      define_method(:attributes_white_list) { Helpers.get_instance_variable(self, :attributes_white_list, Set.new) }
+      def attributes_white_list
+        Helpers.get_instance_variable(self, :attributes_white_list, Set.new)
+      end
 
-      define_method(:attributes_black_list) { Helpers.get_instance_variable(self, :attributes_black_list, Set.new) }
+      def attributes_black_list
+        Helpers.get_instance_variable(self, :attributes_black_list, Set.new)
+      end
 
       def attributes_white_list_add(*getters)
         attributes_white_list.merge getters.map(&:to_s)

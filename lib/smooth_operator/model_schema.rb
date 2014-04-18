@@ -7,11 +7,11 @@ module SmoothOperator
     end
 
     def known_attributes
-      @known_attributes ||= self.class.known_attributes
+      @known_attributes ||= self.class.known_attributes.dup
     end
 
     def internal_structure
-      @internal_structure ||= self.class.internal_structure
+      @internal_structure ||= self.class.internal_structure.dup
     end
 
     

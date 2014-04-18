@@ -33,7 +33,7 @@ describe SmoothOperator::Delegation do
 
     context "when calling a method that matches the initialized attributes" do
       it 'it should return the value of that same attribute' do
-        expect(user.id).to eq(1)
+        attributes_for(:user).each { |key, value| expect(user.send(key)).to eq(value) }
       end
     end
 
@@ -46,6 +46,22 @@ describe SmoothOperator::Delegation do
     context "when calling a method that doesn't match either the schema nor the initialized attributes" do
       it 'it should raise NoMethodError' do
         expect { user.unknown_method }.to raise_error NoMethodError
+      end
+    end
+
+    context "when setting a new and schema unknown attribute" do
+      before { user.unknown_attribute = 'unknown_value' }
+
+      it "#known_attributes must reflect that new attribute" do
+        expect(user.known_attributes.to_a).to include('unknown_attribute')
+      end
+      
+      it "#respond_to? must return true" do
+        expect(user.respond_to?(:unknown_attribute)).to eq(true)
+      end
+      
+      it "calling a method with the same name must return that attribute's value" do
+        expect(user.unknown_attribute).to eq('unknown_value')
       end
     end
 

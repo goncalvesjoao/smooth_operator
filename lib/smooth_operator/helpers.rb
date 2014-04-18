@@ -15,16 +15,15 @@ module SmoothOperator
     end
 
     def stringify_keys(hash)
-      hash.keys.reduce({}) do |acc, key|
-        acc[key.to_s] = hash[key]
-        acc
-      end
+      stringified_hash = {}
+      hash.keys.each { |key| stringified_hash[key.to_s] = hash[key] }
+      stringified_hash
     end
 
     def symbolyze_keys(hash)
-      hash.keys.reduce({}) do |acc, key|
-        acc[key.to_sym] = hash[key]
-        acc
+      hash.keys.reduce({}) do |cloned_hash, key|
+        cloned_hash[key.to_sym] = hash[key]
+        cloned_hash
       end
     end
     
