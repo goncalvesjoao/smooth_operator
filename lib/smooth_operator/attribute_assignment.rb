@@ -27,7 +27,7 @@ module SmoothOperator
       
       known_attributes.add attribute_name
       
-      internal_data[attribute_name] = parse_attribute(attribute_name, attribute_value)
+      internal_data[attribute_name] = cast_according_to_schema(attribute_name, attribute_value)
     end
 
 
@@ -41,29 +41,42 @@ module SmoothOperator
       true
     end
 
-    def parse_attribute(name, value)
-      case value
+    def cast_according_to_schema(attribute_name, attribute_value)
+      case attribute_value
       when Array
-        resource = nil
-        value.map do |attributes|
-          if attributes.is_a?(Hash)
-            resource ||= find_or_create_resource_for(name)
-            resource.new(attributes)
-          else
-            Helpers.duplicate(attributes)
-          end
-        end
+        attribute_value.map { |array_entry| cast_according_to_schema(attribute_name, array_entry) }
       when Hash
-        resource = find_or_create_resource_for(name)
-        resource.new(value)
+        class_according_to_schema(attribute_name).new(attribute_value)
       else
-        Helpers.duplicate(value)
+        field_according_to_schema(attribute_name, Helpers.duplicate(attribute_value))
       end
     end
 
-    # TODO: THE RESOURCE SHOULD BE COMING FROM SOME SORT OF SCHEMA
-    def find_or_create_resource_for(attribute_symbol)
-      OpenStruct
+    def class_according_to_schema(attribute_name)
+      internal_structure[attribute_name] || OpenStruct
+    end
+
+    def field_according_to_schema(attribute_name, attribute_value)
+      case internal_structure[attribute_name]
+
+      when [:float]
+        attribute_value.to_f
+
+      when [:bool, :boolean]
+        ['1', 'true', true].include?(attribute_value.dowcase) ? true : ['0', 'false', false].include?(attribute_value.dowcase) ? false : nil
+
+      when [:date, Date]
+        attribute_value.to_date rescue nil
+
+      when [:string, String]
+        attribute_value.to_s
+
+      when [:int, :integer, Integer]
+        attribute_value.to_i
+
+      else
+        attribute_value
+      end
     end
 
   end

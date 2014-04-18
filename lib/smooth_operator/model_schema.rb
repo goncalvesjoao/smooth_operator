@@ -10,12 +10,17 @@ module SmoothOperator
       @known_attributes ||= self.class.known_attributes
     end
 
+    def internal_structure
+      @internal_structure ||= self.class.internal_structure
+    end
+
+    
     module ClassMethods
 
       attr_accessor :table_name
 
-      def schema(structure = nil)
-        internal_structure.merge! Helpers.stringify_keys(structure || yield)
+      def schema(structure)
+        internal_structure.merge! Helpers.stringify_keys(structure)
 
         known_attributes.merge internal_structure.keys
       end
