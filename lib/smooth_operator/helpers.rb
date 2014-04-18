@@ -4,6 +4,16 @@ module SmoothOperator
 
     extend self
 
+    def get_instance_variable(object, variable, default_value)
+      instance_var = object.instance_variable_get("@#{variable}")
+
+      return instance_var unless instance_var.nil?
+
+      (object.zuper_method(variable) || default_value).dup.tap do |instance_var|
+        object.instance_variable_set("@#{variable}", instance_var)
+      end
+    end
+
     def stringify_keys(hash)
       hash.keys.reduce({}) do |acc, key|
         acc[key.to_s] = hash[key]

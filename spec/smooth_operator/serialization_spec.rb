@@ -3,6 +3,7 @@ require "spec_helper"
 describe SmoothOperator::Serialization do
 
   describe "#to_json" do
+    
     subject(:user) { User::Base.new(attributes_for(:user)) }
 
     context "when there are no changes to attributes's white and black list" do

@@ -6,10 +6,10 @@ module SmoothOperator
       exposed_attributes = internal_data.keys
       
       if !self.class.attributes_white_list.empty?
-        exposed_attributes = self.class.attributes_white_list
+        exposed_attributes = self.class.attributes_white_list.to_a
 
       elsif !self.class.attributes_black_list.empty?
-        exposed_attributes = exposed_attributes - self.class.attributes_black_list
+        exposed_attributes = exposed_attributes - self.class.attributes_black_list.to_a
       end
 
       exposed_attributes.reduce({}) do |hash, exposed_attribute|
@@ -32,7 +32,7 @@ module SmoothOperator
       send(attribute)
     end
 
-    def serializable_hash(options = nil)
+    def serializable_hash(options = nil) # Code ripped off from ActiveSupport
       options ||= {}
 
       attribute_names = attributes.keys.sort
@@ -57,25 +57,17 @@ module SmoothOperator
     end
 
     module ClassMethods
-      
-      def attributes_white_list
-        @internal_data_white_list ||= (zuper_method(:attributes_white_list) || []).dup
-      end
+
+      define_method(:attributes_white_list) { Helpers.get_instance_variable(self, :attributes_white_list, Set.new) }
+
+      define_method(:attributes_black_list) { Helpers.get_instance_variable(self, :attributes_black_list, Set.new) }
 
       def attributes_white_list_add(*getters)
-        getters = getters.map(&:to_s)
-
-        attributes_white_list.push(*getters) unless attributes_white_list.include?(getters)
-      end
-
-      def attributes_black_list
-        @internal_data_black_list ||= (zuper_method(:attributes_black_list) || []).dup
+        attributes_white_list.merge getters.map(&:to_s)
       end
 
       def attributes_black_list_add(*getters)
-        getters = getters.map(&:to_s)
-
-        attributes_black_list.push(*getters) unless attributes_black_list.include?(getters)
+        attributes_black_list.merge getters.map(&:to_s)
       end
 
     end

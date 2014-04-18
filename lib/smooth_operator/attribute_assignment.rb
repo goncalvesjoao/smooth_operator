@@ -68,7 +68,7 @@ module SmoothOperator
       when [:date, Date]
         attribute_value.to_date rescue nil
 
-      when [:string, String]
+      when [:string, :text, String]
         attribute_value.to_s
 
       when [:int, :integer, Integer]

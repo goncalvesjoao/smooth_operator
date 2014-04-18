@@ -14,7 +14,7 @@ module SmoothOperator
 
     attr_writer *OPTIONS
 
-    OPTIONS.each { |option| define_method(option) { get_option(option) } }
+    OPTIONS.each { |option| define_method(option) { Helpers.get_instance_variable(self, option, ENV["API_#{option.upcase}"] || '') } }
 
     HTTP_VERBS.each { |http_verb| define_method(http_verb) { |relative_path = '', params = {}, options = {}| make_the_call(http_verb, relative_path, params, options) } }
 
@@ -60,16 +60,6 @@ module SmoothOperator
       connection = (options.delete(:connection) || generate_connection)
 
       [connection, options]
-    end
-
-    def get_option(option)
-      instance_var = instance_variable_get("@#{option}")
-
-      return instance_var unless instance_var.nil?
-
-      (zuper_method(option) || ENV["API_#{option.upcase}"] || '').dup.tap do |instance_var|
-        instance_variable_set("@#{option}", instance_var)
-      end
     end
 
   end

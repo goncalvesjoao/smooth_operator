@@ -9,11 +9,15 @@ module SmoothOperator
       end
 
       def method_missing(method, *args, &block)
-        if Helpers.setter_method?(method)
-          internal_data[method.to_s[0..-1]] = args.first
-        else
-          internal_data[method.to_s]
+        _method = method.to_s
+
+        if Helpers.setter_method?(_method)
+          return internal_data[_method[0..-1]] = args.first
+        elsif respond_to?(_method)
+          return internal_data[_method]
         end
+
+        super
       end
 
     end
