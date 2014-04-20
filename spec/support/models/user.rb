@@ -59,7 +59,11 @@ module User
 
     class Son < Father
 
-      schema manager: :bool
+      schema(
+        age: :int,
+        dob: :date,
+        manager: :bool
+      )
 
     end
     

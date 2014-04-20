@@ -59,20 +59,21 @@ module SmoothOperator
     def field_according_to_schema(attribute_name, attribute_value)
       case internal_structure[attribute_name]
 
-      when [:float]
+      when :float
         attribute_value.to_f
 
-      when [:bool, :boolean]
-        ['1', 'true', true].include?(attribute_value.dowcase) ? true : ['0', 'false', false].include?(attribute_value.dowcase) ? false : nil
+      when :bool, :boolean
+        value = attribute_value.to_s.downcase
+        ['1', 'true'].include?(value) ? true : ['0', 'false'].include?(value) ? false : nil
 
-      when [:date, Date]
+      when :date, Date
         attribute_value.to_date rescue nil
 
-      when [:string, :text, String]
+      when :string, :text, String
         attribute_value.to_s
 
-      when [:int, :integer, Integer]
-        attribute_value.to_i
+      when :int, :integer, Integer
+        Helpers.to_int(attribute_value)
 
       else
         attribute_value

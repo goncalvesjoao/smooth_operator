@@ -4,6 +4,20 @@ module SmoothOperator
 
     extend self
 
+    def to_int(string)
+      to_float(string).to_i
+    end
+
+    def to_float(string)
+      return string if [Fixnum, Float].include?(string.class)
+
+      return 0 if string.nil? || !string.is_a?(String)
+      
+      value = string.scan(/-*\d+[,.]*\d*/).flatten.map(&:to_f).first
+
+      value.nil? ? 0 : value
+    end
+    
     def get_instance_variable(object, variable, default_value)
       instance_var = object.instance_variable_get("@#{variable}")
 
