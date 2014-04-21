@@ -21,15 +21,14 @@ module SmoothOperator
     extend Translation if defined? I18n
 
     extend Operator
-    extend Delegation
     extend FinderMethods
 
+    include Delegation
     include Validations
     include ModelSchema
     include Persistence
     include Serialization
     include AttributeAssignment
-    include Delegation::MissingMethods
 
   end
   

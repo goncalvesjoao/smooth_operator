@@ -26,11 +26,11 @@ module SmoothOperator
       end
 
       def internal_structure
-        @internal_structure ||= (zuper_method(:internal_structure) || {}).dup
+        @internal_structure ||= (Helpers.super_method(self, :internal_structure) || {}).dup
       end
 
       def known_attributes
-        @known_attributes ||= (zuper_method(:known_attributes) || Set.new).dup
+        @known_attributes ||= (Helpers.super_method(self, :known_attributes) || Set.new).dup
       end
 
     end
