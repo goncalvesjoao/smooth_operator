@@ -8,6 +8,8 @@ module SmoothOperator
 
   class OpenStruct
 
+    extend Naming
+    
     include Delegation
     include Validations
     include ModelSchema

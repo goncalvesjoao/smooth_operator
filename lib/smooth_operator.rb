@@ -14,11 +14,9 @@ module SmoothOperator
   
   class Base < OpenStruct
 
-    extend Naming if defined? ActiveModel
-    extend Translation if defined? I18n
-
     extend Operator
     extend FinderMethods
+    extend Translation if defined? I18n
 
     include Persistence
 

@@ -17,7 +17,11 @@ module SmoothOperator
     
     module ClassMethods
 
-      attr_accessor :table_name
+      attr_writer :table_name
+
+      def table_name
+        @table_name ||= self.model_name.to_s.downcase.pluralize
+      end
 
       def schema(structure)
         internal_structure.merge! Helpers.stringify_keys(structure)
@@ -26,11 +30,11 @@ module SmoothOperator
       end
 
       def internal_structure
-        @internal_structure ||= (Helpers.super_method(self, :internal_structure) || {}).dup
+        Helpers.get_instance_variable(self, :internal_structure, {})
       end
 
       def known_attributes
-        @known_attributes ||= (Helpers.super_method(self, :known_attributes) || Set.new).dup
+        Helpers.get_instance_variable(self, :known_attributes, Set.new)
       end
 
     end

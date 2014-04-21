@@ -2,7 +2,9 @@ module User
 
   class Base < SmoothOperator::Base
 
-    self.endpoint = 'http://localhost:3000/api/v0/users/'
+    self.table_name = 'users'
+    
+    self.endpoint = 'http://localhost:3000/api/v0/'
 
   end
 

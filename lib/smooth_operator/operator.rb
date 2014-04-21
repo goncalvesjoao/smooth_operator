@@ -33,27 +33,23 @@ module SmoothOperator
 
     protected ################ PROTECTED ################
 
-    def make_the_call(http_verb, relative_path = '', params = {}, options = {})
+    def make_the_call(http_verb, relative_path = '', data = {}, options = {})
+      url = Helpers.present?(table_name) ? "#{table_name}/#{relative_path}" : relative_path
+
       connection, options = strip_options(options)
 
-      if [:get, :head, :delete].include?(http_verb)
-        body = nil
-      else
-        body = params
-        params = []
-      end
+      params, body = *([:get, :head, :delete].include?(http_verb) ? [data, nil] : [{}, data])
 
       begin
         response = connection.send(http_verb) do |request|
           params.each { |key, value| request.params[key] = value }
           options.each { |key, value| request.options.send("#{key}=", value) }
 
-          request.url relative_path
+          request.url url
           request.body = body
         end
 
         RemoteCall::Base.new(response)
-        
       rescue Faraday::ConnectionFailed
         RemoteCall::ConnectionFailed.new
       end
