@@ -2,7 +2,7 @@
 
 require "smooth_operator/naming"
 require "smooth_operator/helpers"
-require "smooth_operator/web_agent"
+require "smooth_operator/operator"
 require "smooth_operator/delegation"
 require "smooth_operator/remote_call"
 require "smooth_operator/persistence"
@@ -20,7 +20,7 @@ module SmoothOperator
     extend Naming if defined? ActiveModel
     extend Translation if defined? I18n
 
-    extend WebAgent
+    extend Operator
     extend Delegation
     extend FinderMethods
 

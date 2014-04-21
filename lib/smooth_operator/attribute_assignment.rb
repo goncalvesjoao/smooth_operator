@@ -1,3 +1,6 @@
+require 'date'
+require "smooth_operator/type_converter"
+
 module SmoothOperator
 
   module AttributeAssignment
@@ -59,21 +62,23 @@ module SmoothOperator
     def field_according_to_schema(attribute_name, attribute_value)
       case internal_structure[attribute_name]
 
-      when :float
-        attribute_value.to_f
-
-      when :bool, :boolean
-        value = attribute_value.to_s.downcase
-        ['1', 'true'].include?(value) ? true : ['0', 'false'].include?(value) ? false : nil
-
-      when :date, Date
-        attribute_value.to_date rescue nil
-
       when :string, :text, String
         attribute_value.to_s
+      
+      when :int, :integer, Integer, Fixnum
+        TypeConverter.to_int(attribute_value)
 
-      when :int, :integer, Integer
-        Helpers.to_int(attribute_value)
+      when :date, Date
+        TypeConverter.to_date(attribute_value)
+
+      when :float, Float
+        TypeConverter.to_float(attribute_value)
+
+      when :bool, :boolean
+        TypeConverter.to_boolean(attribute_value)
+
+      when :datetime, :date_time, DateTime
+        TypeConverter.to_datetime(attribute_value)
 
       else
         attribute_value

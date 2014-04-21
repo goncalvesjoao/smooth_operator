@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe SmoothOperator::WebAgent do
+describe SmoothOperator::Operator do
 
   describe "#get" do
 

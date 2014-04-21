@@ -1,3 +1,4 @@
+require 'date'
 require "spec_helper"
 
 describe SmoothOperator::AttributeAssignment do
@@ -107,6 +108,31 @@ describe SmoothOperator::AttributeAssignment do
           
           expect(posts[1]).to be_instance_of(Post)
           expect(posts[1].body).to eq('post2')
+        end
+
+      end
+
+      context "that is declared (in schema) as a date" do
+
+        it "if the attribute's value is a valid date string" do
+          dob = User::WithAddressAndPosts::Son.new(dob: '2-2-2222').dob
+
+          expect(dob).to be_instance_of(Date)
+          expect(dob.day).to be(2)
+          expect(dob.month).to be(2)
+          expect(dob.year).to be(2222)
+        end
+
+        it "if the attribute's value is a valid date" do
+          date_now = DateTime.now
+          dob = User::WithAddressAndPosts::Son.new(dob: date_now).dob
+
+          expect(dob).to be_instance_of(DateTime)
+          expect(dob).to eq(date_now)
+        end
+
+        it "if the attribute's value is an invalid date string, the returning value should be nil" do
+          expect(User::WithAddressAndPosts::Son.new(dob: '2s-2-2222').dob).to be_nil
         end
 
       end

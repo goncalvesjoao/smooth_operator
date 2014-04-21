@@ -5,7 +5,7 @@ require 'faraday'
 
 module SmoothOperator
 
-  module WebAgent
+  module Operator
 
     HTTP_VERBS = [:get, :post, :put, :delete]
 
