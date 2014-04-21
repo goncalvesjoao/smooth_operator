@@ -10,6 +10,8 @@ Dir.chdir("spec/") do
   Dir["support/**/*.rb"].each { |file| require file }
 end
 
+include WebMock::API
+
 FactoryGirl.find_definitions
 
 RSpec.configure do |config|

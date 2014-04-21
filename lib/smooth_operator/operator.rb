@@ -7,7 +7,7 @@ module SmoothOperator
 
   module Operator
 
-    HTTP_VERBS = [:get, :post, :put, :delete]
+    HTTP_VERBS = [:get, :post, :put, :patch, :delete]
 
     OPTIONS = [:endpoint, :endpoint_user, :endpoint_pass, :timeout]
 
@@ -25,8 +25,8 @@ module SmoothOperator
 
     def generate_connection(adapter = :net_http)
       Faraday.new(url: endpoint) do |faraday|
-        faraday.adapter  adapter
-        faraday.request  :url_encoded
+        faraday.request :url_encoded
+        faraday.adapter adapter
       end
     end
 
@@ -36,11 +36,20 @@ module SmoothOperator
     def make_the_call(http_verb, relative_path = '', params = {}, options = {})
       connection, options = strip_options(options)
 
+      if [:get, :head, :delete].include?(http_verb)
+        body = nil
+      else
+        body = params
+        params = []
+      end
+
       begin
         response = connection.send(http_verb) do |request|
-          request.url relative_path
           params.each { |key, value| request.params[key] = value }
           options.each { |key, value| request.options.send("#{key}=", value) }
+
+          request.url relative_path
+          request.body = body
         end
 
         RemoteCall::Base.new(response)
@@ -54,7 +63,7 @@ module SmoothOperator
     private ################# PRIVATE ###################
 
     def strip_options(options)
-      options ||= {}
+      options ||= { params_encoder: Faraday::FlatParamsEncoder }
 
       options[:timeout] ||= timeout unless timeout == ''
       connection = (options.delete(:connection) || generate_connection)

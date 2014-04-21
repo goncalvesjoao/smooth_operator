@@ -2,7 +2,7 @@ module User
 
   class Base < SmoothOperator::Base
 
-    endpoint = 'http://localhost:3000/api/v0/patient_medicines/'
+    self.endpoint = 'http://localhost:3000/api/v0/users/'
 
   end
 

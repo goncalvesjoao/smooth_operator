@@ -5,4 +5,6 @@ $LOAD_PATH << './lib'
 
 require "spec/spec_helper"
 
+WebMock.allow_net_connect!
+
 binding.pry

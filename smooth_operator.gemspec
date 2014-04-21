@@ -24,5 +24,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bundler", "~> 1.3"
   
   spec.add_dependency "json"
-  spec.add_dependency "faraday", "~> 0.9.0"
+  spec.add_dependency 'faraday', '> 0.9.0.rc5'
 end
