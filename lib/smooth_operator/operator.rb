@@ -14,7 +14,7 @@ module SmoothOperator
 
     attr_writer *OPTIONS
 
-    OPTIONS.each { |option| define_method(option) { Helpers.get_instance_variable(self, option, ENV["API_#{option.upcase}"] || '') } }
+    OPTIONS.each { |option| define_method(option) { Helpers.get_instance_variable(self, option, '') } }
 
     HTTP_VERBS.each { |http_verb| define_method(http_verb) { |relative_path = '', params = {}, options = {}| make_the_call(http_verb, relative_path, params, options) } }
 

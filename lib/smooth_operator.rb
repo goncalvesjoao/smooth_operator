@@ -3,19 +3,15 @@
 require "smooth_operator/naming"
 require "smooth_operator/helpers"
 require "smooth_operator/operator"
-require "smooth_operator/delegation"
 require "smooth_operator/remote_call"
 require "smooth_operator/persistence"
-require "smooth_operator/validations"
 require "smooth_operator/translation"
-require "smooth_operator/model_schema"
-require "smooth_operator/serialization"
+require "smooth_operator/open_struct"
 require "smooth_operator/finder_methods"
-require "smooth_operator/attribute_assignment"
 
 module SmoothOperator
   
-  class Base
+  class Base < OpenStruct
 
     extend Naming if defined? ActiveModel
     extend Translation if defined? I18n
@@ -23,12 +19,7 @@ module SmoothOperator
     extend Operator
     extend FinderMethods
 
-    include Delegation
-    include Validations
-    include ModelSchema
     include Persistence
-    include Serialization
-    include AttributeAssignment
 
   end
   

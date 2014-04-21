@@ -17,6 +17,16 @@ describe SmoothOperator::AttributeAssignment do
         expect(user.known_attributes.to_a).to match_array(expected_internal_data.keys)
       end
 
+      it "if the attribute's value is an hash a new instance of SmoothOperator::OpenStruct will be initialized with that hash" do
+        address = User::Base.new(address: { street: 'something', creator: { first_name: 'admin' } }).address
+
+        expect(address).to be_instance_of(SmoothOperator::OpenStruct)
+        expect(address.street).to eq('something')
+
+        expect(address.creator).to be_instance_of(SmoothOperator::OpenStruct)
+        expect(address.creator.first_name).to eq('admin')
+      end
+
     end
 
     context "when there is a known schema and the received hash has an attribute" do
