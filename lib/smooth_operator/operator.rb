@@ -1,4 +1,6 @@
 require 'faraday'
+require "smooth_operator/params_encoder"
+
 # require 'faraday_middleware'
 # require 'typhoeus'
 # require 'typhoeus/adapters/faraday'
@@ -59,9 +61,12 @@ module SmoothOperator
     private ################# PRIVATE ###################
 
     def strip_options(options)
-      options ||= { params_encoder: Faraday::FlatParamsEncoder }
+      options ||= {}
 
       options[:timeout] ||= timeout unless timeout == ''
+      # options[:params_encoder] ||= ParamsEncoder # to properly encode arrays
+      options[:params_encoder] ||= Faraday::NestedParamsEncoder # to properly encode arrays
+
       connection = (options.delete(:connection) || generate_connection)
 
       [connection, options]

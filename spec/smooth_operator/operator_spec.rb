@@ -1,19 +1,21 @@
 require "spec_helper"
 
 describe SmoothOperator::Operator do
-  let(:hash_with_array) { { user: { first_name: 'John', posts: [{ body: 'post1' }, { body: 'post2' }] } } }
+  subject { User::Base }
+
+  let(:hash_with_array) { { first_name: 'John', age: 3, dob: '2-2-2222', manager: true, posts: [{ body: 'post1' }, { body: 'post2' }] } }
 
   describe "#get" do
 
     context "submiting a hash, with an array" do
       
       before do
-        stub_request(:get, "http://localhost:3000/api/v0/users/").
-          to_return(:status => 200)
+        stub_request(:get, "http://localhost:3000/api/v0/patient_medicines/")
+          .to_return(:status => 200)
       end
 
       it 'should correctly encode that hash' do
-        remote_call = User::Base.get('', hash_with_array)
+        remote_call = subject.get('', hash_with_array)
 
         expect(remote_call.status).to eq(200)
       end
@@ -24,15 +26,16 @@ describe SmoothOperator::Operator do
 
   describe "#post" do
 
-    context "submiting a hash, with an array" do
+    context "submiting a hash, with an array", current: true do
 
       before do
-        stub_request(:post, "http://localhost:3000/api/v0/users/").
-          with(:body => hash_with_array).to_return(:status => 200)
+        stub_request(:post, "http://localhost:3000/api/v0/patient_medicines/")
+          .with(:body => hash_with_array)
+          .to_return(:status => 200)
       end
 
       it 'should correctly encode that hash' do
-        remote_call = User::Base.post('', hash_with_array)
+        remote_call = subject.post('', hash_with_array)
         
         expect(remote_call.status).to eq(200)
       end
