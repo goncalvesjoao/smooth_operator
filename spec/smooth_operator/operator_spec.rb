@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe SmoothOperator::Operator do
-  subject { User::Base }
+  subject { User }
 
   let(:hash_with_array) { { first_name: 'John', age: 3, dob: '2-2-2222', manager: true, posts: [{ body: 'post1' }, { body: 'post2' }] } }
 

@@ -45,7 +45,7 @@ end
 
 
 describe SmoothOperator::Persistence do
-  subject { User::Base }
+  subject { User }
 
 
   describe ".create" do

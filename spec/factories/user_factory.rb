@@ -1,6 +1,6 @@
 FactoryGirl.define do
   
-  factory :user, class: User::Base do
+  factory :user, class: User do
     id 1
     admin true
     last_name 'Doe'
@@ -13,7 +13,7 @@ FactoryGirl.define do
     factory :user_with_my_method, traits: [:has_my_method]
   end
 
-  factory :user_filtered, class: User::Base do
+  factory :user_filtered, class: User do
     id 1
     first_name 'John'
   end

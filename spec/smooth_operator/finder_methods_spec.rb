@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe SmoothOperator::FinderMethods do
-  subject { User::Base }
+  subject { User }
 
 
   describe ".find" do
