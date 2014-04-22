@@ -4,6 +4,32 @@ module SmoothOperator
 
     extend self
 
+    def convert(value, type)
+      case type
+
+      when :string, :text, String
+        value.to_s
+      
+      when :int, :integer, Integer, Fixnum
+        TypeConverter.to_int(value)
+
+      when :date, Date
+        TypeConverter.to_date(value)
+
+      when :float, Float
+        TypeConverter.to_float(value)
+
+      when :bool, :boolean
+        TypeConverter.to_boolean(value)
+
+      when :datetime, :date_time, DateTime
+        TypeConverter.to_datetime(value)
+
+      else
+        value
+      end
+    end
+
     def to_int(string)
       return string if string.is_a?(Fixnum)
 

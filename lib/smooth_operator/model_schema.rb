@@ -14,6 +14,14 @@ module SmoothOperator
       @internal_structure ||= self.class.internal_structure.dup
     end
 
+    def table_name
+      @table_name ||= self.class.table_name.dup
+    end
+
+    def model_name
+      @model_name ||= table_name.singularize
+    end
+
     
     module ClassMethods
 
@@ -35,6 +43,26 @@ module SmoothOperator
 
       def known_attributes
         Helpers.get_instance_variable(self, :known_attributes, Set.new)
+      end
+
+      def model_name
+        if defined? ActiveModel
+          rails_model_name_method
+        else
+          name.split('::').last.underscore.capitalize
+        end
+      end
+
+      
+      protected ############## PROTECTED #############
+
+      def rails_model_name_method
+        @_model_name ||= begin
+          namespace = self.parents.detect do |n|
+            n.respond_to?(:use_relative_model_naming?) && n.use_relative_model_naming?
+          end
+          ActiveModel::Name.new(self, namespace)
+        end
       end
 
     end

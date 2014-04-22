@@ -1,6 +1,5 @@
 # require 'active_model'
 
-require "smooth_operator/naming"
 require "smooth_operator/version"
 require "smooth_operator/helpers"
 require "smooth_operator/operator"

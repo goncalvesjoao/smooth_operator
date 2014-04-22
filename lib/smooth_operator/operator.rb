@@ -1,6 +1,4 @@
 require 'faraday'
-require "smooth_operator/params_encoder"
-
 # require 'faraday_middleware'
 # require 'typhoeus'
 # require 'typhoeus/adapters/faraday'

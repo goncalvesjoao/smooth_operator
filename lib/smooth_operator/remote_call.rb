@@ -12,11 +12,16 @@ module SmoothOperator
         @response = response
       end
 
-      def_delegators :response, :success?, :status, :headers, :body
+      def_delegator :response, :status, :http_status
 
-      
+      def_delegators :response, :success?, :headers, :body
+
+      def failure?
+        [400..499].include?(http_status)
+      end
+
       def error?
-        !success?
+        [500..599].include?(http_status)
       end
 
       def data
@@ -27,6 +32,10 @@ module SmoothOperator
         rescue JSON::ParserError
           nil
         end
+      end
+
+      def status
+        error? ? nil : success?
       end
 
     end

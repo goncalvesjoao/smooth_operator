@@ -1,8 +1,7 @@
 class User < SmoothOperator::Base
 
-  # self.table_name = 'users'
-  # self.table_name = 'patient_medicines'
+  self.table_name = 'invoices'
 
-  self.endpoint = 'http://localhost:3000/api/v0/'
+  self.endpoint = 'http://localhost:3000/v0/'
 
 end

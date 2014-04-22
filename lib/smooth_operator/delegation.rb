@@ -12,7 +12,7 @@ module SmoothOperator
       if Helpers.setter_method?(_method)
         return push_to_internal_data(_method[0..-2], args.first)
       elsif respond_to?(_method)
-        return internal_data[_method]
+        return get_internal_data(_method)
       end
 
       super

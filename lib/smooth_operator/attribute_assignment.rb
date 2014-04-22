@@ -1,5 +1,6 @@
 require 'date'
-require "smooth_operator/type_converter"
+require 'smooth_operator/type_converter'
+require 'smooth_operator/internal_attribute'
 
 module SmoothOperator
 
@@ -14,13 +15,17 @@ module SmoothOperator
     end
 
     def assign_attributes(attributes = {})
-      raise ArgumentError, "expected an attributes Hash, got #{attributes.inspect}" unless attributes.is_a?(Hash)
+      return nil unless attributes.is_a?(Hash)
       
       attributes.each { |name, value| push_to_internal_data(name, value) }
     end
 
     def internal_data
       @internal_data ||= {}
+    end
+
+    def get_internal_data(field)
+      internal_data[field].nil? ? nil : internal_data[field].value
     end
 
     def push_to_internal_data(attribute_name, attribute_value)
@@ -30,10 +35,14 @@ module SmoothOperator
       
       known_attributes.add attribute_name
       
-      internal_data[attribute_name] = cast_according_to_schema(attribute_name, attribute_value)
+      if internal_data[attribute_name].nil?
+        internal_data[attribute_name] = InternalAttribute.new(attribute_name, attribute_value, internal_structure[attribute_name])
+      else
+        internal_data[attribute_name].set_value(attribute_value)
+      end
     end
 
-
+    
     protected #################### PROTECTED METHODS DOWN BELOW ######################
 
     def before_initialize(attributes); end
@@ -42,47 +51,6 @@ module SmoothOperator
 
     def allowed_attribute(attribute)
       true
-    end
-
-    def cast_according_to_schema(attribute_name, attribute_value)
-      case attribute_value
-      when Array
-        attribute_value.map { |array_entry| cast_according_to_schema(attribute_name, array_entry) }
-      when Hash
-        class_according_to_schema(attribute_name).new(attribute_value)
-      else
-        field_according_to_schema(attribute_name, Helpers.duplicate(attribute_value))
-      end
-    end
-
-    def class_according_to_schema(attribute_name)
-      internal_structure[attribute_name] || OpenStruct
-    end
-
-    def field_according_to_schema(attribute_name, attribute_value)
-      case internal_structure[attribute_name]
-
-      when :string, :text, String
-        attribute_value.to_s
-      
-      when :int, :integer, Integer, Fixnum
-        TypeConverter.to_int(attribute_value)
-
-      when :date, Date
-        TypeConverter.to_date(attribute_value)
-
-      when :float, Float
-        TypeConverter.to_float(attribute_value)
-
-      when :bool, :boolean
-        TypeConverter.to_boolean(attribute_value)
-
-      when :datetime, :date_time, DateTime
-        TypeConverter.to_datetime(attribute_value)
-
-      else
-        attribute_value
-      end
     end
 
   end

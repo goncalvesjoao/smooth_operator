@@ -2,6 +2,31 @@ module SmoothOperator
 
   module Serialization
 
+    def self.included(base)
+      base.extend(ClassMethods)
+    end
+
+    module ClassMethods
+
+      def attributes_white_list
+        Helpers.get_instance_variable(self, :attributes_white_list, Set.new)
+      end
+
+      def attributes_black_list
+        Helpers.get_instance_variable(self, :attributes_black_list, Set.new)
+      end
+
+      def attributes_white_list_add(*getters)
+        attributes_white_list.merge getters.map(&:to_s)
+      end
+
+      def attributes_black_list_add(*getters)
+        attributes_black_list.merge getters.map(&:to_s)
+      end
+
+    end
+
+
     def attributes
       exposed_attributes = internal_data.keys
       
@@ -44,7 +69,7 @@ module SmoothOperator
       end
 
       hash = {}
-      attribute_names.each { |n| hash[n] = read_attribute_for_serialization(n) }
+      attribute_names.each { |attribute_name| hash[attribute_name] = read_attribute_for_hashing(attribute_name, options) }
 
       method_names = [*options[:methods]].select { |n| respond_to?(n) }
       method_names.each { |method_name| hash[method_name.to_s] = send(method_name) }
@@ -52,28 +77,27 @@ module SmoothOperator
       hash
     end
 
-    def self.included(base)
-      base.extend(ClassMethods)
+
+    protected ##################### PROTECTED ###################
+
+    def read_attribute_for_hashing(attribute_name, options)
+      object = read_attribute_for_serialization(attribute_name)
+
+      _options = options[attribute_name] || options[attribute_name.to_sym]
+
+      if object.is_a?(Array)
+        object.map { |array_entry| attribute_to_hash(array_entry, _options) }
+      else
+        attribute_to_hash(object, _options)
+      end
     end
 
-    module ClassMethods
-
-      def attributes_white_list
-        Helpers.get_instance_variable(self, :attributes_white_list, Set.new)
+    def attribute_to_hash(object, options = nil)
+      if object.respond_to?(:serializable_hash)
+        Helpers.symbolyze_keys(object.serializable_hash(options))
+      else
+        object
       end
-
-      def attributes_black_list
-        Helpers.get_instance_variable(self, :attributes_black_list, Set.new)
-      end
-
-      def attributes_white_list_add(*getters)
-        attributes_white_list.merge getters.map(&:to_s)
-      end
-
-      def attributes_black_list_add(*getters)
-        attributes_black_list.merge getters.map(&:to_s)
-      end
-
     end
 
   end

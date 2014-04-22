@@ -5,12 +5,20 @@ describe SmoothOperator::AttributeAssignment do
 
   describe "#assign_attributes" do
 
+    context "when something other than a hash is introduced" do
+      it "should do nothing" do
+        [nil, '', [1, 2], 'test', 1, 2].each do |something_other_than_a_hash|
+          expect(User.new(something_other_than_a_hash).internal_data).to eq({})
+        end
+      end
+    end
+
     context "when there is no declared schema" do
       subject { User.new(attributes_for(:user)) }
       let(:expected_internal_data) { SmoothOperator::Helpers.stringify_keys(attributes_for(:user)) }
 
       it "it should populate 'internal_data' with unaltered duplicate data from the received hash" do
-        expect(subject.internal_data).to eq(expected_internal_data)
+        expect(subject.to_hash).to eq(attributes_for(:user))
       end
 
       it "it should populate 'known_attributes' with the keys of the received hash" do
