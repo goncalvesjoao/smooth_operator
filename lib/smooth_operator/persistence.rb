@@ -19,7 +19,7 @@ module SmoothOperator
     end
     
     def destroyed?
-      @destroyed
+      @destroyed || false
     end
 
     def last_remote_call
@@ -39,7 +39,7 @@ module SmoothOperator
     end
 
     def destroy(relative_path = nil, data = {}, options = {})
-      return true unless persisted?
+      return false unless persisted?
 
       relative_path = "#{id}" if Helpers.blank?(relative_path)
 
@@ -91,7 +91,7 @@ module SmoothOperator
     def build_remote_call_args(http_verb, data, options)
       return [data, options] if http_verb == :delete
 
-      hash = to_hash(options[:to_hash_options]).dup
+      hash = serializable_hash(options[:serializable_options]).dup
       hash.delete('id')
 
       [{ model_name => hash }.merge(data), options]

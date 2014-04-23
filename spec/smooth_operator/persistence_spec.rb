@@ -1,48 +1,71 @@
 require "spec_helper"
 
 
-shared_examples_for "a correct after save call procedure" do
+shared_examples_for "after save call procedure" do
   xit "it should populate 'internal_data' with the server's response" do
+    expect(user_instance.attr_from_server).to be(true)
   end
 
-  it "it should populate 'last_remote_call' with the remote_call used on this transaction" do
+  xit "it should populate 'last_remote_call' with the remote_call used on this transaction" do
     expect(user_instance.last_remote_call.response.env.url.to_s).to eq(save_url)
   end
 end
 
-shared_examples_for "remote call" do
-  context "when the response is positive" do
-    xit "it should return true" do
-    end
-
-    it_behaves_like "a correct after save call procedure"
+shared_examples_for "positive remote call" do
+  it "it should return true" do
+    expect(method_result).to be true
   end
 
-  context "when the response is negative" do
-    xit "it should return false" do
-    end
+  it_behaves_like "after save call procedure"
+end
 
-    it_behaves_like "a correct after save call procedure"
+shared_examples_for "negative remote call" do
+  it "it should return false" do
+    expect(method_result).to be false
   end
 
-  context "when the there is a connection error ou http 500" do
-    xit "it should return nil" do
-    end
+  it_behaves_like "after save call procedure"
+end
 
-    xit "it should NOT alter 'internal_data'" do
-    end
+shared_examples_for "error remote call" do
+  it "it should return nil" do
+    expect(method_result).to be_nil
+  end
 
-    xit "it should populate 'last_remote_call' with the remote_call used on this transaction" do
-    end
+  it "it should NOT alter 'internal_data'" do
+    expect(user_instance.respond_to?(:attr_from_server)).to be(false)
+  end
+
+  xit "it should populate 'last_remote_call' with the remote_call used on this transaction" do
   end
 end
 
-shared_examples_for "remote save call" do
-  it "it should make a http call with the contents of 'internal_data'" do
+shared_examples_for "save method" do
+  xit "it should make a http call with the contents of 'internal_data'" do
     assert_requested :any, save_url, :body => { user_instance.model_name => user_instance.to_hash }
   end
+end
 
-  it_behaves_like "remote call"
+shared_examples_for "create method" do
+  it "it should make a post http call" do
+    assert_requested :post, save_url, times: times
+  end
+
+  it_behaves_like "save method"
+end
+
+shared_examples_for "update method" do
+  it "it should make a put http call" do
+    assert_requested :put, save_url, times: times
+  end
+
+  it_behaves_like "save method"
+end
+
+shared_examples_for "destroy method" do
+  it "it should make a delete http call" do
+    assert_requested :delete, save_url, times: times
+  end
 end
 
 
@@ -71,6 +94,8 @@ describe SmoothOperator::Persistence do
   end
 
   describe "#destroyed?" do
+    let(:save_url) { "http://localhost:3000/v0/invoices/1" }
+
     context "before executing #destroy" do
       it "it should return false" do
         expect(user_with_data.destroyed?).to be_falsey
@@ -78,12 +103,20 @@ describe SmoothOperator::Persistence do
     end
 
     context "after a successful execution of #destroy" do
-      xit "it should return true" do
+      before { stub_request(:any, save_url).to_return(:body => "{ 'attr_from_server': 'true' }", :status => 200) }
+
+      it "it should return true" do
+        user_with_data.destroy
+        expect(user_with_data.destroyed?).to be(true)
       end
     end
   
     context "after a failed execution of #destroy" do
-      xit "it should return false" do
+      before { stub_request(:any, save_url).to_return(:body => "{ 'attr_from_server': 'true' }", :status => 404) }
+
+      it "it should return false" do
+        user_with_data.destroy
+        expect(user_with_data.destroyed?).to be(false)
       end
     end
 
@@ -121,40 +154,64 @@ describe SmoothOperator::Persistence do
   
   describe "#save" do
 
+    let(:method_result) { user_instance.save }
+
     context "when an instance is NOT persisted" do
       let(:save_url) { "http://localhost:3000/v0/invoices/" }
-
       let(:user_instance) { subject.new( observations: '123' ) }
 
-      before do
-        stub_request(:any, save_url)
+      context "when the response is positive" do
+        let(:times) { 1 }
+        before { stub_request(:any, save_url).to_return(:body => "{ 'attr_from_server': 'true' }", :status => 200) }
 
-        user_instance.save
+        it_behaves_like "positive remote call"
+        it_behaves_like "create method"
       end
 
-      it "it should make a post http call" do
-        assert_requested :post, save_url
+      context "when the response is negative" do
+        let(:times) { 2 }
+        before { stub_request(:any, save_url).to_return(:body => "{ 'attr_from_server': 'true' }", :status => 404) }
+
+        it_behaves_like "negative remote call"
+        it_behaves_like "create method"
       end
 
-      it_behaves_like "remote save call"
+      context "when the there is a connection error ou http 500" do
+        let(:times) { 3 }
+        before { stub_request(:any, save_url).to_return(:body => "{ 'attr_from_server': 'true' }", :status => 500) }
+
+        it_behaves_like "error remote call"
+        it_behaves_like "create method"
+      end
     end
 
     context "when an instance IS persisted" do
       let(:save_url) { "http://localhost:3000/v0/invoices/1" }
-
       let(:user_instance) { subject.new(attributes_for(:user_with_address_and_posts)) }
 
-      before do
-        stub_request(:any, save_url)
+      context "when the response is positive" do
+        let(:times) { 1 }
+        before { stub_request(:any, save_url).to_return(:body => "{ 'attr_from_server': 'true' }", :status => 200) }
 
-        user_instance.save
+        it_behaves_like "positive remote call"
+        it_behaves_like "update method"
       end
 
-      it "it should make a put http call" do
-        assert_requested :put, save_url
+      context "when the response is negative" do
+        let(:times) { 2 }
+        before { stub_request(:any, save_url).to_return(:body => "{ 'attr_from_server': 'true' }", :status => 404) }
+
+        it_behaves_like "negative remote call"
+        it_behaves_like "update method"
       end
 
-      it_behaves_like "remote save call"
+      context "when the there is a connection error ou http 500" do
+        let(:times) { 3 }
+        before { stub_request(:any, save_url).to_return(:body => "{ 'attr_from_server': 'true' }", :status => 500) }
+
+        it_behaves_like "error remote call"
+        it_behaves_like "update method"
+      end
     end
 
   end
@@ -174,39 +231,50 @@ describe SmoothOperator::Persistence do
   describe "#destroy" do
     let(:save_url) { "http://localhost:3000/v0/invoices/1" }
 
-    before do
-      stub_request(:any, save_url)
-    end
-
     context "when an instance is not persisted" do
+      before { stub_request(:any, save_url) }
+
       let(:user_instance) { subject.new( observations: '123' ) }
 
-      before do
-        user_instance.destroy
+      let(:method_result) { user_instance.destroy }
+
+      it "it should return false" do
+        expect(method_result).to be_falsey
       end
 
       it "it NOT should make a delete http call" do
-        assert_not_requested :delete, save_url
-      end
-
-      xit "it should return true" do
+        assert_not_requested :delete, save_url, times: 2
       end
     end
 
     context "when an instance is persisted" do
+      let(:method_result) { user_instance.destroy }
+
       let(:user_instance) { subject.new(attributes_for(:user_with_address_and_posts)) }
 
-      before do
-        stub_request(:any, save_url)
+      context "when the response is positive" do
+        let(:times) { 3 }
+        before { stub_request(:any, save_url).to_return(:body => "{ 'attr_from_server': 'true' }", :status => 200) }
 
-        user_instance.destroy
+        it_behaves_like "positive remote call"
+        it_behaves_like "destroy method"
       end
 
-      it "it should make a delete http call" do
-        assert_requested :delete, save_url
+      context "when the response is negative" do
+        let(:times) { 4 }
+        before { stub_request(:any, save_url).to_return(:body => "{ 'attr_from_server': 'true' }", :status => 404) }
+
+        it_behaves_like "negative remote call"
+        it_behaves_like "destroy method"
       end
 
-      it_behaves_like "remote call"
+      context "when the there is a connection error ou http 500" do
+        let(:times) { 5 }
+        before { stub_request(:any, save_url).to_return(:body => "{ 'attr_from_server': 'true' }", :status => 500) }
+
+        it_behaves_like "error remote call"
+        it_behaves_like "destroy method"
+      end
     end
   end
 

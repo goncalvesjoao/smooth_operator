@@ -17,11 +17,11 @@ module SmoothOperator
       def_delegators :response, :success?, :headers, :body
 
       def failure?
-        [400..499].include?(http_status)
+        http_status.between?(400, 499)
       end
 
       def error?
-        [500..599].include?(http_status)
+        http_status.between?(500, 599)
       end
 
       def data
@@ -44,11 +44,13 @@ module SmoothOperator
 
       attr_reader :data, :status, :headers, :body
 
-      def status; 0; end
+      def http_status; 0; end
 
       def error?; true; end
 
       def success?; false; end
+
+      def failure?; false; end
 
     end
 
