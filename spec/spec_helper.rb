@@ -23,4 +23,8 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 
+  config.before do
+    stub_request(:any, /localhost/).to_rack(FakeServer)
+  end
+
 end
