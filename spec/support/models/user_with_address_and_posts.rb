@@ -11,7 +11,7 @@ module UserWithAddressAndPosts
 
   class Son < Father
 
-    self.table_name = 'invoices'
+    self.table_name = 'users'
 
     self.endpoint = 'http://localhost:3000/v0/'
 

@@ -75,6 +75,8 @@ describe SmoothOperator::Persistence do
 
   let(:user_with_data) { subject.new(attributes_for(:user_with_address_and_posts)) }
 
+  let(:save_url) { "http://localhost:3000/v0/users/1" }
+
   describe ".create" do
     
   end
@@ -94,8 +96,6 @@ describe SmoothOperator::Persistence do
   end
 
   describe "#destroyed?" do
-    let(:save_url) { "http://localhost:3000/v0/invoices/1" }
-
     context "before executing #destroy" do
       it "it should return false" do
         expect(user_with_data.destroyed?).to be_falsey
@@ -130,6 +130,9 @@ describe SmoothOperator::Persistence do
     end
 
     context "when initializing an instance with an id" do
+      
+      let(:user_instance) { subject.new(attributes_for(:user_with_address_and_posts)) }
+
       context "before destroying the instance" do
         it "it should return true" do
           expect(user_with_data.persisted?).to be(true)
@@ -137,27 +140,31 @@ describe SmoothOperator::Persistence do
       end
 
       context "after a successful #destroy" do
-        xit "it should return false" do
-          user_with_data.destroy
-          expect(user_with_data.persisted?).to be(false)
+        before { stub_request(:any, save_url).to_return(:body => "{ 'attr_from_server': 'true' }", :status => 200) }
+
+        it "it should return false" do
+          user_instance.destroy
+          expect(user_instance.persisted?).to be(false)
         end
       end
 
       context "after a failed #destroy" do
-        xit "it should return true" do
-          user_with_data.destroy
-          expect(user_with_data.persisted?).to be(true)
+        before { stub_request(:any, save_url).to_return(:body => "{ 'attr_from_server': 'true' }", :status => 500) }
+
+        it "it should return true" do
+          user_instance.destroy
+          expect(user_instance.persisted?).to be(true)
         end
       end
     end
-  end
-  
+  end  
+
   describe "#save" do
 
     let(:method_result) { user_instance.save }
 
     context "when an instance is NOT persisted" do
-      let(:save_url) { "http://localhost:3000/v0/invoices/" }
+      let(:save_url) { "http://localhost:3000/v0/users/" }
       let(:user_instance) { subject.new( observations: '123' ) }
 
       context "when the response is positive" do
@@ -186,7 +193,6 @@ describe SmoothOperator::Persistence do
     end
 
     context "when an instance IS persisted" do
-      let(:save_url) { "http://localhost:3000/v0/invoices/1" }
       let(:user_instance) { subject.new(attributes_for(:user_with_address_and_posts)) }
 
       context "when the response is positive" do
@@ -217,19 +223,26 @@ describe SmoothOperator::Persistence do
   end
 
   describe "#save!" do
+    let(:user_instance) { subject.new(attributes_for(:user_with_address_and_posts)) }
+
     context "when #save return true" do
-      xit "should return true" do
+      before { stub_request(:any, save_url).to_return(:body => "{ 'attr_from_server': 'true' }", :status => 200) }
+      
+      it "should return true" do
+        expect(user_instance.save!).to be(true)
       end
     end
 
     context "when #save return false or nil" do
-      xit "should raise an exception" do
+      before { stub_request(:any, save_url).to_return(:body => "{ 'attr_from_server': 'true' }", :status => 500) }
+
+      it "should raise an exception" do
+        expect(user_instance.save!).to raise_error 'RecordNotSaved'
       end
     end
   end
 
   describe "#destroy" do
-    let(:save_url) { "http://localhost:3000/v0/invoices/1" }
 
     context "when an instance is not persisted" do
       before { stub_request(:any, save_url) }
@@ -253,7 +266,7 @@ describe SmoothOperator::Persistence do
       let(:user_instance) { subject.new(attributes_for(:user_with_address_and_posts)) }
 
       context "when the response is positive" do
-        let(:times) { 3 }
+        let(:times) { 5 }
         before { stub_request(:any, save_url).to_return(:body => "{ 'attr_from_server': 'true' }", :status => 200) }
 
         it_behaves_like "positive remote call"
@@ -261,7 +274,7 @@ describe SmoothOperator::Persistence do
       end
 
       context "when the response is negative" do
-        let(:times) { 4 }
+        let(:times) { 6 }
         before { stub_request(:any, save_url).to_return(:body => "{ 'attr_from_server': 'true' }", :status => 404) }
 
         it_behaves_like "negative remote call"
@@ -269,7 +282,7 @@ describe SmoothOperator::Persistence do
       end
 
       context "when the there is a connection error ou http 500" do
-        let(:times) { 5 }
+        let(:times) { 7 }
         before { stub_request(:any, save_url).to_return(:body => "{ 'attr_from_server': 'true' }", :status => 500) }
 
         it_behaves_like "error remote call"
