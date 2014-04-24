@@ -16,6 +16,8 @@ module PersistenceHelper
   end
 
   def execute_method
+    _method_to_execute = (method_to_execute == :create) ? :save : method_to_execute
+    
     subject.send(method_to_execute, *method_arguments)
   end
 
