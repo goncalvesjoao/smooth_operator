@@ -24,9 +24,9 @@ module SmoothOperator
     end
 
     def generate_connection(adapter = :net_http)
-      Faraday.new(url: endpoint) do |faraday|
-        faraday.request :url_encoded
-        faraday.adapter adapter
+      Faraday.new(url: endpoint) do |builder|
+        builder.request :url_encoded
+        builder.adapter adapter
       end
     end
 
@@ -43,10 +43,12 @@ module SmoothOperator
       params = query_string(params || {})
 
       begin
+        connection.basic_auth(endpoint_user, endpoint_pass) if Helpers.present?(endpoint_user)
+
         response = connection.send(http_verb) do |request|
           params.each { |key, value| request.params[key] = value }
           options.each { |key, value| request.options.send("#{key}=", value) }
-
+          
           request.url url
           request.body = body
         end

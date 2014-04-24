@@ -3,6 +3,9 @@ require 'sinatra/json'
 
 class FakeServer < Sinatra::Base
 
+  use Rack::Auth::Basic, "Restricted Area" do |username, password|
+    username == 'admin' and password == 'admin'
+  end
 
   get '/users/test_hash_with_array' do
     status test_hash_with_array
