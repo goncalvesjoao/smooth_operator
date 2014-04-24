@@ -2,20 +2,27 @@ module SmoothOperator
   
   module Persistence
 
+    def self.included(base)
+      base.extend(ClassMethods)
+    end
+
     module ClassMethods
       
-      def create(attributes = nil, options = {}, &block)
+      def create(attributes = nil, relative_path = nil, data = {}, options = {})
         if attributes.is_a?(Array)
-          attributes.map { |attr| create(attr, options, &block) }
+          attributes.map { |array_entry| create(array_entry, relative_path, data, options) }
         else
-          new(attributes, options, &block).tap { |object| object.save }
+          new(attributes).tap { |object| object.save(relative_path, data, options) }
         end
       end
 
     end
 
+
     def new_record?
-      @new_record ||= Helpers.blank?(get_internal_data("id"))
+      return @new_record if defined?(@new_record)
+      
+      @new_record = Helpers.blank?(get_internal_data("id"))
     end
     
     def destroyed?

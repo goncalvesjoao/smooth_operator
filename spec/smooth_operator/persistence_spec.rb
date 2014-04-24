@@ -7,7 +7,7 @@ shared_examples_for "successful persistent remote call" do
   end
 
   it "it should populate 'last_remote_call' with the remote_call used on this transaction" do
-    expect(subject.last_remote_call).to be_nil
+    expect(subject.last_remote_call).to be_nil unless method_to_execute.to_s =~ /create/
     execute_method
     expect(subject.last_remote_call).to be_instance_of(SmoothOperator::RemoteCall::Base)
   end
@@ -23,7 +23,13 @@ shared_examples_for "persistent remote call" do
     let(:method_arguments) { ['', { status: 200 }] }
 
     it "it should return true" do
-      expect(execute_method).to be true
+      execute_method
+      expect(subject.last_remote_call.status).to be true
+    end
+
+    it "it should assert the subject's persistence" do
+      execute_method
+      expect(subject.persisted?).to be(persistence_state[200])
     end
 
     it_behaves_like "successful persistent remote call"
@@ -33,7 +39,13 @@ shared_examples_for "persistent remote call" do
     let(:method_arguments) { ['', { status: 422 }] }
 
     it "it should return false" do
-      expect(execute_method).to be false
+      execute_method
+      expect(subject.last_remote_call.status).to be false
+    end
+
+    it "it should assert the subject's persistence" do
+      execute_method
+      expect(subject.persisted?).to be(persistence_state[422])
     end
 
     it_behaves_like "successful persistent remote call"
@@ -43,7 +55,8 @@ shared_examples_for "persistent remote call" do
     let(:method_arguments) { ['', { status: 500 }] }
 
     it "it should return nil" do
-      expect(execute_method).to be_nil
+      execute_method
+      expect(subject.last_remote_call.status).to be_nil
     end
 
     it "it should NOT alter 'internal_data'" do
@@ -52,9 +65,14 @@ shared_examples_for "persistent remote call" do
     end
 
     it "it should populate 'last_remote_call' with the remote_call used on this transaction" do
-      expect(subject.last_remote_call).to be_nil
+      expect(subject.last_remote_call).to be_nil unless method_to_execute.to_s =~ /create/
       execute_method
       expect(subject.last_remote_call).to be_instance_of(SmoothOperator::RemoteCall::Base)
+    end
+
+    it "it should assert the subject's persistence" do
+      execute_method
+      expect(subject.persisted?).to be(persistence_state[500])
     end
   end
 end
@@ -70,8 +88,39 @@ end
 describe SmoothOperator::Persistence, helpers: :persistence do
 
   describe ".create" do
-    xit '...' do
+    
+    let(:method_arguments) { [] }
+
+    context "when attributes DON'T contain an ID" do
+      subject { created_subject }
+      let(:method_to_execute) { :create_without_id }
+      let(:persistence_state) { { 200 => true, 422 => false, 500 => false } }
+
+      it_behaves_like "persistent remote call"
+
+      it "it should make a post http call" do
+        execute_method
+        expect(subject.last_remote_call.data['http_verb']).to eq('post')
+      end
+
+      it_behaves_like "save method"
     end
+
+    context "when attributes contain an ID" do
+      subject { created_subject }
+      let(:method_to_execute) { :create_with_id }
+      let(:persistence_state) { { 200 => true, 422 => true, 500 => true } }
+
+      it_behaves_like "persistent remote call"
+
+      it "it should make a post http call" do
+        execute_method
+        expect(subject.last_remote_call.data['http_verb']).to eq('put')
+      end
+
+      it_behaves_like "save method"
+    end
+
   end
 
   describe "#new_record?" do
@@ -167,6 +216,7 @@ describe SmoothOperator::Persistence, helpers: :persistence do
 
     context "when an instance is NOT persisted" do
       subject { new_user }
+      let(:persistence_state) { { 200 => true, 422 => false, 500 => false } }
 
       it_behaves_like "persistent remote call"
 
@@ -180,6 +230,7 @@ describe SmoothOperator::Persistence, helpers: :persistence do
 
     context "when an instance IS persisted" do
       subject { existing_user }
+      let(:persistence_state) { { 200 => true, 422 => true, 500 => true } }
 
       it_behaves_like "persistent remote call"
 
@@ -229,6 +280,7 @@ describe SmoothOperator::Persistence, helpers: :persistence do
 
     context "when an instance is persisted" do
       subject { existing_user }
+      let(:persistence_state) { { 200 => false, 422 => true, 500 => true } }
 
       it_behaves_like "persistent remote call"
 
