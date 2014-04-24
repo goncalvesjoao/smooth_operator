@@ -38,19 +38,16 @@ class FakeServer < Sinatra::Base
   protected ################ PROTECTED ################
 
   def common_response
-    status params[:status] || (!params[:user].nil? && params[:user][:status]) || 500
+    status params[:status]
 
     data = stringify_data FactoryGirl.attributes_for(:user_with_address_and_posts)
     data.delete('id')
 
-    if params[:user]
-      params[:user].delete('status')
-      data_match = (params[:user] == data)
-    else
-      data_match = true
-    end
+    query_params = (!params[:status].nil? && !params[:random].nil?)
+    
+    internal_data_match = params[:user] ? (params[:user] == data) : true
 
-    json({ server_response: true, http_verb: env["REQUEST_METHOD"].downcase, data_match: data_match })
+    json({ server_response: true, http_verb: env["REQUEST_METHOD"].downcase, internal_data_match: internal_data_match, query_params: query_params })
   end
 
   def test_hash_with_array

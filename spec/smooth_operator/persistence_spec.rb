@@ -1,22 +1,21 @@
 require "spec_helper"
 
-
 shared_examples_for "after save call procedure" do
   it "it should populate 'internal_data' with the server's response" do
-    run_method
-    expect(user_instance.server_response).to be true
+    execute_method
+    expect(subject.server_response).to be true
   end
 
   it "it should populate 'last_remote_call' with the remote_call used on this transaction" do
-    expect(user_instance.last_remote_call).to be_nil
-    run_method
-    expect(user_instance.last_remote_call).to be_instance_of(SmoothOperator::RemoteCall::Base)
+    expect(subject.last_remote_call).to be_nil
+    execute_method
+    expect(subject.last_remote_call).to be_instance_of(SmoothOperator::RemoteCall::Base)
   end
 end
 
 shared_examples_for "positive remote call" do
   it "it should return true" do
-    expect(run_method).to be true
+    expect(execute_method).to be true
   end
 
   it_behaves_like "after save call procedure"
@@ -24,7 +23,7 @@ end
 
 shared_examples_for "negative remote call" do
   it "it should return false" do
-    expect(run_method).to be false
+    expect(execute_method).to be false
   end
 
   it_behaves_like "after save call procedure"
@@ -32,31 +31,32 @@ end
 
 shared_examples_for "error remote call" do
   it "it should return nil" do
-    expect(run_method).to be_nil
+    expect(execute_method).to be_nil
   end
 
   it "it should NOT alter 'internal_data'" do
-    expect(user_instance.respond_to?(:server_response)).to be(false)
+    execute_method
+    expect(subject.respond_to?(:server_response)).to be(false)
   end
 
   it "it should populate 'last_remote_call' with the remote_call used on this transaction" do
-    expect(user_instance.last_remote_call).to be_nil
-    run_method
-    expect(user_instance.last_remote_call).to be_instance_of(SmoothOperator::RemoteCall::Base)
+    expect(subject.last_remote_call).to be_nil
+    execute_method
+    expect(subject.last_remote_call).to be_instance_of(SmoothOperator::RemoteCall::Base)
   end
 end
 
 shared_examples_for "save method" do
   it "it should make a http call with the contents of 'internal_data'" do
-    run_method
-    expect(user_instance.last_remote_call.data['data_match']).to be true
+    execute_method
+    expect(subject.last_remote_call.data['internal_data_match']).to be true
   end
 end
 
 shared_examples_for "create method" do
   it "it should make a post http call" do
-    run_method
-    expect(user_instance.last_remote_call.data['http_verb']).to eq('post')
+    execute_method
+    expect(subject.last_remote_call.data['http_verb']).to eq('post')
   end
 
   it_behaves_like "save method"
@@ -64,8 +64,8 @@ end
 
 shared_examples_for "update method" do
   it "it should make a put http call" do
-    run_method
-    expect(user_instance.last_remote_call.data['http_verb']).to eq('put')
+    execute_method
+    expect(subject.last_remote_call.data['http_verb']).to eq('put')
   end
 
   it_behaves_like "save method"
@@ -73,54 +73,61 @@ end
 
 shared_examples_for "destroy method" do
   it "it should make a delete http call" do
-    run_method
-    expect(user_instance.last_remote_call.data['http_verb']).to eq('delete')
+    execute_method
+    expect(subject.last_remote_call.data['http_verb']).to eq('delete')
   end
 end
 
 
-describe SmoothOperator::Persistence do
-
-  subject { UserWithAddressAndPosts::Son }
-
-  let(:user_with_data) { subject.new(attributes_for(:user_with_address_and_posts)) }
+describe SmoothOperator::Persistence, helpers: :persistence do
 
   describe ".create" do
-    
+    xit '...' do
+    end
   end
 
   describe "#new_record?" do
     context "when initializing an instance without an id" do
+      subject { new_user }
+
       it "it should return true" do
-        expect(subject.new.new_record?).to be(true)
+        expect(subject.new_record?).to be(true)
       end
     end
 
     context "when initializing an instance with an id" do
+      subject { existing_user }
+
       it "it should return false" do
-        expect(user_with_data.new_record?).to be(false)
+        expect(subject.new_record?).to be(false)
       end
     end
   end
 
   describe "#destroyed?" do
     context "before executing #destroy" do
+      subject { existing_user }
+
       it "it should return false" do
-        expect(user_with_data.destroyed?).to be_falsey
+        expect(subject.destroyed?).to be_falsey
       end
     end
 
     context "after a successful execution of #destroy" do
+      subject { existing_user }
+      before  { subject.destroy('', { status: 200 }) }
+
       it "it should return true" do
-        user_with_data.destroy('', { status: 200 })
-        expect(user_with_data.destroyed?).to be(true)
+        expect(subject.destroyed?).to be(true)
       end
     end
   
     context "after a failed execution of #destroy" do
+      subject { existing_user }
+      before  { subject.destroy('', { status: 422 }) }
+
       it "it should return false" do
-        user_with_data.destroy('', { status: 422 })
-        expect(user_with_data.destroyed?).to be(false)
+        expect(subject.destroyed?).to be(false)
       end
     end
 
@@ -128,64 +135,67 @@ describe SmoothOperator::Persistence do
 
   describe "#persisted?" do
     context "when initializing an instance without an id" do
+      subject { new_user }
+
       it "it should return false" do
-        expect(subject.new.persisted?).to be(false)
+        expect(subject.persisted?).to be(false)
       end
     end
 
     context "when initializing an instance with an id" do
-      
-      let(:user_instance) { subject.new(attributes_for(:user_with_address_and_posts)) }
 
       context "before destroying the instance" do
+        subject { existing_user }
+
         it "it should return true" do
-          expect(user_with_data.persisted?).to be(true)
+          expect(subject.persisted?).to be(true)
         end
       end
 
       context "after a successful #destroy" do
+        subject { existing_user }
+        before  { subject.destroy('', { status: 200 }) }
+
         it "it should return false" do
-          user_instance.destroy('', { status: 200 })
-          expect(user_instance.persisted?).to be(false)
+          expect(subject.persisted?).to be(false)
         end
       end
 
       context "after a failed #destroy" do
+        subject { existing_user }
+        before  { subject.destroy('', { status: 422 }) }
+
         it "it should return true" do
-          user_instance.destroy('', { status: 422 })
-          expect(user_instance.persisted?).to be(true)
+          expect(subject.persisted?).to be(true)
         end
       end
     end
-  end  
-
+  end
+=begin
   describe "#save" do
 
-    let(:run_method) { user_instance.save }
+    method_to_execute = :save
 
     context "when an instance is NOT persisted" do
-      let(:user_instance) do
-        attributes = attributes_for(:user_with_address_and_posts)
-        attributes.delete(:id)
-        subject.new(attributes)
-      end
-
       context "when the response is positive" do
-        before { user_instance.status = 200 }
+        subject { new_user }
+        before  { execute_method = subject.save('', { status: 200 }) }
 
         it_behaves_like "positive remote call"
         it_behaves_like "create method"
       end
 
       context "when the response is negative" do
-        before { user_instance.status = 422 }
+        subject { new_user }
+        before  { execute_method = subject.save('', { status: 422 }) }
 
         it_behaves_like "negative remote call"
         it_behaves_like "create method"
       end
 
       context "when the there is a connection error ou http 500" do
-        before { user_instance.status = 500 }
+        subject { new_user }
+        before  { execute_method = subject.save('', { status: 500 }) }
 
         it_behaves_like "error remote call"
         it_behaves_like "create method"
@@ -193,24 +203,25 @@ describe SmoothOperator::Persistence do
     end
 
     context "when an instance IS persisted" do
-      let(:user_instance) { subject.new(attributes_for(:user_with_address_and_posts)) }
-
       context "when the response is positive" do
-        before { user_instance.status = 200 }
+        subject { existing_user }
+        before  { execute_method = subject.save('', { status: 200 }) }
 
         it_behaves_like "positive remote call"
         it_behaves_like "update method"
       end
 
       context "when the response is negative" do
-        before { user_instance.status = 422 }
+        subject { existing_user }
+        before  { execute_method = subject.save('', { status: 422 }) }
 
         it_behaves_like "negative remote call"
         it_behaves_like "update method"
       end
 
       context "when the there is a connection error ou http 500" do
-        before { user_instance.status = 500 }
+        subject { existing_user }
+        before  { execute_method = subject.save('', { status: 500 }) }
 
         it_behaves_like "error remote call"
         it_behaves_like "update method"
@@ -218,68 +229,67 @@ describe SmoothOperator::Persistence do
     end
 
   end
-
+=end
   describe "#save!" do
-    let(:user_instance) { subject.new(attributes_for(:user_with_address_and_posts)) }
+    subject { existing_user }
 
     context "when #save return true" do
-      before { user_instance.status = 200 }
-      
       it "should return true" do
-        expect(user_instance.save!).to be(true)
+        expect(subject.save!('', { status: 200 })).to be(true)
       end
     end
 
     context "when #save return false or nil" do
-      before { user_instance.status = 500 }
-
       it "should raise an exception" do
-        expect { user_instance.save! }.to raise_error
+        expect { subject.save!('', { status: 500 }) }.to raise_error
       end
     end
   end
 
   describe "#destroy" do
+    
+    let(:method_to_execute) { :destroy }
+    let(:method_arguments) { [] }
 
     context "when an instance is not persisted" do
-
-      let(:user_instance) { subject.new( observations: '123' ) }
-
-      let(:run_method) { user_instance.destroy }
+      subject { new_user }
+      before  { @method_result = execute_method }
 
       it "it should return false" do
-        expect(run_method).to be_falsey
+        expect(@method_result).to be_falsey
       end
 
       it "it NOT should make a delete http call" do
-        assert_not_requested :delete, /localhost/, times: 2
+        assert_not_requested :delete, /localhost/, times: 1
       end
     end
 
     context "when an instance is persisted" do
-      let(:user_instance) { subject.new(attributes_for(:user_with_address_and_posts)) }
-
       context "when the response is positive" do
-        let(:run_method) { user_instance.destroy('', status: 200) }
+        subject { existing_user }
+        let(:method_arguments) { ['', { status: 200 }] }
 
         it_behaves_like "positive remote call"
         it_behaves_like "destroy method"
       end
 
       context "when the response is negative" do
-        let(:run_method) { user_instance.destroy('', status: 422) }
+        subject { existing_user }
+        let(:method_arguments) { ['', { status: 422 }] }
 
         it_behaves_like "negative remote call"
         it_behaves_like "destroy method"
       end
 
       context "when the there is a connection error ou http 500" do
-        let(:run_method) { user_instance.destroy('', status: 500) }
+        subject { existing_user }
+        let(:method_arguments) { ['', { status: 500 }] }
 
         it_behaves_like "error remote call"
         it_behaves_like "destroy method"
       end
     end
+
   end
 
 end
