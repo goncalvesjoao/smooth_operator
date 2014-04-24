@@ -42,7 +42,7 @@ module SmoothOperator
       return false unless persisted?
 
       relative_path = "#{id}" if Helpers.blank?(relative_path)
-
+      
       success = make_remote_call(:delete, relative_path, data, options)
 
       @destroyed = true if success
@@ -90,7 +90,7 @@ module SmoothOperator
 
     def build_remote_call_args(http_verb, data, options)
       return [data, options] if http_verb == :delete
-
+      
       hash = serializable_hash(options[:serializable_options]).dup
       hash.delete('id')
 

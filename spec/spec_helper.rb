@@ -11,7 +11,6 @@ Dir.chdir("spec/") do
 end
 
 include WebMock::API
-# WebMock.allow_net_connect!
 
 FactoryGirl.find_definitions
 

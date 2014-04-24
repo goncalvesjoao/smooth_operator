@@ -13,7 +13,7 @@ module UserWithAddressAndPosts
 
     self.table_name = 'users'
 
-    self.endpoint = 'http://localhost:3000/v0/'
+    self.endpoint = 'http://localhost:4567/'
 
     schema(
       age: :int,
