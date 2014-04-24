@@ -1,5 +1,3 @@
-require 'date'
-require 'smooth_operator/type_converter'
 require 'smooth_operator/internal_attribute'
 
 module SmoothOperator

@@ -1,3 +1,5 @@
+require 'smooth_operator/type_converter'
+
 module SmoothOperator
 
   class InternalAttribute

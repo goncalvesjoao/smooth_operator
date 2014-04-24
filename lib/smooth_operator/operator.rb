@@ -62,7 +62,6 @@ module SmoothOperator
       options ||= {}
 
       options[:timeout] ||= timeout unless timeout == ''
-      # options[:params_encoder] ||= ParamsEncoder # to properly encode arrays
       options[:params_encoder] ||= Faraday::NestedParamsEncoder # to properly encode arrays
 
       connection = (options.delete(:connection) || generate_connection)

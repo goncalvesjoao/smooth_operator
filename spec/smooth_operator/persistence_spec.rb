@@ -234,7 +234,7 @@ describe SmoothOperator::Persistence do
       before { user_instance.status = 500 }
 
       it "should raise an exception" do
-        expect(user_instance.save!).to raise_error 'RecordNotSaved'
+        expect { user_instance.save! }.to raise_error
       end
     end
   end
