@@ -164,7 +164,11 @@ describe SmoothOperator::Persistence do
     let(:run_method) { user_instance.save }
 
     context "when an instance is NOT persisted" do
-      let(:user_instance) { subject.new( observations: '123' ) }
+      let(:user_instance) do
+        attributes = attributes_for(:user_with_address_and_posts)
+        attributes.delete(:id)
+        subject.new(attributes)
+      end
 
       context "when the response is positive" do
         before { user_instance.status = 200 }

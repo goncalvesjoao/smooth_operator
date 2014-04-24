@@ -39,13 +39,24 @@ class FakeServer < Sinatra::Base
 
   def common_response
     status params[:status] || (!params[:user].nil? && params[:user][:status]) || 500
-    json({ server_response: true, _status: params[:status], http_verb: env["REQUEST_METHOD"].downcase, data_match: true })
+
+    data = stringify_data FactoryGirl.attributes_for(:user_with_address_and_posts)
+    data.delete('id')
+
+    if params[:user]
+      params[:user].delete('status')
+      data_match = (params[:user] == data)
+    else
+      data_match = true
+    end
+
+    json({ server_response: true, http_verb: env["REQUEST_METHOD"].downcase, data_match: data_match })
   end
 
   def test_hash_with_array
     data = stringify_data FactoryGirl.attributes_for(:user_with_address_and_posts)
 
-    (params == data) ? 200 : 403
+    (params == data) ? 200 : 422
   end
 
   def stringify_data(object)
