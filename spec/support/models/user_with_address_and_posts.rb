@@ -1,6 +1,6 @@
 module UserWithAddressAndPosts
   
-  class Father < SmoothOperator::Base
+  class Father < User
 
     schema(
       posts: Post,
@@ -12,8 +12,6 @@ module UserWithAddressAndPosts
   class Son < Father
 
     self.table_name = 'users'
-
-    self.endpoint = 'http://localhost:4567/'
 
     schema(
       age: :int,

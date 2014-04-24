@@ -40,6 +40,8 @@ module SmoothOperator
 
       params, body = *([:get, :head, :delete].include?(http_verb) ? [data, nil] : [{}, data])
 
+      params = query_string(params || {})
+
       begin
         response = connection.send(http_verb) do |request|
           params.each { |key, value| request.params[key] = value }
@@ -53,6 +55,10 @@ module SmoothOperator
       rescue Faraday::ConnectionFailed
         RemoteCall::ConnectionFailed.new
       end
+    end
+
+    def query_string(options)
+      options
     end
 
 

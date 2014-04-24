@@ -12,6 +12,14 @@ class FakeServer < Sinatra::Base
     status test_hash_with_array
   end
 
+  get '/users/test_query_string' do
+    status test_query_string
+  end
+
+  post '/users/test_query_string' do
+    status test_query_string
+  end
+
 
   get '/users' do
     json [{ id: 1 }, { id: 2 }]
@@ -43,7 +51,7 @@ class FakeServer < Sinatra::Base
     data = stringify_data FactoryGirl.attributes_for(:user_with_address_and_posts)
     data.delete('id')
 
-    query_params = (!params[:status].nil? && !params[:random].nil?)
+    query_params = (!params[:status].nil? && !params[:query_string_param].nil?)
     
     internal_data_match = params[:user] ? (params[:user] == data) : true
 
@@ -52,9 +60,18 @@ class FakeServer < Sinatra::Base
 
   def test_hash_with_array
     data = stringify_data FactoryGirl.attributes_for(:user_with_address_and_posts)
+    
+    params.delete("query_string_param")
 
     (params == data) ? 200 : 422
   end
+
+  def test_query_string
+    params[:normal_param] == 'true' && params[:query_string_param] == 'true' ? 200 : 422
+  end
+
+
+  private ######################### PRIVATE #####################
 
   def stringify_data(object)
     if object.is_a?(Hash)

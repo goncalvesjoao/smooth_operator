@@ -15,6 +15,12 @@ describe SmoothOperator::Operator do
 
     end
 
+    it "should send the extra params set by .query_string method" do
+      remote_call = subject.get('test_query_string', { normal_param: true })
+
+      expect(remote_call.status).to eq(true)
+    end
+
   end
 
   describe "#post" do
@@ -27,6 +33,12 @@ describe SmoothOperator::Operator do
         expect(remote_call.status).to eq(true)
       end
 
+    end
+
+    it "should send the extra params set by .query_string method" do
+      remote_call = subject.post('test_query_string', { normal_param: true })
+
+      expect(remote_call.status).to eq(true)
     end
 
   end
