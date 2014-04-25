@@ -272,9 +272,10 @@ describe SmoothOperator::Persistence, helpers: :persistence do
         expect(execute_method).to be_falsey
       end
 
-      xit "it NOT should make a delete http call" do
+      it "it NOT should make a delete http call" do
+        expect(subject.last_remote_call).to be_nil
         execute_method
-        # assert_not_requested :delete, /localhost/, times: 1
+        expect(subject.last_remote_call).to be_nil
       end
     end
 
