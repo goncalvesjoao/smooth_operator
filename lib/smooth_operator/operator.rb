@@ -36,14 +36,14 @@ module SmoothOperator
     protected ################ PROTECTED ################
 
     def make_the_call(http_verb, relative_path = '', data = {}, options = {})
-      relative_path = build_relative_path(relative_path)
-
       params, body = strip_params(http_verb, data)
 
       connection, connection_options, options = strip_options(options)
 
+      relative_path = build_relative_path(relative_path, options)
+
       begin
-        connection.basic_auth(endpoint_user, endpoint_pass) if Helpers.present?(endpoint_user)
+        set_basic_authentication(connection, options)
 
         response = connection.send(http_verb) do |request|
           connection_options.each { |key, value| request.options.send("#{key}=", value) }
@@ -66,8 +66,14 @@ module SmoothOperator
 
     private ################# PRIVATE ###################
 
-    def build_relative_path(relative_path)
-      Helpers.present?(table_name) ? "#{table_name}/#{relative_path}" : relative_path
+    def build_relative_path(relative_path, options)
+      table_name = options[:table_name] || self.table_name
+
+      if Helpers.present?(table_name)
+        Helpers.present?(relative_path) ? "#{table_name}/#{relative_path}" : table_name
+      else
+        relative_path
+      end
     end
 
     def strip_params(http_verb, data)
@@ -88,6 +94,13 @@ module SmoothOperator
       end
 
       [connection, connection_options, options]
+    end
+
+    def set_basic_authentication(connection, options)
+      endpoint_user = options[:endpoint_user] || self.endpoint_user
+      endpoint_pass = options[:endpoint_pass] || self.endpoint_pass
+
+      connection.basic_auth(endpoint_user, endpoint_pass) if Helpers.present?(endpoint_user)
     end
 
   end

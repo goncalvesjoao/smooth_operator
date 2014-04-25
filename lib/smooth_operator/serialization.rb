@@ -9,6 +9,8 @@ module SmoothOperator
     alias :attributes :to_hash
     
     def to_json(options = nil)
+      require 'json' unless defined? JSON
+      
       JSON(serializable_hash(options))
     end
 
