@@ -12,8 +12,8 @@ module SmoothOperator
         @methods_http_verbs ||= { create: :post, save: :put, destroy: :delete }
       end
 
-      def save_http_verb=(http_verb)
-        methods_http_verbs[:save] = http_verb
+      [:create, :save, :destroy].each do |method|
+        define_method("#{method}_http_verb=") { |http_verb| methods_http_verbs[method] = http_verb }
       end
       
       def create(attributes = nil, relative_path = nil, data = {}, options = {})
