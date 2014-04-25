@@ -36,6 +36,10 @@ class TestServer < Sinatra::Base
   put '/users/:id' do
     common_response
   end
+  
+  patch '/users/:id' do
+    common_response
+  end
 
   delete '/users/:id' do
     common_response

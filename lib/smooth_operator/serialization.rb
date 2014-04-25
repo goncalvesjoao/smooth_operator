@@ -2,12 +2,12 @@ module SmoothOperator
 
   module Serialization
 
-    def attributes; to_hash; end
-
     def to_hash(options = nil)
       Helpers.symbolyze_keys serializable_hash(options)
     end
-
+    
+    alias :attributes :to_hash
+    
     def to_json(options = nil)
       JSON(serializable_hash(options))
     end

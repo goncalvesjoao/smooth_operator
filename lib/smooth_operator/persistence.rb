@@ -7,6 +7,14 @@ module SmoothOperator
     end
 
     module ClassMethods
+
+      def methods_http_verbs
+        @methods_http_verbs ||= { create: :post, save: :put, destroy: :delete }
+      end
+
+      def save_http_verb=(http_verb)
+        methods_http_verbs[:save] = http_verb
+      end
       
       def create(attributes = nil, relative_path = nil, data = {}, options = {})
         if attributes.is_a?(Array)
@@ -50,7 +58,7 @@ module SmoothOperator
 
       relative_path = "#{id}" if Helpers.blank?(relative_path)
       
-      success = make_remote_call(:delete, relative_path, data, options)
+      success = make_remote_call(self.class.methods_http_verbs[:destroy], relative_path, data, options)
 
       @destroyed = true if success
 
@@ -65,7 +73,7 @@ module SmoothOperator
     end
 
     def create(relative_path, data, options)
-      success = make_remote_call(:post, relative_path, data, options)
+      success = make_remote_call(self.class.methods_http_verbs[:create], relative_path, data, options)
 
       @new_record = false if success
 
@@ -75,7 +83,7 @@ module SmoothOperator
     def update(relative_path, data, options)
       relative_path = "#{id}" if Helpers.blank?(relative_path)
 
-      make_remote_call(:put, relative_path, data, options)
+      make_remote_call(self.class.methods_http_verbs[:save], relative_path, data, options)
     end
 
 

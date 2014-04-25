@@ -20,6 +20,14 @@ module UserWithAddressAndPosts
     )
 
   end
+
+  class WithPatch < Son
+
+    self.table_name = 'users'
+
+    self.save_http_verb = :patch
+
+  end
   
 
   module UserBlackListed

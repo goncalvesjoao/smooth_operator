@@ -229,17 +229,33 @@ describe SmoothOperator::Persistence, helpers: :persistence do
     end
 
     context "when an instance IS persisted" do
-      subject { existing_user }
-      let(:persistence_state) { { 200 => true, 422 => true, 500 => true } }
+      context "and it uses 'put' http verb to save" do
+        subject { existing_user }
+        let(:persistence_state) { { 200 => true, 422 => true, 500 => true } }
 
-      it_behaves_like "persistent remote call"
+        it_behaves_like "persistent remote call"
 
-      it "it should make a put http call" do
-        execute_method
-        expect(subject.last_remote_call.data['http_verb']).to eq('put')
+        it "it should make a put http call" do
+          execute_method
+          expect(subject.last_remote_call.data['http_verb']).to eq('put')
+        end
+
+        it_behaves_like "save method"
       end
 
-      it_behaves_like "save method"
+      context "and it uses 'patch' http verb to save" do
+        subject { existing_user_with_patch }
+        let(:persistence_state) { { 200 => true, 422 => true, 500 => true } }
+
+        it_behaves_like "persistent remote call"
+
+        it "it should make a patch http call" do
+          execute_method
+          expect(subject.last_remote_call.data['http_verb']).to eq('patch')
+        end
+
+        it_behaves_like "save method"
+      end
     end
 
   end

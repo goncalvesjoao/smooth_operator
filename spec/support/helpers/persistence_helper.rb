@@ -15,6 +15,10 @@ module PersistenceHelper
     subject_class.new(attributes_for(:user_with_address_and_posts))
   end
 
+  def existing_user_with_patch
+    UserWithAddressAndPosts::WithPatch.new(attributes_for(:user_with_address_and_posts))
+  end
+
   def created_subject
     @created_subject
   end
