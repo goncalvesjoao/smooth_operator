@@ -71,7 +71,7 @@ class TestServer < Sinatra::Base
     
     internal_data_match = params[:user] ? (params[:user] == data) : true
 
-    json({ server_response: true, http_verb: env["REQUEST_METHOD"].downcase, internal_data_match: internal_data_match, query_params: query_params })
+    json({ user: { server_response: true }, http_verb: env["REQUEST_METHOD"].downcase, internal_data_match: internal_data_match, query_params: query_params })
   end
 
   def test_hash_with_array
