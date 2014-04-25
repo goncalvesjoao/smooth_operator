@@ -64,18 +64,18 @@ module SmoothOperator
       new_record? ? create(relative_path, data, options) : update(relative_path, data, options)
     end
 
-    def update(relative_path, data, options)
-      relative_path = "#{id}" if Helpers.blank?(relative_path)
-
-      make_remote_call(:put, relative_path, data, options)
-    end
-
     def create(relative_path, data, options)
       success = make_remote_call(:post, relative_path, data, options)
 
       @new_record = false if success
 
       success
+    end
+
+    def update(relative_path, data, options)
+      relative_path = "#{id}" if Helpers.blank?(relative_path)
+
+      make_remote_call(:put, relative_path, data, options)
     end
 
 

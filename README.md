@@ -27,3 +27,11 @@ TODO: Write usage instructions here
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
+
+
+## TODO
+
+1. FinderMethods
+2. Switch between Put and Patch
+3. Turn on/off the casting of unknown hashes into OpenStruct class
+3. Cache
