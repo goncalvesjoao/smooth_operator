@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 # Specify your gem's dependencies in smooth_operator.gemspec
 gemspec
 
-gem "codeclimate-test-reporter", group: :test, require: nil
+gem 'simplecov', :require => false, :group => :test
 
 group :development, :test do
   gem "pry"
