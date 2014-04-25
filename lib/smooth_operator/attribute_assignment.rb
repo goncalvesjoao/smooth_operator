@@ -4,6 +4,31 @@ module SmoothOperator
 
   module AttributeAssignment
 
+    def self.included(base)
+      base.extend(ClassMethods)
+    end
+
+    module ClassMethods
+
+      def attributes_white_list
+        Helpers.get_instance_variable(self, :attributes_white_list, Set.new)
+      end
+
+      def attributes_black_list
+        Helpers.get_instance_variable(self, :attributes_black_list, Set.new)
+      end
+
+      def attributes_white_list_add(*getters)
+        attributes_white_list.merge getters.map(&:to_s)
+      end
+
+      def attributes_black_list_add(*getters)
+        attributes_black_list.merge getters.map(&:to_s)
+      end
+
+    end
+
+
     def initialize(attributes = {})
       before_initialize(attributes)
 
@@ -48,7 +73,13 @@ module SmoothOperator
     def after_initialize(attributes); end
 
     def allowed_attribute(attribute)
-      true
+      if !self.class.attributes_white_list.empty?
+        self.class.attributes_white_list.include?(attribute)
+      elsif !self.class.attributes_black_list.empty?
+        !self.class.attributes_black_list.include?(attribute)
+      else
+        true
+      end
     end
 
   end

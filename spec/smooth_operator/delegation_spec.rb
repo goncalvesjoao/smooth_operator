@@ -6,7 +6,7 @@ describe SmoothOperator::Delegation do
     let(:initial_attributes_keys) { attributes_for(:user).keys }
 
     context "when there is no declared schema" do
-      subject { UserWithMyMethod.new(attributes_for(:user)) }
+      subject { UserWithAddressAndPosts::UserWithMyMethod.new(attributes_for(:user)) }
 
       it 'it should return true for every attribute used uppon initialization' do
         initial_attributes_keys.each do |attribute|

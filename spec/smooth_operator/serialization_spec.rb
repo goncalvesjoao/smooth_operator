@@ -4,16 +4,16 @@ describe SmoothOperator::Serialization do
 
   describe "#to_json" do
     
-    subject { User.new(attributes_for(:user)) }
+    subject { UserWithAddressAndPosts::Son.new(attributes_for(:user_with_address_and_posts)) }
 
     context "when there are no changes to attributes's white and black list" do
       it 'it should return all attributes' do
-        expect(subject.to_hash).to eq(attributes_for(:user))
+        expect(subject.to_hash).to eq(attributes_for(:user_with_address_and_posts))
       end
     end
 
     context "when there are changes to attributes's white list" do
-      subject(:user_white_listed) { UserWhiteListed::Son.new(attributes_for(:user)) }
+      subject(:user_white_listed) { UserWithAddressAndPosts::UserWhiteListed::Son.new(attributes_for(:user_with_address_and_posts)) }
 
       it 'it should return only the white listed' do
         expect(user_white_listed.to_hash).to eq(attributes_for(:user_filtered))
@@ -21,7 +21,7 @@ describe SmoothOperator::Serialization do
     end
 
     context "when there are changes to attributes's black list" do
-      subject(:user_black_listed) { UserBlackListed::Son.new(attributes_for(:user)) }
+      subject(:user_black_listed) { UserWithAddressAndPosts::UserBlackListed::Son.new(attributes_for(:user_with_address_and_posts)) }
 
       it 'it should not return the black listed' do
         expect(user_black_listed.to_hash).to eq(attributes_for(:user_filtered))
@@ -46,7 +46,7 @@ describe SmoothOperator::Serialization do
 
     context "when option 'methods' is introduced" do
       let(:options_with_method) { { methods: :my_method } }
-      subject(:user_with_my_method) { UserWithMyMethod.new(attributes_for(:user)) }
+      subject(:user_with_my_method) { UserWithAddressAndPosts::UserWithMyMethod.new(attributes_for(:user_with_address_and_posts)) }
 
       it 'it should return all fields including the expected method and its returning value' do
         expect(user_with_my_method.to_hash(options_with_method)).to eq(attributes_for(:user_with_my_method))
