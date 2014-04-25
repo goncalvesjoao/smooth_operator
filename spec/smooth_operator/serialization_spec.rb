@@ -16,7 +16,7 @@ describe SmoothOperator::Serialization do
       subject(:user_white_listed) { UserWithAddressAndPosts::UserWhiteListed::Son.new(attributes_for(:user_with_address_and_posts)) }
 
       it 'it should return only the white listed' do
-        expect(user_white_listed.to_hash).to eq(attributes_for(:user_filtered))
+        expect(user_white_listed.to_hash).to eq(attributes_for(:white_list))
       end
     end
 
@@ -24,7 +24,7 @@ describe SmoothOperator::Serialization do
       subject(:user_black_listed) { UserWithAddressAndPosts::UserBlackListed::Son.new(attributes_for(:user_with_address_and_posts)) }
 
       it 'it should not return the black listed' do
-        expect(user_black_listed.to_hash).to eq(attributes_for(:user_filtered))
+        expect(user_black_listed.to_hash).not_to include(attributes_for(:black_list))
       end
     end
 
@@ -32,7 +32,7 @@ describe SmoothOperator::Serialization do
       let(:options_with_only) { { only: [:id, :first_name] } }
 
       it 'it should only return the filtered options' do
-        expect(subject.to_hash(options_with_only)).to eq(attributes_for(:user_filtered))
+        expect(subject.to_hash(options_with_only)).to eq(attributes_for(:white_list))
       end
     end
 
@@ -40,7 +40,7 @@ describe SmoothOperator::Serialization do
       let(:options_with_except) { { except: [:last_name, :admin] } }
 
       it 'it should return all fields except for the filtered options' do
-        expect(subject.to_hash(options_with_except)).to eq(attributes_for(:user_filtered))
+        expect(subject.to_hash(options_with_except)).not_to include(attributes_for(:black_list))
       end
     end
 
