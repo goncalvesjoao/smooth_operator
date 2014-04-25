@@ -39,6 +39,36 @@ describe SmoothOperator::AttributeAssignment do
       end
     end
 
+    context "when one of the attribute's value, is an hash and is unknown to the schema" do
+      context "when the .turn_unknown_hash_to_open_struct is set to true or unused" do
+        subject { User.new(address: { street: 'something', postal_code: { code: '123' } }) }
+
+        it "a new instance of SmoothOperator::OpenStruct will be initialized with that hash" do
+          address = subject.address
+
+          expect(address).to be_instance_of(SmoothOperator::OpenStruct)
+          expect(address.street).to eq('something')
+
+          expect(address.postal_code).to be_instance_of(SmoothOperator::OpenStruct)
+          expect(address.postal_code.code).to eq('123')
+        end
+      end
+        
+      context "when the .turn_unknown_hash_to_open_struct is set to false", current: true do
+        subject { Post.new(creator: { first_name: 'admin', address: { street: 'something' } }) }
+
+        it "the hash will be copied as it is" do
+          creator = subject.creator
+
+          expect(creator).to be_instance_of(Hash)
+          expect(creator[:first_name]).to eq('admin')
+
+          expect(creator[:address]).to be_instance_of(Hash)
+          expect(creator[:address][:street]).to eq('something')
+        end
+      end
+    end
+
     context "when there is no declared schema" do
       subject { User.new(attributes_for(:user)) }
       let(:expected_internal_data) { SmoothOperator::Helpers.stringify_keys(attributes_for(:user)) }
@@ -50,17 +80,6 @@ describe SmoothOperator::AttributeAssignment do
       it "it should populate 'known_attributes' with the keys of the received hash" do
         expect(subject.known_attributes.to_a).to match_array(expected_internal_data.keys)
       end
-
-      it "if the attribute's value is an hash a new instance of SmoothOperator::OpenStruct will be initialized with that hash" do
-        address = User.new(address: { street: 'something', creator: { first_name: 'admin' } }).address
-
-        expect(address).to be_instance_of(SmoothOperator::OpenStruct)
-        expect(address.street).to eq('something')
-
-        expect(address.creator).to be_instance_of(SmoothOperator::OpenStruct)
-        expect(address.creator.first_name).to eq('admin')
-      end
-
     end
 
     context "when there is a known schema and the received hash has an attribute" do

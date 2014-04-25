@@ -33,7 +33,6 @@ TODO: Write usage instructions here
 test after persistent method procedure with { <data> } and { model_name: <data> }
 
 1. FinderMethods specs
-2. Turn on/off the casting of unknown hashes into OpenStruct class
-3. serialization_specs to test the json options for nested classes
-4. model_schema_specs
+2. serialization_specs to test the json options for nested classes
+3. model_schema_specs
 4. Cache 

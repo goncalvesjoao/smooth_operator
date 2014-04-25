@@ -10,6 +10,8 @@ module SmoothOperator
 
     module ClassMethods
 
+      attr_accessor :turn_unknown_hash_to_open_struct
+
       def attributes_white_list
         Helpers.get_instance_variable(self, :attributes_white_list, Set.new)
       end
@@ -59,7 +61,7 @@ module SmoothOperator
       known_attributes.add attribute_name
       
       if internal_data[attribute_name].nil?
-        internal_data[attribute_name] = InternalAttribute.new(attribute_name, attribute_value, internal_structure[attribute_name])
+        internal_data[attribute_name] = InternalAttribute.new(attribute_name, attribute_value, internal_structure[attribute_name], self.class.turn_unknown_hash_to_open_struct)
       else
         internal_data[attribute_name].set_value(attribute_value)
       end

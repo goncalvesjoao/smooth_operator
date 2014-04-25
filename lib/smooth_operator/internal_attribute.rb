@@ -4,10 +4,12 @@ module SmoothOperator
 
   class InternalAttribute
 
-    attr_reader :original_name, :original_value, :first_value, :value, :type
+    attr_reader :original_name, :original_value, :first_value, :value, :type, :turn_unknown_hash_to_open_struct
 
-    def initialize(name, value, type)
+    def initialize(name, value, type, turn_to_open_struct = nil)
       @original_name, @original_value, @type = name, value, type
+      
+      @turn_unknown_hash_to_open_struct = turn_to_open_struct.nil? ? true : turn_to_open_struct
 
       @first_value = set_value(value)
     end
@@ -30,9 +32,13 @@ module SmoothOperator
     def cast_to_type(_value)
       case _value
       when Array
-        _value.map { |array_entry| InternalAttribute.new(original_name, array_entry, type).value }
+        _value.map { |array_entry| InternalAttribute.new(original_name, array_entry, type, turn_unknown_hash_to_open_struct).value }
       when Hash
-        (type || OpenStruct).new(_value)
+        if turn_unknown_hash_to_open_struct
+          (type || OpenStruct).new(_value)
+        else
+          type.nil? ? _value : type.new(_value)
+        end
       else
         TypeConverter.convert(_value, type)
       end
