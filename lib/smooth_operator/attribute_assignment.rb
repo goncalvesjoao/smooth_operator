@@ -22,8 +22,8 @@ module SmoothOperator
       @internal_data ||= {}
     end
 
-    def get_internal_data(field)
-      internal_data[field].nil? ? nil : internal_data[field].value
+    def get_internal_data(field, method = :value)
+      internal_data[field].nil? ? nil : internal_data[field].send(method)
     end
 
     def push_to_internal_data(attribute_name, attribute_value)

@@ -30,10 +30,6 @@ module SmoothOperator
         cloned_hash
       end
     end
-    
-    def setter_method?(method)
-      !! ((method.to_s) =~ /=$/)
-    end
 
     def duplicate(object)
       object.dup rescue object

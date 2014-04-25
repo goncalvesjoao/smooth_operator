@@ -48,8 +48,6 @@ module SmoothOperator
     end
 
     def to_json(options = nil)
-      require 'json' unless defined?(::JSON)
-
       JSON(serializable_hash(options))
     end
 
@@ -57,7 +55,7 @@ module SmoothOperator
       send(attribute)
     end
 
-    def serializable_hash(options = nil) # Code ripped off from ActiveSupport
+    def serializable_hash(options = nil) # Code inspired in ActiveSupport#serializable_hash
       options ||= {}
 
       attribute_names = attributes.keys.sort

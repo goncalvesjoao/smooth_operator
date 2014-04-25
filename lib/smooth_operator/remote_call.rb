@@ -25,8 +25,6 @@ module SmoothOperator
       end
 
       def data
-        require 'json' unless defined?(::JSON)
-
         begin
           JSON.parse(body)
         rescue JSON::ParserError
