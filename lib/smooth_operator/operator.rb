@@ -23,10 +23,14 @@ module SmoothOperator
       generate_connection(:typhoeus)
     end
 
-    def generate_connection(adapter = :net_http)
-      Faraday.new(url: endpoint) do |builder|
+    def generate_connection(adapter = nil, options = nil)
+      adapter ||= :net_http
+      options ||= {}
+      url, timeout = (options[:endpoint] || self.endpoint), (options[:timeout] || self.timeout)
+
+      Faraday.new(url: url) do |builder|
         builder.options.params_encoder = Faraday::NestedParamsEncoder # to properly encode arrays
-        builder.options.timeout = timeout unless timeout == ''
+        builder.options.timeout = timeout unless Helpers.blank?(timeout)
         builder.request :url_encoded
         builder.adapter adapter
       end
@@ -38,15 +42,15 @@ module SmoothOperator
     def make_the_call(http_verb, relative_path = '', data = {}, options = {})
       params, body = strip_params(http_verb, data)
 
-      connection, connection_options, options = strip_options(options)
+      connection, operator_options, options = strip_options(options)
 
       relative_path = build_relative_path(relative_path, options)
 
       begin
-        set_basic_authentication(connection, options)
+        set_basic_authentication(connection, operator_options)
 
         response = connection.send(http_verb) do |request|
-          connection_options.each { |key, value| request.options.send("#{key}=", value) }
+          operator_options.each { |key, value| request.options.send("#{key}=", value) }
           params.each { |key, value| request.params[key] = value }
           
           request.url relative_path
@@ -85,15 +89,10 @@ module SmoothOperator
     def strip_options(options)
       options ||= {}
 
-      connection_array, connection_options = options.delete(:connection), {}
+      operator_options = options.delete(:operator_options) || {}
+      connection = options.delete(:connection) || generate_connection(nil, operator_options)
 
-      if connection_array.is_a?(Array)
-        connection, connection_options = *connection_array
-      else
-        connection = connection_array || generate_connection
-      end
-
-      [connection, connection_options, options]
+      [connection, operator_options, options]
     end
 
     def set_basic_authentication(connection, options)
