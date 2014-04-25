@@ -12,7 +12,7 @@ describe SmoothOperator::Serialization do
         new_attributes = attributes_for(:user_with_address_and_posts)
         new_attributes[:address][:street] = 'new street'
         
-        expect(subject.to_hash).to eq(new_attributes)
+        expect(subject.attributes).to eq(new_attributes)
       end
     end
   end

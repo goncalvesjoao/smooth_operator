@@ -2,12 +2,7 @@ module SmoothOperator
 
   module Serialization
 
-    def attributes
-      internal_data.keys.reduce({}) do |hash, attribute_name|
-        hash[attribute_name] = read_attribute_for_hashing(attribute_name)
-        hash
-      end
-    end
+    def attributes; to_hash; end
 
     def to_hash(options = nil)
       Helpers.symbolyze_keys serializable_hash(options)
