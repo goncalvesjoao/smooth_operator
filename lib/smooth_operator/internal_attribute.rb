@@ -20,6 +20,10 @@ module SmoothOperator
       @first_value != @value
     end
 
+    def was
+      @first_value
+    end
+
 
     protected ######################## PROTECTED #####################
 

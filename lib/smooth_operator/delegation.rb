@@ -28,12 +28,12 @@ module SmoothOperator
 
     def parse_method(method)
       method = method.to_s
-
+      
       if method?(method, /=$/)
         [:setter, method[0..-2]]
       elsif method?(method, /_was$/)
         [:was, method[0..-5]]
-      elsif method?(method, /_changed?$/)
+      elsif method?(method, /_changed\?$/)
         [:changed, method[0..-10]]
       else
         [nil, method]
