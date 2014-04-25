@@ -31,7 +31,6 @@ TODO: Write usage instructions here
 ## TODO
 
 1. FinderMethods
-2. Switch between Put and Patch
-3. Turn on/off the casting of unknown hashes into OpenStruct class
-4. serialization_specs to test the json options for nested classes
-5. Cache 
+2. Turn on/off the casting of unknown hashes into OpenStruct class
+3. serialization_specs to test the json options for nested classes
+4. Cache 
