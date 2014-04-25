@@ -94,7 +94,7 @@ module SmoothOperator
 
       @last_remote_call = self.class.send(http_verb, relative_path, data, options)
 
-      returning_data = @last_remote_call.data
+      returning_data = @last_remote_call.parsed_response
       
       if !@last_remote_call.error? && returning_data.is_a?(Hash)
         assign_attributes returning_data.include?(model_name) ? returning_data[model_name] : returning_data

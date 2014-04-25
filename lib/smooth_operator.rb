@@ -19,6 +19,8 @@ module SmoothOperator
 
     include Persistence
 
+    attr_reader :last_remote_call
+
   end
   
 end

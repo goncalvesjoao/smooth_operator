@@ -33,4 +33,5 @@ TODO: Write usage instructions here
 1. FinderMethods
 2. Turn on/off the casting of unknown hashes into OpenStruct class
 3. serialization_specs to test the json options for nested classes
+4. model_schema_specs
 4. Cache 

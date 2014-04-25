@@ -16,7 +16,7 @@ end
 shared_examples_for "persistent remote call" do
   it "should send the extra params set by .query_string method" do
     execute_method
-    expect(subject.last_remote_call.data['query_params']).to be true
+    expect(subject.last_remote_call.parsed_response['query_params']).to be true
   end
 
   context "when the response is positive" do
@@ -80,7 +80,7 @@ end
 shared_examples_for "save method" do
   it "it should make a http call with the contents of 'internal_data'" do
     execute_method
-    expect(subject.last_remote_call.data['internal_data_match']).to be true
+    expect(subject.last_remote_call.parsed_response['internal_data_match']).to be true
   end
 end
 
@@ -100,7 +100,7 @@ describe SmoothOperator::Persistence, helpers: :persistence do
 
       it "it should make a post http call" do
         execute_method
-        expect(subject.last_remote_call.data['http_verb']).to eq('post')
+        expect(subject.last_remote_call.parsed_response['http_verb']).to eq('post')
       end
 
       it_behaves_like "save method"
@@ -115,7 +115,7 @@ describe SmoothOperator::Persistence, helpers: :persistence do
 
       it "it should make a post http call" do
         execute_method
-        expect(subject.last_remote_call.data['http_verb']).to eq('put')
+        expect(subject.last_remote_call.parsed_response['http_verb']).to eq('put')
       end
 
       it_behaves_like "save method"
@@ -222,7 +222,7 @@ describe SmoothOperator::Persistence, helpers: :persistence do
 
       it "it should make a post http call" do
         execute_method
-        expect(subject.last_remote_call.data['http_verb']).to eq('post')
+        expect(subject.last_remote_call.parsed_response['http_verb']).to eq('post')
       end
 
       it_behaves_like "save method"
@@ -237,7 +237,7 @@ describe SmoothOperator::Persistence, helpers: :persistence do
 
         it "it should make a put http call" do
           execute_method
-          expect(subject.last_remote_call.data['http_verb']).to eq('put')
+          expect(subject.last_remote_call.parsed_response['http_verb']).to eq('put')
         end
 
         it_behaves_like "save method"
@@ -251,7 +251,7 @@ describe SmoothOperator::Persistence, helpers: :persistence do
 
         it "it should make a patch http call" do
           execute_method
-          expect(subject.last_remote_call.data['http_verb']).to eq('patch')
+          expect(subject.last_remote_call.parsed_response['http_verb']).to eq('patch')
         end
 
         it_behaves_like "save method"
@@ -303,7 +303,7 @@ describe SmoothOperator::Persistence, helpers: :persistence do
 
       it "it should make a delete http call" do
         execute_method
-        expect(subject.last_remote_call.data['http_verb']).to eq('delete')
+        expect(subject.last_remote_call.parsed_response['http_verb']).to eq('delete')
       end
     end
 

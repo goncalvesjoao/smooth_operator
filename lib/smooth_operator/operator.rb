@@ -36,22 +36,20 @@ module SmoothOperator
     protected ################ PROTECTED ################
 
     def make_the_call(http_verb, relative_path = '', data = {}, options = {})
-      url = Helpers.present?(table_name) ? "#{table_name}/#{relative_path}" : relative_path
+      relative_path = build_relative_path(relative_path)
+
+      params, body = strip_params(http_verb, data)
 
       connection, connection_options, options = strip_options(options)
-
-      params, body = *([:get, :head, :delete].include?(http_verb) ? [data, nil] : [{}, data])
-
-      params = query_string(params || {})
 
       begin
         connection.basic_auth(endpoint_user, endpoint_pass) if Helpers.present?(endpoint_user)
 
         response = connection.send(http_verb) do |request|
-          params.each { |key, value| request.params[key] = value }
           connection_options.each { |key, value| request.options.send("#{key}=", value) }
+          params.each { |key, value| request.params[key] = value }
           
-          request.url url
+          request.url relative_path
           request.body = body
         end
 
@@ -67,6 +65,16 @@ module SmoothOperator
 
 
     private ################# PRIVATE ###################
+
+    def build_relative_path(relative_path)
+      Helpers.present?(table_name) ? "#{table_name}/#{relative_path}" : relative_path
+    end
+
+    def strip_params(http_verb, data)
+      data ||= {}
+
+      ([:get, :head, :delete].include?(http_verb) ? [query_string(data), nil] : [query_string({}), data])
+    end
 
     def strip_options(options)
       options ||= {}

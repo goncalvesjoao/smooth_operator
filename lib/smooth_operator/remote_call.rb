@@ -8,8 +8,10 @@ module SmoothOperator
 
       attr_reader :response
 
-      def initialize(response)
-        @response = response
+      attr_accessor :object_class
+
+      def initialize(response, object_class = nil)
+        @response, @object_class = response, object_class
       end
 
       def_delegator :response, :status, :http_status
@@ -24,7 +26,7 @@ module SmoothOperator
         http_status.between?(500, 599)
       end
 
-      def data
+      def parsed_response
         begin
           JSON.parse(body)
         rescue JSON::ParserError
