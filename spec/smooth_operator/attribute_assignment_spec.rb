@@ -5,6 +5,32 @@ describe SmoothOperator::AttributeAssignment do
 
   describe "#assign_attributes" do
 
+    describe "white and black list" do
+      subject { UserWithAddressAndPosts::Son.new(attributes_for(:user_with_address_and_posts)) }
+
+      context "when there are no changes to attributes's white and black list" do
+        it 'it should return all attributes' do
+          expect(subject.to_hash).to eq(attributes_for(:user_with_address_and_posts))
+        end
+      end
+
+      context "when there are changes to attributes's white list" do
+        subject(:user_white_listed) { UserWithAddressAndPosts::UserWhiteListed::Son.new(attributes_for(:user_with_address_and_posts)) }
+
+        it 'it should return only the white listed' do
+          expect(user_white_listed.to_hash).to eq(attributes_for(:white_list))
+        end
+      end
+
+      context "when there are changes to attributes's black list" do
+        subject(:user_black_listed) { UserWithAddressAndPosts::UserBlackListed::Son.new(attributes_for(:user_with_address_and_posts)) }
+
+        it 'it should not return the black listed' do
+          expect(user_black_listed.to_hash).not_to include(attributes_for(:black_list))
+        end
+      end
+    end
+
     context "when something other than a hash is introduced" do
       it "should do nothing" do
         [nil, '', [1, 2], 'test', 1, 2].each do |something_other_than_a_hash|

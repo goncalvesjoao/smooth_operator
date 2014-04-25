@@ -3,10 +3,10 @@ require "spec_helper"
 describe SmoothOperator::Delegation do
 
   describe "#respond_to?" do
-    let(:initial_attributes_keys) { attributes_for(:user).keys }
+    let(:initial_attributes_keys) { attributes_for(:user_with_address_and_posts).keys }
 
     context "when there is no declared schema" do
-      subject { UserWithAddressAndPosts::UserWithMyMethod.new(attributes_for(:user)) }
+      subject { UserWithAddressAndPosts::UserWithMyMethod.new(attributes_for(:user_with_address_and_posts)) }
 
       it 'it should return true for every attribute used uppon initialization' do
         initial_attributes_keys.each do |attribute|
@@ -24,7 +24,7 @@ describe SmoothOperator::Delegation do
     end
 
     context "when there is a known schema" do
-      subject { UserWithAddressAndPosts::Son.new(attributes_for(:user)) }
+      subject { UserWithAddressAndPosts::Son.new(attributes_for(:user_with_address_and_posts)) }
       let(:known_schema_attributes) { ["posts", "address", "manager"] }
 
       it 'it should return true for every attribute used uppon initialization' do
@@ -43,13 +43,19 @@ describe SmoothOperator::Delegation do
   end
 
   describe "#method_missing" do
-    subject { UserWithAddressAndPosts::Son.new(attributes_for(:user)) }
-
+    
     context "when calling a method that matches the initialized attributes" do
+      subject { User.new(attributes_for(:user)) }
+
       it 'it should return the value of that same attribute' do
-        attributes_for(:user).each { |key, value| expect(subject.send(key)).to eq(value) }
+        attributes_for(:user).each do |key, value|
+          expect(subject.send(key)).to eq(value)
+        end
       end
     end
+
+
+    subject { UserWithAddressAndPosts::Son.new(attributes_for(:user_with_address_and_posts)) }
 
     context "when calling a method that doesn't match the initialized attributes but matches the schema" do
       it 'it should return nil' do
@@ -92,7 +98,7 @@ describe SmoothOperator::Delegation do
     context "when there are changes made to an attribute" do
       before { subject.first_name = 'nhoJ' }
 
-      it "checking it that attribute is changed, should return true" do
+      it "checking if that attribute is changed, should return true" do
         expect(subject.first_name_changed?).to be true
       end
 
@@ -110,6 +116,18 @@ describe SmoothOperator::Delegation do
         it "checking that attribute past value, should its first original value" do
           expect(subject.first_name_was).to eq('John')
         end
+      end
+    end
+
+    context "when there are changes made to a nested object" do
+      before { subject.address.street = 'my street' }
+
+      it "checking if the nested object as changed, should return false" do
+        expect(subject.address_changed?).to be false
+      end
+
+      it "checking if the nested object's attribute as changed, should return true" do
+        expect(subject.address.street_changed?).to be true
       end
     end
 

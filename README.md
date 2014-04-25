@@ -22,9 +22,11 @@ Or install it yourself as:
 
     $ gem install smooth_operator
 
+
 ## Usage
 
 TODO: Write usage instructions here
+
 
 ## TODO
 

@@ -2,29 +2,27 @@ require "spec_helper"
 
 describe SmoothOperator::Serialization do
 
-  describe "#to_json" do
-    
+  describe "#attributes" do
     subject { UserWithAddressAndPosts::Son.new(attributes_for(:user_with_address_and_posts)) }
 
-    context "when there are no changes to attributes's white and black list" do
+    context "when there are changes to nested objects" do
+      before { subject.address.street = 'new street' }
+
+      it "should refect those changes" do
+        new_attributes = attributes_for(:user_with_address_and_posts)
+        new_attributes[:address][:street] = 'new street'
+        
+        expect(subject.to_hash).to eq(new_attributes)
+      end
+    end
+  end
+
+  describe "#to_hash" do
+    subject { UserWithAddressAndPosts::Son.new(attributes_for(:user_with_address_and_posts)) }
+
+    context "when no options are given" do
       it 'it should return all attributes' do
         expect(subject.to_hash).to eq(attributes_for(:user_with_address_and_posts))
-      end
-    end
-
-    context "when there are changes to attributes's white list" do
-      subject(:user_white_listed) { UserWithAddressAndPosts::UserWhiteListed::Son.new(attributes_for(:user_with_address_and_posts)) }
-
-      it 'it should return only the white listed' do
-        expect(user_white_listed.to_hash).to eq(attributes_for(:white_list))
-      end
-    end
-
-    context "when there are changes to attributes's black list" do
-      subject(:user_black_listed) { UserWithAddressAndPosts::UserBlackListed::Son.new(attributes_for(:user_with_address_and_posts)) }
-
-      it 'it should not return the black listed' do
-        expect(user_black_listed.to_hash).not_to include(attributes_for(:black_list))
       end
     end
 
