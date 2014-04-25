@@ -1,6 +1,6 @@
 require 'faraday'
-# require 'faraday_middleware'
 # require 'typhoeus'
+# require 'faraday_middleware'
 # require 'typhoeus/adapters/faraday'
 
 module SmoothOperator
@@ -25,6 +25,8 @@ module SmoothOperator
 
     def generate_connection(adapter = :net_http)
       Faraday.new(url: endpoint) do |builder|
+        builder.options.params_encoder = Faraday::NestedParamsEncoder # to properly encode arrays
+        builder.options.timeout = timeout unless timeout == ''
         builder.request :url_encoded
         builder.adapter adapter
       end
@@ -36,7 +38,7 @@ module SmoothOperator
     def make_the_call(http_verb, relative_path = '', data = {}, options = {})
       url = Helpers.present?(table_name) ? "#{table_name}/#{relative_path}" : relative_path
 
-      connection, options = strip_options(options)
+      connection, connection_options, options = strip_options(options)
 
       params, body = *([:get, :head, :delete].include?(http_verb) ? [data, nil] : [{}, data])
 
@@ -47,7 +49,7 @@ module SmoothOperator
 
         response = connection.send(http_verb) do |request|
           params.each { |key, value| request.params[key] = value }
-          options.each { |key, value| request.options.send("#{key}=", value) }
+          connection_options.each { |key, value| request.options.send("#{key}=", value) }
           
           request.url url
           request.body = body
@@ -69,12 +71,15 @@ module SmoothOperator
     def strip_options(options)
       options ||= {}
 
-      options[:timeout] ||= timeout unless timeout == ''
-      options[:params_encoder] ||= Faraday::NestedParamsEncoder # to properly encode arrays
+      connection_array, connection_options = options.delete(:connection), {}
 
-      connection = (options.delete(:connection) || generate_connection)
+      if connection_array.is_a?(Array)
+        connection, connection_options = *connection_array
+      else
+        connection = connection_array || generate_connection
+      end
 
-      [connection, options]
+      [connection, connection_options, options]
     end
 
   end

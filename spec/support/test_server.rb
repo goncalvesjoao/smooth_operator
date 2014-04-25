@@ -1,7 +1,7 @@
 require 'sinatra/base'
 require 'sinatra/json'
 
-class FakeServer < Sinatra::Base
+class TestServer < Sinatra::Base
 
   use Rack::Auth::Basic, "Restricted Area" do |username, password|
     username == 'admin' and password == 'admin'
@@ -88,6 +88,9 @@ class FakeServer < Sinatra::Base
     end
   end
 
-  run! if app_file == $0
+  if app_file == $0
+    require './spec/spec_helper' unless defined? SmoothOperator
+    run!
+  end
 
 end

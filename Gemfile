@@ -5,7 +5,6 @@ gemspec
 
 group :development, :test do
   gem "pry"
-  gem "webmock"
   gem "sinatra"
   gem "sinatra-contrib"
   gem "rspec", "~> 3.0.0.beta1"

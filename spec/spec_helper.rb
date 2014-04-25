@@ -10,8 +10,6 @@ Dir.chdir("spec/") do
   Dir["support/**/*.rb"].each { |file| require file }
 end
 
-include WebMock::API
-
 FactoryGirl.find_definitions
 
 RSpec.configure do |config|
@@ -24,8 +22,6 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 
-  config.before do
-    stub_request(:any, /localhost/).to_rack(FakeServer)
-  end
+  LocalhostServer.new(TestServer.new, 4567)
 
 end
