@@ -38,7 +38,7 @@ module SmoothOperator
 
 
     protected ################ PROTECTED ################
-
+    #COMPLEX
     def make_the_call(http_verb, relative_path = '', data = {}, options = {})
       params, body = strip_params(http_verb, data)
 
