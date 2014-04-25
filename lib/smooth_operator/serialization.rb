@@ -18,9 +18,25 @@ module SmoothOperator
       send(attribute)
     end
 
-    def serializable_hash(options = nil) # Code inspired in ActiveSupport#serializable_hash
+    def serializable_hash(options = nil)
+      hash = {}
       options ||= {}
 
+      attribute_names(options).each do |attribute_name|
+        hash[attribute_name] = read_attribute_for_hashing(attribute_name, options)
+      end
+
+      method_names(options).each do |method_name|
+        hash[method_name.to_s] = send(method_name)
+      end
+
+      hash
+    end
+
+
+    protected ##################### PROTECTED ###################
+
+    def attribute_names(options)
       attribute_names = internal_data.keys.sort
 
       if only = options[:only]
@@ -29,18 +45,12 @@ module SmoothOperator
         attribute_names -= [*except].map(&:to_s)
       end
 
-      method_names = [*options[:methods]].select { |n| respond_to?(n) }
-
-      hash = {}
-      
-      attribute_names.each { |attribute_name| hash[attribute_name] = read_attribute_for_hashing(attribute_name, options) }
-      method_names.each { |method_name| hash[method_name.to_s] = send(method_name) }
-
-      hash
+      attribute_names
     end
 
-
-    protected ##################### PROTECTED ###################
+    def method_names(options)
+      [*options[:methods]].select { |n| respond_to?(n) }
+    end
 
     def read_attribute_for_hashing(attribute_name, options)
       object = read_attribute_for_serialization(attribute_name)
