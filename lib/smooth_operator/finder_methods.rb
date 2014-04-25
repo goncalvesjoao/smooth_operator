@@ -1,4 +1,4 @@
-require 'smooth_operator/metadata_array'
+require 'smooth_operator/array_with_meta_data'
 
 module SmoothOperator
   
@@ -20,12 +20,12 @@ module SmoothOperator
     protected #################### PROTECTED ##################
 
     def build_object(parsed_response, options)
-      table_name = options[:table_name] || self.table_name
+      table_name = (options[:table_name] || self.table_name).to_s
 
       if parsed_response.is_a?(Array)
         parsed_response.map { |array_entry| build_object(array_entry, options) }
       elsif parsed_response.is_a?(Hash)
-        parsed_response.include?(table_name.to_s) ? MetadataArray(parsed_response, self) : new(parsed_response)
+        parsed_response.include?(table_name) ? ArrayWithMetaData.new(parsed_response, table_name, self) : new(parsed_response)
       else
         parsed_response
       end

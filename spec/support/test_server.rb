@@ -28,8 +28,17 @@ class TestServer < Sinatra::Base
     json [{ id: 1 }, { id: 2 }]
   end
 
+  get '/users/with_metadata' do
+    data = { page: 1, total: 6, users: [{ id: 1 }, { id: 2 }] }
+    json data
+  end
+  
+  get '/users/:id' do
+    json FactoryGirl.attributes_for(:user_with_address_and_posts)
+  end
 
-  post '/users/' do
+
+  post '/users' do
     common_response
   end
 
