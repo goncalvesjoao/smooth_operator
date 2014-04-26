@@ -39,8 +39,6 @@ module SmoothOperator
       case object
       when String
         object.to_s == ''
-      when Array
-        object.empty?
       else
         object.nil?
       end

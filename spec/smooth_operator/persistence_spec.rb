@@ -89,10 +89,10 @@ describe SmoothOperator::Persistence, helpers: :persistence do
 
   describe ".create" do
     
+    subject { created_subject }
     let(:method_arguments) { [] }
 
     context "when attributes DON'T contain an ID" do
-      subject { created_subject }
       let(:method_to_execute) { :create_without_id }
       let(:persistence_state) { { 200 => true, 422 => false, 500 => false } }
 
@@ -107,7 +107,6 @@ describe SmoothOperator::Persistence, helpers: :persistence do
     end
 
     context "when attributes contain an ID" do
-      subject { created_subject }
       let(:method_to_execute) { :create_with_id }
       let(:persistence_state) { { 200 => true, 422 => true, 500 => true } }
 
