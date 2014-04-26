@@ -46,6 +46,11 @@ class TestServer < Sinatra::Base
     json FactoryGirl.attributes_for(:user_with_address_and_posts)
   end
 
+  put '/users/send_error' do
+    data_with_error = { id: 1, errors: { first_name: ["can't be blank"] } }
+    json data_with_error
+  end
+
 
   post '/users' do
     common_response

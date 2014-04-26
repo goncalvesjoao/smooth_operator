@@ -24,6 +24,7 @@ shared_examples_for "persistent remote call" do
 
     it "it should return true" do
       execute_method
+      expect(subject.last_remote_call.success?).to be true
       expect(subject.last_remote_call.status).to be true
     end
 
@@ -40,6 +41,7 @@ shared_examples_for "persistent remote call" do
 
     it "it should return false" do
       execute_method
+      expect(subject.last_remote_call.failure?).to be true
       expect(subject.last_remote_call.status).to be false
     end
 
@@ -56,6 +58,7 @@ shared_examples_for "persistent remote call" do
 
     it "it should return nil" do
       execute_method
+      expect(subject.last_remote_call.error?).to be true
       expect(subject.last_remote_call.status).to be_nil
     end
 
