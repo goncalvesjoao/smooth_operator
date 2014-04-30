@@ -11,22 +11,22 @@ module SmoothOperator
         value.to_s
       
       when :int, :integer, Integer, Fixnum
-        TypeConverter.to_int(value)
+        to_int(value)
 
       when :date, Date
-        TypeConverter.to_date(value)
+        to_date(value)
 
       when :float, Float
-        TypeConverter.to_float(value)
+        to_float(value)
 
       when :bool, :boolean
-        TypeConverter.to_boolean(value)
+        to_boolean(value)
 
       when :datetime, :date_time, DateTime
-        TypeConverter.to_datetime(value)
+        to_datetime(value)
 
       else
-        value
+        Helpers.duplicate(value)
       end
     end
 

@@ -8,7 +8,7 @@ module SmoothOperator
 
     attr_reader :meta_data, :internal_array, :table_name, :object_class
 
-    def_delegators :internal_array, :length, :<<
+    def_delegators :internal_array, :length, :<<, :[]
 
     def initialize(attributes, table_name, object_class)
       _attributes = attributes.dup

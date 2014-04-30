@@ -25,7 +25,16 @@ class TestServer < Sinatra::Base
 
 
   get '/users' do
-    json [{ id: 1 }, { id: 2 }]
+    users = [FactoryGirl.attributes_for(:user_with_address_and_posts), FactoryGirl.attributes_for(:user_with_address_and_posts)]
+    
+    users[0][:id] = 1
+    users[1][:id] = 2
+
+    json users
+  end
+
+  get '/users/misc_array' do
+    json [FactoryGirl.attributes_for(:user_with_address_and_posts), 2]
   end
 
   get '/users/with_metadata' do
@@ -35,6 +44,11 @@ class TestServer < Sinatra::Base
   
   get '/users/:id' do
     json FactoryGirl.attributes_for(:user_with_address_and_posts)
+  end
+
+  put '/users/send_error' do
+    data_with_error = { id: 1, errors: { first_name: ["can't be blank"] } }
+    json data_with_error
   end
 
 
