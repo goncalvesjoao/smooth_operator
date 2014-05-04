@@ -45,7 +45,7 @@ end
 ### 2.1) Creating a .new 'Post' and #save it
 
 ```ruby
-post = Post.new( body: 'my first post', author: 'John Doe' )
+post = Post.new(body: 'my first post', author: 'John Doe')
 
 post.new_record?     # true
 post.persisted?     # false
@@ -91,9 +91,20 @@ post.errors # will raise NoMethodError
 
 ---
 
-### 2.2) Customize #save 'url', 'params' and 'options'
+### 2.2) Editing an existing record
 ```ruby
-post = Post.new( id: 2, body: 'editing my second page' )
+post = Post.find(2)
+
+post.body = 'editing my second page'
+
+post.save
+```
+
+---
+
+### 2.3) Customize #save 'url', 'params' and 'options'
+```ruby
+post = Post.new(id: 2, body: 'editing my second page')
 
 post.new_record? # false
 post.persisted?  # true
@@ -106,13 +117,13 @@ post.save("#{post.id}/save_and_add_to_list", { admin: true, post: { author: 'Age
 
 ---
 
-### 2.3) Saving using HTTP Patch verb
+### 2.4) Saving using HTTP Patch verb
 ```ruby
 class Page < MyBlogResource
   self.save_http_verb = :patch
 end
 
-page = Page.new( id: 2, body: 'editing my second page' )
+page = Page.new(id: 2, body: 'editing my second page')
 
 page.save # will make a http PATCH call to 'http://myblog.com/api/v0/pages/2'
           # with `{ page: { body: 'editing my second page' } }`
@@ -120,7 +131,7 @@ page.save # will make a http PATCH call to 'http://myblog.com/api/v0/pages/2'
 
 ---
 
-### 2.4) Retrieving remote objects - 'index' REST action
+### 2.5) Retrieving remote objects - 'index' REST action
 
 ```ruby
 remote_call = Page.find(:all) # Will make a GET call to 'http://myblog.com/api/v0/pages'
@@ -153,7 +164,7 @@ pages = remote_call.objects # 'pages = remote_call.data' also works
 
 ---
 
-### 2.5) Retrieving remote objects - 'show' REST action
+### 2.6) Retrieving remote objects - 'show' REST action
 
 ```ruby
 remote_call = Page.find(2) # Will make a GET call to 'http://myblog.com/api/v0/pages/2'
@@ -164,7 +175,7 @@ page = remote_call.object # 'page = remote_call.data' also works
 
 ---
 
-### 2.6) Retrieving remote objects - custom query
+### 2.7) Retrieving remote objects - custom query
 ```ruby
 remote_call = Page.find('my_pages', { q: body_contains: 'link' }, { endpoint_user: 'admin', endpoint_pass: 'new_password' })
 # will make a GET call to 'http://myblog.com/api/v0/pages/my_pages?q={body_contains="link"}'
