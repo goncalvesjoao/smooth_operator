@@ -1,5 +1,5 @@
 module SmoothOperator
-  
+
   module Persistence
 
     def self.included(base)
@@ -15,7 +15,7 @@ module SmoothOperator
       [:create, :save, :destroy].each do |method|
         define_method("#{method}_http_verb=") { |http_verb| methods_http_verbs[method] = http_verb }
       end
-      
+
       def create(attributes = nil, relative_path = nil, data = {}, options = {})
         # if attributes.is_a?(Array)
         #   attributes.map { |array_entry| create(array_entry, relative_path, data, options) }
@@ -29,12 +29,14 @@ module SmoothOperator
 
     def new_record?
       return @new_record if defined?(@new_record)
-      
+
       @new_record = Helpers.blank?(get_internal_data("id"))
     end
-    
+
     def destroyed?
-      @destroyed || false
+      return @destroyed if defined?(@destroyed)
+
+      @destroyed = false
     end
 
     def persisted?
@@ -52,8 +54,8 @@ module SmoothOperator
     def destroy(relative_path = nil, data = {}, options = {})
       return false unless persisted?
 
-      relative_path = "#{id}" if Helpers.blank?(relative_path)
-      
+      relative_path = id.to_s if Helpers.blank?(relative_path)
+
       success = make_remote_call(self.class.methods_http_verbs[:destroy], relative_path, data, options)
 
       @destroyed = true if success
@@ -77,7 +79,7 @@ module SmoothOperator
     end
 
     def update(relative_path, data, options)
-      relative_path = "#{id}" if Helpers.blank?(relative_path)
+      relative_path = id.to_s if Helpers.blank?(relative_path)
 
       make_remote_call(self.class.methods_http_verbs[:save], relative_path, data, options)
     end
@@ -91,7 +93,7 @@ module SmoothOperator
       @last_remote_call = self.class.send(http_verb, relative_path, data, options)
 
       returning_data = @last_remote_call.parsed_response
-      
+
       if !@last_remote_call.error? && returning_data.is_a?(Hash)
         assign_attributes returning_data.include?(model_name) ? returning_data[model_name] : returning_data
       end
@@ -101,7 +103,7 @@ module SmoothOperator
 
     def build_remote_call_args(http_verb, data, options)
       return [data, options] if http_verb == :delete
-      
+
       hash = serializable_hash(options[:serializable_options]).dup
       hash.delete('id')
 
@@ -109,5 +111,5 @@ module SmoothOperator
     end
 
   end
-  
+
 end
