@@ -28,7 +28,7 @@ module SmoothOperator
       attr_writer :table_name
 
       def table_name
-        @table_name ||= self.model_name.to_s.downcase.pluralize
+        @table_name ||= self.model_name.to_s.underscore.pluralize
       end
 
       def schema(structure)
