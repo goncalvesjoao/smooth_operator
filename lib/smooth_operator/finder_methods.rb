@@ -12,7 +12,7 @@ module SmoothOperator
       relative_path = '' if relative_path == :all
 
       get(relative_path, data, options).tap do |remote_call|
-        remote_call.object = build_object(remote_call.parsed_response, options)
+        remote_call.object = build_object(remote_call.parsed_response, options) if remote_call.success?
       end
     end
 
