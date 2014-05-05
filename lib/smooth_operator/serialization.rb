@@ -36,7 +36,8 @@ module SmoothOperator
 
 
     protected ##################### PROTECTED ###################
-    #COMPLEX
+    
+    # TODO: COMPLEX METHOD
     def attribute_names(options)
       attribute_names = internal_data.keys.sort
 

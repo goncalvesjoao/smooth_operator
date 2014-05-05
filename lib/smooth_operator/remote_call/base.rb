@@ -1,3 +1,7 @@
+require "smooth_operator/remote_call/errors/base"
+require "smooth_operator/remote_call/errors/timeout"
+require "smooth_operator/remote_call/errors/connection_failed"
+
 module SmoothOperator
 
   module RemoteCall
@@ -16,8 +20,8 @@ module SmoothOperator
 
       alias :ok? :success?
 
-      def initialize(response, object_class = nil)
-        @response, @object_class = response, object_class
+      def initialize(response)
+        @response = response
       end
 
 
@@ -50,20 +54,6 @@ module SmoothOperator
       def data
         object.nil? ? parsed_response : object
       end
-
-    end
-
-    class ConnectionFailed
-
-      attr_reader :data, :object, :objects, :parsed_response, :status, :headers, :body
-
-      def http_status; 0; end
-
-      def error?; true; end
-
-      def success?; false; end
-
-      def failure?; false; end
 
     end
 

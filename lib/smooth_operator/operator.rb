@@ -2,6 +2,7 @@ require 'faraday'
 # require 'typhoeus'
 # require 'faraday_middleware'
 # require 'typhoeus/adapters/faraday'
+require "smooth_operator/remote_call/base"
 
 module SmoothOperator
 
@@ -36,7 +37,7 @@ module SmoothOperator
 
       Faraday.new(url: url) do |builder|
         # builder.options.params_encoder = Faraday::NestedParamsEncoder # to properly encode arrays
-        builder.options.timeout = timeout unless Helpers.blank?(timeout)
+        builder.options[:timeout] = timeout unless Helpers.blank?(timeout)
         builder.request :url_encoded
         builder.adapter adapter
       end
@@ -44,7 +45,8 @@ module SmoothOperator
 
 
     protected ################ PROTECTED ################
-    #COMPLEX
+
+    # TODO: COMPLEX METHOD
     def make_the_call(http_verb, relative_path = '', data = {}, options = {})
       params, body = strip_params(http_verb, data)
 
@@ -67,7 +69,9 @@ module SmoothOperator
         RemoteCall::Base.new(response)
       # rescue Faraday::ConnectionFailed
       rescue Faraday::Error::ConnectionFailed
-        RemoteCall::ConnectionFailed.new
+        RemoteCall::Errors::ConnectionFailed.new(response)
+      rescue Faraday::Error::TimeoutError
+        RemoteCall::Errors::Timeout.new(response)
       end
     end
 
