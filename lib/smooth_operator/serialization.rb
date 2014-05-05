@@ -6,7 +6,8 @@ module SmoothOperator
       Helpers.symbolyze_keys serializable_hash(options)
     end
     
-    alias :attributes :to_hash
+    # alias :attributes :to_hash
+    def attributes; to_hash; end
     
     def to_json(options = nil)
       require 'json' unless defined? JSON
