@@ -123,7 +123,9 @@ class Page < MyBlogResource
   self.save_http_verb = :patch
 end
 
-page = Page.new(id: 2, body: 'editing my second page')
+page = Page.find(2)
+
+page.body = 'editing my second page'
 
 page.save # will make a http PATCH call to 'http://myblog.com/api/v0/pages/2'
           # with `{ page: { body: 'editing my second page' } }`
