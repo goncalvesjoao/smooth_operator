@@ -61,6 +61,8 @@ module SmoothOperator
       protected ############## PROTECTED #############
 
       def rails_model_name_method
+        return '' if Helpers.blank?(@_model_name)
+        
         @model_name ||= begin
           namespace ||= self.parents.detect do |n|
             n.respond_to?(:use_relative_model_naming?) && n.use_relative_model_naming?
