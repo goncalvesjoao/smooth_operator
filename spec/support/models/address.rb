@@ -1,4 +1,7 @@
 class Address < SmoothOperator::Base
+
+  self.dirty_attributes
+
   self.model_name = :none
 
   self.endpoint_user = 'admin'
@@ -7,4 +10,5 @@ class Address < SmoothOperator::Base
   self.endpoint = 'http://localhost:4567/'
 
   self.headers = { "X-APPTOKEN" => "joaquim_app_token", "X-LAYERTOKEN" => "joaquim_layer_token" }
+  
 end

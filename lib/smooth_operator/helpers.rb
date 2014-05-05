@@ -13,8 +13,12 @@ module SmoothOperator
 
       return instance_var unless instance_var.nil?
 
-      (super_method(object, variable) || default_value).dup.tap do |instance_var|
+      instance_var = (super_method(object, variable) || default_value)
+
+      if instance_var.class == Class
         object.instance_variable_set("@#{variable}", instance_var)
+      else
+        object.instance_variable_set("@#{variable}", duplicate(instance_var))
       end
     end
 

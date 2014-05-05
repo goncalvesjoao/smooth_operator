@@ -34,28 +34,42 @@ describe SmoothOperator::AttributeAssignment do
     context "when something other than a hash is introduced" do
       it "should do nothing" do
         [nil, '', [1, 2], 'test', 1, 2].each do |something_other_than_a_hash|
-          expect(User.new(something_other_than_a_hash).internal_data).to eq({})
+          expect(User::Base.new(something_other_than_a_hash).internal_data).to eq({})
         end
       end
     end
 
     context "when one of the attribute's value, is an hash and is unknown to the schema" do
-      context "when the .turn_unknown_hash_to_open_struct is set to true or unused" do
-        subject { User.new(address: { street: 'something', postal_code: { code: '123' } }) }
+      context "when the .unknown_hash_class is unused" do
+        subject { User::Base.new(address: { street: 'something', postal_code: { code: '123' } }) }
 
-        it "a new instance of SmoothOperator::OpenStruct will be initialized with that hash" do
+        it "a new instance of OpenStruct will be initialized with that hash" do
           address = subject.address
 
-          expect(address).to be_instance_of(SmoothOperator::OpenStruct)
+          expect(address).to be_instance_of(OpenStruct)
           expect(address.street).to eq('something')
 
-          expect(address.postal_code).to be_instance_of(SmoothOperator::OpenStruct)
+          expect(address.postal_code).to be_instance_of(OpenStruct)
           expect(address.postal_code.code).to eq('123')
         end
       end
-        
-      context "when the .turn_unknown_hash_to_open_struct is set to false", current: true do
-        subject { Post.new(creator: { first_name: 'admin', address: { street: 'something' } }) }
+      
+      context "when the .unknown_hash_class is set to SmoothOperator::OpenStruct::Base" do
+        subject { User::UnknownHashClass::OpenStructBase.new(address: { street: 'something', postal_code: { code: '123' } }) }
+
+        it "a new instance of SmoothOperator::OpenStruct::Base will be initialized with that hash" do
+          address = subject.address
+
+          expect(address).to be_instance_of(SmoothOperator::OpenStruct::Base)
+          expect(address.street).to eq('something')
+
+          expect(address.postal_code).to be_instance_of(SmoothOperator::OpenStruct::Base)
+          expect(address.postal_code.code).to eq('123')
+        end
+      end
+
+      context "when the .unknown_hash_class is set to :none" do
+        subject { User::UnknownHashClass::None.new(creator: { first_name: 'admin', address: { street: 'something' } }) }
 
         it "the hash will be copied as it is" do
           creator = subject.creator
@@ -70,7 +84,7 @@ describe SmoothOperator::AttributeAssignment do
     end
 
     context "when there is no declared schema" do
-      subject { User.new(attributes_for(:user)) }
+      subject { User::Base.new(attributes_for(:user)) }
       let(:expected_internal_data) { SmoothOperator::Helpers.stringify_keys(attributes_for(:user)) }
 
       it "it should populate 'internal_data' with unaltered duplicate data from the received hash" do

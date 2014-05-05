@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe SmoothOperator::Operator do
-  subject { User }
+  subject { User::Base }
 
   describe "#get" do
 

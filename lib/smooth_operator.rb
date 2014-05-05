@@ -11,7 +11,7 @@ require "smooth_operator/finder_methods"
 
 module SmoothOperator
   
-  class Base < OpenStruct
+  class Base < OpenStruct::Base
 
     extend Operator
     extend FinderMethods

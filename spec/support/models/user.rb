@@ -1,15 +1,33 @@
-class User < SmoothOperator::Base
+module User
+  
+  class Base < SmoothOperator::Base
 
-  self.endpoint_user = 'admin'
+    self.model_name = 'user'
 
-  self.endpoint_pass = 'admin'
+    self.endpoint_user = 'admin'
 
-  self.endpoint = 'http://localhost:4567/'
+    self.endpoint_pass = 'admin'
 
-  def self.query_string(params)
-    params['query_string_param'] = true
+    self.endpoint = 'http://localhost:4567/'
 
-    params
+    def self.query_string(params)
+      params['query_string_param'] = true
+
+      params
+    end
+
+  end
+
+  module UnknownHashClass
+    
+    class OpenStructBase < User::Base
+      self.unknown_hash_class = SmoothOperator::OpenStruct::Base
+    end
+
+    class None < User::Base
+      self.unknown_hash_class = :none
+    end
+
   end
 
 end

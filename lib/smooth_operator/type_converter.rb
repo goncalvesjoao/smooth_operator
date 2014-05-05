@@ -4,6 +4,17 @@ module SmoothOperator
 
     extend self
 
+    def cast_to_type(name, value, type, array_class, unknown_hash_class)
+      case value
+      when Array
+        value.map { |array_entry| array_class.new(name, array_entry, type, unknown_hash_class).value }
+      when Hash
+        type.nil? ? new_unknown_hash(value, array_class, unknown_hash_class) : type.new(value)
+      else
+        TypeConverter.convert(value, type)
+      end
+    end
+
     def convert(value, type)
       case type
 
@@ -62,6 +73,30 @@ module SmoothOperator
       value = string.scan(/-*\d+[,.]*\d*/).flatten.map(&:to_f).first
 
       value.nil? ? 0 : value
+    end
+
+
+    protected ################### PROTECTED #####################
+
+    def new_unknown_hash(hash, array_class, unknown_hash_class)
+      if unknown_hash_class == :none
+        hash
+      else
+        unknown_hash_class.new(cast_params(hash, array_class, unknown_hash_class))
+      end
+    end
+
+
+    private ################### PRIVATE #####################
+
+    def cast_params(attributes, array_class, unknown_hash_class)
+      hash = {}
+
+      attributes.each do |key, value|
+        hash[key] = cast_to_type(key, value, nil, array_class, unknown_hash_class)
+      end
+
+      hash
     end
   
   end

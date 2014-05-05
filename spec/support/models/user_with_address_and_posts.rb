@@ -1,6 +1,6 @@
 module UserWithAddressAndPosts
   
-  class Father < User
+  class Father < User::Base
 
     schema(
       posts: Post,
@@ -67,6 +67,14 @@ module UserWithAddressAndPosts
     def my_method
       'my_method'
     end
+
+  end
+
+  class DirtyAttributes < UserWithAddressAndPosts::Son
+
+    self.dirty_attributes
+
+    self.unknown_hash_class = SmoothOperator::OpenStruct::Dirty
 
   end
 

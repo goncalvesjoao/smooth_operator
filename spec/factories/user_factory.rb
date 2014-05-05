@@ -1,6 +1,6 @@
 FactoryGirl.define do
   
-  factory :user, class: User do
+  factory :user, class: User::Base do
     
     id 1
     admin true
@@ -20,12 +20,12 @@ FactoryGirl.define do
 
   end
 
-  factory :white_list, class: User do
+  factory :white_list, class: User::Base do
     id 1
     first_name 'John'
   end
   
-  factory :black_list, class: User do
+  factory :black_list, class: User::Base do
     admin true
     last_name 'Doe'
   end

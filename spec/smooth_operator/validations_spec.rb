@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe SmoothOperator::Validations do
-  subject { User.new(attributes_for(:user)) }
+  subject { User::Base.new(attributes_for(:user)) }
 
   describe "#valid?" do
     context "when executing a persistence method, and the server response has a hash with the key 'errors'" do

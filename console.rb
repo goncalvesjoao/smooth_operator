@@ -5,7 +5,7 @@ $LOAD_PATH << './lib'
 
 require "spec/spec_helper"
 
-#User.post('', { user: { age: 1, posts: [{ body: 'post1' }, 2] } })
+#User::Base.post('', { user: { age: 1, posts: [{ body: 'post1' }, 2] } })
 
 binding.pry
 

@@ -1,6 +1,6 @@
 module SmoothOperator
 
-  class ArrayWithMetaData < OpenStruct
+  class ArrayWithMetaData < OpenStruct::Base
     
     extend Forwardable
 
