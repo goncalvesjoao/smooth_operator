@@ -29,7 +29,7 @@ module SmoothOperator
       url, timeout = (options[:endpoint] || self.endpoint), (options[:timeout] || self.timeout)
 
       Faraday.new(url: url) do |builder|
-        builder.options.params_encoder = Faraday::NestedParamsEncoder # to properly encode arrays
+        # builder.options.params_encoder = Faraday::NestedParamsEncoder # to properly encode arrays
         builder.options.timeout = timeout unless Helpers.blank?(timeout)
         builder.request :url_encoded
         builder.adapter adapter
