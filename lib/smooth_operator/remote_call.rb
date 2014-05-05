@@ -14,6 +14,8 @@ module SmoothOperator
 
       def_delegators :response, :success?, :headers, :body
 
+      alias :ok? :success?
+
       def initialize(response, object_class = nil)
         @response, @object_class = response, object_class
       end
