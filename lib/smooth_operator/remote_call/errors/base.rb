@@ -5,7 +5,7 @@ module SmoothOperator
       class Base
 
         attr_reader :response, :data, :object, :objects, :parsed_response, :status, :headers, :body
-
+        
         def initialize(response)
           @response = response
         end
@@ -17,6 +17,8 @@ module SmoothOperator
         def success?; false; end
 
         def failure?; false; end
+
+        alias :ok? :success?
 
       end
 
