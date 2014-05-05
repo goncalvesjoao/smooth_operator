@@ -53,7 +53,7 @@ module SmoothOperator
 
     class ConnectionFailed
 
-      attr_reader :data, :object, :objects, :status, :headers, :body
+      attr_reader :data, :object, :objects, :parsed_response, :status, :headers, :body
 
       def http_status; 0; end
 

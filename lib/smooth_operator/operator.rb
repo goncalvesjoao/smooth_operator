@@ -58,7 +58,8 @@ module SmoothOperator
         end
 
         RemoteCall::Base.new(response)
-      rescue Faraday::ConnectionFailed
+      # rescue Faraday::ConnectionFailed
+      rescue Faraday::Error::ConnectionFailed
         RemoteCall::ConnectionFailed.new
       end
     end
