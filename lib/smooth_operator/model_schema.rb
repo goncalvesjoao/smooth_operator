@@ -49,23 +49,23 @@ module SmoothOperator
         if defined? ActiveModel
           rails_model_name_method
         else
-          @_model_name_namespace ||= name.split('::').last.underscore.capitalize
+          @model_name ||= name.split('::').last.underscore.capitalize
         end
       end
 
       def model_name=(name)
-        @_model_name_namespace = name
+        @_model_name = name
       end
       
 
       protected ############## PROTECTED #############
 
       def rails_model_name_method
-        @_model_name ||= begin
-          @_model_name_namespace ||= self.parents.detect do |n|
+        @model_name ||= begin
+          namespace ||= self.parents.detect do |n|
             n.respond_to?(:use_relative_model_naming?) && n.use_relative_model_naming?
           end
-          ActiveModel::Name.new(self, @_model_name_namespace)
+          ActiveModel::Name.new(self, namespace, @_model_name)
         end
       end
 
