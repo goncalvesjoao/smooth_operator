@@ -20,6 +20,8 @@ module SmoothOperator
     protected #################### PROTECTED ##################
 
     def build_object(parsed_response, options)
+      options ||={}
+      
       table_name = (options[:table_name] || self.table_name).to_s
 
       if parsed_response.is_a?(Array)

@@ -19,6 +19,12 @@ module SmoothOperator
     HTTP_VERBS.each { |http_verb| define_method(http_verb) { |relative_path = '', params = {}, options = {}| make_the_call(http_verb, relative_path, params, options) } }
 
 
+    def headers
+      Helpers.get_instance_variable(self, :headers, {})
+    end
+    attr_writer :headers
+
+    
     def generate_parallel_connection
       generate_connection(:typhoeus)
     end
@@ -51,8 +57,9 @@ module SmoothOperator
 
         response = connection.send(http_verb) do |request|
           operator_options.each { |key, value| request.options.send("#{key}=", value) }
+          options[:headers].each { |key, value| request.headers[key] = value }
           params.each { |key, value| request.params[key] = value }
-          
+
           request.url relative_path
           request.body = body
         end
@@ -90,6 +97,7 @@ module SmoothOperator
     def strip_options(options)
       options ||= {}
 
+      options[:headers] = self.headers.merge(options[:headers] || {})
       operator_options = options.delete(:operator_options) || {}
       connection = options.delete(:connection) || generate_connection(nil, operator_options)
 

@@ -49,7 +49,7 @@ module SmoothOperator
         if defined? ActiveModel
           rails_model_name_method
         else
-          @model_name ||= name.split('::').last.underscore.capitalize
+          @_model_name ||= name.split('::').last.underscore.capitalize
         end
       end
 
