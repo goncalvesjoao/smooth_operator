@@ -1,5 +1,5 @@
 class Address < SmoothOperator::Base
-  self.model_name = ''
+  self.model_name = nil
 
   self.endpoint_user = 'admin'
   self.endpoint_pass = 'admin'
