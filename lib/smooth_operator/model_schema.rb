@@ -46,12 +46,12 @@ module SmoothOperator
       end
 
       def model_name
+        return '' if @_model_name == :none
+
         if defined? ActiveModel
           rails_model_name_method
         else
-          return @_model_name if defined?(@_model_name)
-
-          @_model_name = name.split('::').last.underscore.capitalize
+          @_model_name ||= name.split('::').last.underscore.capitalize
         end
       end
 
@@ -63,8 +63,6 @@ module SmoothOperator
       protected ############## PROTECTED #############
 
       def rails_model_name_method
-        return '' if @_model_name.nil?
-
         @model_name ||= begin
           namespace ||= self.parents.detect do |n|
             n.respond_to?(:use_relative_model_naming?) && n.use_relative_model_naming?
