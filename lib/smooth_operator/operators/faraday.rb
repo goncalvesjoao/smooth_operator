@@ -1,10 +1,11 @@
-require 'typhoeus'
+require 'faraday'
+require 'typhoeus/adapters/faraday'
 
 module SmoothOperator
 
-  module OperatorCall
+  module Operators
 
-    class Typhoeus < Base
+    class Faraday < Base
 
       def make_the_call
         begin

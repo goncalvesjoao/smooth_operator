@@ -1,7 +1,7 @@
 require "smooth_operator/remote_call/base"
-require "smooth_operator/operator_call/base"
-require "smooth_operator/operator_call/faraday"
-require "smooth_operator/operator_call/typhoeus"
+require "smooth_operator/operators/base"
+require "smooth_operator/operators/faraday"
+require "smooth_operator/operators/typhoeus"
 
 module SmoothOperator
 
@@ -43,9 +43,9 @@ module SmoothOperator
 
     def make_the_call(http_verb, relative_path = '', data = {}, options = {})
       if Helpers.present?(options[:hydra])
-        operator_call = OperatorCall::Faraday.new(self, http_verb, relative_path, data, options)
+        operator_call = Operators::Typhoeus.new(self, http_verb, relative_path, data, options)
       else
-        operator_call = OperatorCall::Typhoeus.new(self, http_verb, relative_path, data, options)
+        operator_call = Operators::Faraday.new(self, http_verb, relative_path, data, options)
       end
 
       operator_call.make_the_call

@@ -1,6 +1,6 @@
 module SmoothOperator
 
-  module OperatorCall
+  module Operators
 
     class Base
 
