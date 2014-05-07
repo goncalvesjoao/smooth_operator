@@ -30,6 +30,8 @@ module SmoothOperator
       end
 
       def parsed_response
+        return nil if body.nil?
+        
         require 'json' unless defined? JSON
         
         begin

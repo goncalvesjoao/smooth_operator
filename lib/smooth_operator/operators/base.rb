@@ -25,7 +25,7 @@ module SmoothOperator
 
       def strip_params(http_verb, data)
         data ||= {}
-
+        
         ([:get, :head, :delete].include?(http_verb) ? [@operator_class.query_string(data), nil] : [@operator_class.query_string({}), data])
       end
 

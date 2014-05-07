@@ -1,4 +1,5 @@
 require 'typhoeus'
+require "smooth_operator/remote_call/typhoeus"
 
 module SmoothOperator
 
@@ -9,28 +10,27 @@ module SmoothOperator
       def make_the_call
         set_basic_authentication
 
-        # begin
-          request = ::Typhoeus::Request.new(url, typhoeus_options)
-          
-          remote_call = {}
+        request = ::Typhoeus::Request.new(url, typhoeus_options)
+        
+        remote_call = {}
 
-          hydra.queue(request)
+        hydra.queue(request)
 
-          request.on_complete do |typhoeus_response|
-            remote_call = RemoteCall::Base.new(typhoeus_response)
-
-            yield(remote_call) if block_given?
+        request.on_complete do |typhoeus_response|
+          remote_call_class = if typhoeus_response.timed_out?
+            RemoteCall::Errors::Timeout
+          else
+            RemoteCall::Typhoeus
           end
+binding.pry
+          remote_call = remote_call_class.new(typhoeus_response)
 
-          hydra.run
+          yield(remote_call) if block_given?
+        end
 
-          remote_call
+        hydra.run
 
-        # rescue ::Faraday::Error::ConnectionFailed
-        #   RemoteCall::Errors::ConnectionFailed.new(response)
-        # rescue ::Faraday::Error::TimeoutError
-        #   RemoteCall::Errors::Timeout.new(response)
-        # end
+        remote_call
       end
 
 
@@ -49,13 +49,18 @@ module SmoothOperator
       end
 
       def typhoeus_options
-        @typhoeus_options ||= {
-          body: body,
-          params: params,
-          method: http_verb,
-          headers: options[:headers],
-          timeout: (options[:timeout] || operator_class.timeout)
-        }
+        return @typhoeus_options if defined?(@typhoeus_options)
+        
+        @typhoeus_options = { method: http_verb, headers: options[:headers] }
+
+        timeout = (options[:timeout] || operator_class.timeout)
+
+        @typhoeus_options[:timeout] = timeout if Helpers.present?(timeout)
+
+        @typhoeus_options[:body] = body if Helpers.present?(body)
+        @typhoeus_options[:params] = params if Helpers.present?(params)
+
+        @typhoeus_options
       end
 
       def hydra

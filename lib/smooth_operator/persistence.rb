@@ -27,6 +27,8 @@ module SmoothOperator
     end
 
 
+    attr_accessor :extra_params
+
     def new_record?
       return @new_record if defined?(@new_record)
 
@@ -102,6 +104,9 @@ module SmoothOperator
     private ##################### PRIVATE ####################
 
     def make_remote_call(http_verb, relative_path, data, options)
+      data ||= {}
+      data.merge!(extra_params || {})
+
       data, options = build_remote_call_args(http_verb, data, options)
 
       self.class.make_the_call(http_verb, relative_path, data, options) do |remote_call|

@@ -7,14 +7,8 @@ require "spec/spec_helper"
 
 #User::Base.post('', { user: { age: 1, posts: [{ body: 'post1' }, 2] } })
 
-
-conn = SmoothOperator::Base.generate_parallel_connection
-
-conn.in_parallel do
-  remote_call = User::Base.find('http://localhost:4567/users', nil, { connection: conn })
-end
-
-remote_call
+#user = UserWithAddressAndPosts::Son.new(FactoryGirl.attributes_for(:user_with_address_and_posts))
+#user.save('', { status: 200 })
 
 binding.pry
 

@@ -2,6 +2,8 @@ module User
   
   class Base < SmoothOperator::Base
 
+    # self.timeout = 2
+    
     self.model_name = 'user'
 
     self.endpoint_user = 'admin'
