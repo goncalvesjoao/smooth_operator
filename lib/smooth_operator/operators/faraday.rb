@@ -1,5 +1,6 @@
 require 'faraday'
 require 'typhoeus/adapters/faraday'
+require "smooth_operator/remote_call/faraday"
 
 module SmoothOperator
 
@@ -8,7 +9,7 @@ module SmoothOperator
     class Faraday < Base
 
       def make_the_call
-        begin
+        remote_call = begin
           set_basic_authentication
 
           response = connection.send(http_verb) do |request|
@@ -20,12 +21,16 @@ module SmoothOperator
             request.body = body
           end
 
-          RemoteCall::Base.new(response)
+          RemoteCall::Faraday.new(response)
         rescue ::Faraday::Error::ConnectionFailed
           RemoteCall::Errors::ConnectionFailed.new(response)
         rescue ::Faraday::Error::TimeoutError
           RemoteCall::Errors::Timeout.new(response)
         end
+
+        yield(remote_call) if block_given?
+
+        remote_call
       end
 
 

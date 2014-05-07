@@ -25,5 +25,5 @@ Gem::Specification.new do |spec|
   
   spec.add_dependency "json"
   spec.add_dependency 'typhoeus'
-  spec.add_dependency 'faraday', '~> 0.8.1'
+  spec.add_dependency 'faraday', '~> 0.8.9'
 end

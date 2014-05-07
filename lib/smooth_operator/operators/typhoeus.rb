@@ -12,9 +12,17 @@ module SmoothOperator
         # begin
           request = ::Typhoeus::Request.new(url, typhoeus_options)
           
-          remote_call = RemoteCall::Base.new(request)
+          remote_call = {}
 
           hydra.queue(request)
+
+          request.on_complete do |typhoeus_response|
+            remote_call = RemoteCall::Base.new(typhoeus_response)
+
+            yield(remote_call) if block_given?
+          end
+
+          hydra.run
 
           remote_call
 

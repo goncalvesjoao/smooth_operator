@@ -9,7 +9,7 @@ shared_examples_for "successful persistent remote call" do
   it "it should populate 'last_remote_call' with the remote_call used on this transaction" do
     expect(subject.last_remote_call).to be_nil unless method_to_execute.to_s =~ /create/
     execute_method
-    expect(subject.last_remote_call).to be_instance_of(SmoothOperator::RemoteCall::Base)
+    expect(subject.last_remote_call).to be_a_kind_of(SmoothOperator::RemoteCall::Base)
   end
 end
 
@@ -70,7 +70,7 @@ shared_examples_for "persistent remote call" do
     it "it should populate 'last_remote_call' with the remote_call used on this transaction" do
       expect(subject.last_remote_call).to be_nil unless method_to_execute.to_s =~ /create/
       execute_method
-      expect(subject.last_remote_call).to be_instance_of(SmoothOperator::RemoteCall::Base)
+      expect(subject.last_remote_call).to be_a_kind_of(SmoothOperator::RemoteCall::Base)
     end
 
     it "it should assert the subject's persistence" do

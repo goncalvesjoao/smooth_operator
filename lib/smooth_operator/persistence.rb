@@ -56,9 +56,13 @@ module SmoothOperator
 
       relative_path = id.to_s if Helpers.blank?(relative_path)
 
-      success = make_remote_call(self.class.methods_http_verbs[:destroy], relative_path, data, options)
+      success = {}
 
-      @destroyed = true if success
+      success = make_remote_call(self.class.methods_http_verbs[:destroy], relative_path, data, options) do |remote_call|
+        success = remote_call.status
+
+        @destroyed = true if success
+      end
 
       success
     end
@@ -71,17 +75,27 @@ module SmoothOperator
     end
 
     def create(relative_path, data, options)
-      success = make_remote_call(self.class.methods_http_verbs[:create], relative_path, data, options)
+      success = {}
+      
+      make_remote_call(self.class.methods_http_verbs[:create], relative_path, data, options) do |remote_call|
+        success = remote_call.status
 
-      @new_record = false if success
+        @new_record = false if success
+      end
 
       success
     end
 
     def update(relative_path, data, options)
       relative_path = id.to_s if Helpers.blank?(relative_path)
+      
+      success = {}
 
-      make_remote_call(self.class.methods_http_verbs[:save], relative_path, data, options)
+      make_remote_call(self.class.methods_http_verbs[:save], relative_path, data, options) do |remote_call|
+        success = remote_call.status
+      end
+
+      success
     end
 
 
@@ -90,15 +104,17 @@ module SmoothOperator
     def make_remote_call(http_verb, relative_path, data, options)
       data, options = build_remote_call_args(http_verb, data, options)
 
-      @last_remote_call = self.class.send(http_verb, relative_path, data, options)
+      self.class.make_the_call(http_verb, relative_path, data, options) do |remote_call|
+        @last_remote_call = remote_call
 
-      returning_data = @last_remote_call.parsed_response
+        returning_data = @last_remote_call.parsed_response
 
-      if !@last_remote_call.error? && returning_data.is_a?(Hash)
-        assign_attributes returning_data.include?(model_name) ? returning_data[model_name] : returning_data
+        if !@last_remote_call.error? && returning_data.is_a?(Hash)
+          assign_attributes returning_data.include?(model_name) ? returning_data[model_name] : returning_data
+        end
+
+        yield(remote_call)
       end
-
-      @last_remote_call.status
     end
 
     def build_remote_call_args(http_verb, data, options)

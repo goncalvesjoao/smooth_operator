@@ -1,7 +1,9 @@
-require "smooth_operator/remote_call/base"
 require "smooth_operator/operators/base"
+require "smooth_operator/remote_call/base"
 require "smooth_operator/operators/faraday"
 require "smooth_operator/operators/typhoeus"
+require "smooth_operator/remote_call/errors/timeout"
+require "smooth_operator/remote_call/errors/connection_failed"
 
 module SmoothOperator
 
@@ -48,7 +50,15 @@ module SmoothOperator
         operator_call = Operators::Faraday.new(self, http_verb, relative_path, data, options)
       end
 
-      operator_call.make_the_call
+      remote_call = {}
+
+      operator_call.make_the_call do |_remote_call|
+        remote_call = _remote_call
+
+        yield(remote_call) if block_given?
+      end
+
+      remote_call
     end
 
 
