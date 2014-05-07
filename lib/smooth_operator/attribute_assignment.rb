@@ -1,5 +1,6 @@
 require 'smooth_operator/attributes/base'
 require 'smooth_operator/attributes/dirty'
+require 'smooth_operator/attributes/normal'
 
 module SmoothOperator
 
@@ -45,6 +46,8 @@ module SmoothOperator
 
 
     def initialize(attributes = {}, options = {})
+      @_options = {}
+
       before_initialize(attributes, options)
 
       assign_attributes attributes, options
@@ -52,9 +55,7 @@ module SmoothOperator
       after_initialize(attributes, options)
     end
 
-    attr_reader :has_data_from_server, :meta_data
-
-    alias :from_server :has_data_from_server
+    attr_reader :_options, :_meta_data
 
 
     def assign_attributes(_attributes = {}, options = {})
@@ -64,13 +65,23 @@ module SmoothOperator
 
       if _attributes.include?(model_name)
         attributes = _attributes.delete(model_name)
-        @meta_data = _attributes
+        @_meta_data = _attributes
       end
       
-      @has_data_from_server = true if options[:from_server] == true
+      options.each { |key, value| @_options[key] = value } if options.is_a?(Hash)
 
       attributes.each { |name, value| push_to_internal_data(name, value) }
     end
+
+    def parent_object
+      _options[:parent_object]
+    end
+
+    def has_data_from_server
+      _options[:from_server] == true
+    end
+
+    alias :from_server :has_data_from_server
 
     def internal_data
       @internal_data ||= {}
@@ -107,18 +118,6 @@ module SmoothOperator
 
     def before_initialize(attributes, options); end
 
-    def strip_attributes(_attributes)
-      meta_data = {}
-      attributes = _attributes
-
-      if _attributes.include?(model_name)
-        attributes = _attributes.delete(model_name)
-        meta_data = _attributes
-      end
-
-      [attributes, meta_data]
-    end
-
     def after_initialize(attributes, options); end
 
     def allowed_attribute(attribute)
@@ -142,16 +141,16 @@ module SmoothOperator
 
     def update_internal_data(attribute_name, attribute_value)
       if self.class.dirty_attributes?
-        internal_data[attribute_name].set_value(attribute_value)
+        internal_data[attribute_name].set_value(attribute_value, self.class.unknown_hash_class, self)
       else
         internal_data[attribute_name] = new_attribute_object(attribute_name, attribute_value).value
       end
     end
 
     def new_attribute_object(attribute_name, attribute_value)
-      attribute_class = self.class.dirty_attributes? ?  Attributes::Dirty : Attributes::Base
+      attribute_class = self.class.dirty_attributes? ?  Attributes::Dirty : Attributes::Normal
       
-      attribute_class.new(attribute_name, attribute_value, internal_structure[attribute_name], self.class.unknown_hash_class)
+      attribute_class.new(attribute_name, attribute_value, internal_structure[attribute_name], self.class.unknown_hash_class, self)
     end
 
   end

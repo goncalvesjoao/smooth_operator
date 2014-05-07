@@ -21,7 +21,7 @@ describe SmoothOperator::AttributeAssignment do
         before { subject.assign_attributes({ user: attributes_for(:user), status: 1 }) }
 
         it "#meta_data should reflect the receiving meta_data" do
-          expect(subject.meta_data).to eq({ "status" => 1 })
+          expect(subject._meta_data).to eq({ "status" => 1 })
         end
 
         it "subject should NOT contain meta_data" do

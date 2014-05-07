@@ -37,7 +37,7 @@ describe SmoothOperator::FinderMethods do
       it_behaves_like "finder method"
 
       it "#meta_data should reflect the receiving meta_data" do
-        expect(user.meta_data).to eq({ "status" => 1 })
+        expect(user._meta_data).to eq({ "status" => 1 })
       end
 
       it "user should NOT contain meta_data" do

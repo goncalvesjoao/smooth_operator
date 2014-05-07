@@ -1,20 +1,18 @@
-require 'smooth_operator/type_converter'
-
 module SmoothOperator
   module Attributes
 
-    class Dirty
+    class Dirty < Base
 
-      attr_reader :original_name, :original_value, :first_value, :value, :type, :unknown_hash_class
+      attr_reader :original_name, :original_value, :first_value, :value, :type
 
-      def initialize(name, value, type, unknown_hash_class)
-        @original_name, @original_value, @type, @unknown_hash_class = name, value, type, unknown_hash_class
+      def initialize(name, value, type, unknown_hash_class, parent_object)
+        @original_name, @original_value, @type = name, value, type
 
-        @first_value = set_value(value)
+        @first_value = set_value(value, unknown_hash_class, parent_object)
       end
 
-      def set_value(new_value)
-        @value = TypeConverter.cast_to_type(original_name, new_value, type, self.class, unknown_hash_class)
+      def set_value(new_value, unknown_hash_class, parent_object)
+        @value = cast_to_type(original_name, new_value, type, unknown_hash_class, parent_object)
       end
 
       def changed?

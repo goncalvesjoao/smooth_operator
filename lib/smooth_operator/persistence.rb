@@ -30,7 +30,10 @@ module SmoothOperator
     attr_accessor :extra_params
 
     def reload(relative_path = nil, data = {}, options = {})
-      relative_path = id.to_s if Helpers.blank?(relative_path)
+      raise 'UnknownPath' if !respond_to?(:id) || Helpers.blank?(id)
+
+      relative_path, options = build_relative_path(relative_path, options)
+
       success = {}
 
       make_remote_call(:get, relative_path, data, options) do |remote_call|
@@ -67,7 +70,7 @@ module SmoothOperator
     def destroy(relative_path = nil, data = {}, options = {})
       return false unless persisted?
 
-      relative_path = id.to_s if Helpers.blank?(relative_path)
+      relative_path, options = build_relative_path(relative_path, options)
 
       success = {}
 
@@ -100,7 +103,7 @@ module SmoothOperator
     end
 
     def update(relative_path, data, options)
-      relative_path = id.to_s if Helpers.blank?(relative_path)
+      relative_path, options = build_relative_path(relative_path, options)
       
       success = {}
 
@@ -113,6 +116,24 @@ module SmoothOperator
 
 
     private ##################### PRIVATE ####################
+
+    def build_relative_path(relative_path, options)
+      if Helpers.blank?(relative_path)
+        if parent_object.nil?
+          relative_path = id.to_s
+        else
+          options ||= {}
+          options[:table_name] = ''
+          relative_path = "#{parent_object.send(:rest_relative_path)}/#{table_name}/#{id}"
+        end
+      end
+
+      [relative_path, options]
+    end
+
+    def rest_relative_path
+      "#{table_name}/#{id}"
+    end
 
     def make_remote_call(http_verb, relative_path, data, options)
       data ||= {}

@@ -9,8 +9,8 @@ class TestServer < Sinatra::Base
   end
 
   
-  get '/posts/:id' do
-    post_data = { id: 1, body: 'test' }
+  get '/users/:id/posts/:id' do
+    post_data = { id: 1, body: 'from_server' }
     json post_data
   end
 
@@ -61,7 +61,7 @@ class TestServer < Sinatra::Base
   
 
   put '/users/send_error' do
-    data_with_error = { id: 1, errors: { first_name: ["can't be blank"] } }
+    data_with_error = { id: 1, errors: [{ first_name: ["can't be blank"] }] }
     json data_with_error
   end
 

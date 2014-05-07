@@ -90,6 +90,52 @@ end
 
 describe SmoothOperator::Persistence, helpers: :persistence do
 
+  describe "#reload", current: true do
+    subject { new_user }
+
+    context "before calling #reload" do
+      it "#has_data_from_server and #from_server should return false" do
+        expect(subject.from_server).to be_falsey
+        expect(subject.has_data_from_server).to be_falsey
+      end
+    end
+
+    context "when subject doesn't has an id" do
+      it "it should raise 'UnknownPath'" do
+        expect{ subject.reload }.to raise_error 'UnknownPath'
+      end
+    end
+
+    context "when subject has an id" do
+      before do
+        subject.id = 1
+        subject.reload
+      end
+
+      it "it should fetch server data" do
+        expect(subject.attributes).to eq(attributes_for(:user_with_address_and_posts))
+      end
+
+      it "#has_data_from_server and #from_server should return true" do
+        expect(subject.from_server).to be true
+        expect(subject.has_data_from_server).to be true
+      end
+    end
+
+    context "when calling #reload on a nested object" do
+      before do
+        subject.id = 1
+        subject.reload
+        subject.posts.first.reload
+      end
+
+      it "it should fetch server data, with the correct nested REST url" do
+        # binding.pry
+        expect(subject.posts.first.attributes).to eq({ id: 1, body: 'from_server' })
+      end
+    end
+  end
+
   describe ".create" do
     
     subject { created_subject }
