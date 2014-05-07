@@ -42,12 +42,12 @@ module SmoothOperator
       attribute_names = internal_data.keys.sort
 
       if only = options[:only]
-        attribute_names &= [*only].map(&:to_s)
+        attribute_names & [*only].map(&:to_s)
       elsif except = options[:except]
-        attribute_names -= [*except].map(&:to_s)
+        attribute_names - [*except].map(&:to_s)
+      else
+        attribute_names
       end
-
-      attribute_names
     end
 
     def method_names(options)
