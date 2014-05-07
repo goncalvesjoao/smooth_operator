@@ -44,17 +44,31 @@ module SmoothOperator
     end
 
 
-    def initialize(attributes = {})
-      before_initialize(attributes)
+    def initialize(attributes = {}, options = {})
+      before_initialize(attributes, options)
 
-      assign_attributes attributes
+      assign_attributes attributes, options
 
-      after_initialize(attributes)
+      after_initialize(attributes, options)
     end
 
-    def assign_attributes(attributes = {})
-      return nil unless attributes.is_a?(Hash)
+    attr_reader :has_data_from_server, :meta_data
+
+    alias :from_server :has_data_from_server
+
+
+    def assign_attributes(_attributes = {}, options = {})
+      return nil unless _attributes.is_a?(Hash)
       
+      attributes = _attributes = Helpers.stringify_keys(_attributes)
+
+      if _attributes.include?(model_name)
+        attributes = _attributes.delete(model_name)
+        @meta_data = _attributes
+      end
+      
+      @has_data_from_server = true if options[:from_server] == true
+
       attributes.each { |name, value| push_to_internal_data(name, value) }
     end
 
@@ -91,9 +105,21 @@ module SmoothOperator
     
     protected #################### PROTECTED METHODS DOWN BELOW ######################
 
-    def before_initialize(attributes); end
+    def before_initialize(attributes, options); end
 
-    def after_initialize(attributes); end
+    def strip_attributes(_attributes)
+      meta_data = {}
+      attributes = _attributes
+
+      if _attributes.include?(model_name)
+        attributes = _attributes.delete(model_name)
+        meta_data = _attributes
+      end
+
+      [attributes, meta_data]
+    end
+
+    def after_initialize(attributes, options); end
 
     def allowed_attribute(attribute)
       if !self.class.attributes_white_list.empty?

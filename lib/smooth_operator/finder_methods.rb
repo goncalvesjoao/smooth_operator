@@ -27,13 +27,15 @@ module SmoothOperator
 
     def build_object(parsed_response, options)
       options ||={}
-      
-      table_name = (options[:table_name] || self.table_name).to_s
 
       if parsed_response.is_a?(Array)
         parsed_response.map { |array_entry| build_object(array_entry, options) }
       elsif parsed_response.is_a?(Hash)
-        parsed_response.include?(table_name) ? ArrayWithMetaData.new(parsed_response, table_name, self) : new(parsed_response).tap { |object| object.reloaded = true }
+        if parsed_response.include?(table_name)
+          ArrayWithMetaData.new(parsed_response, self)
+        else
+          new(parsed_response, from_server: true)
+        end
       else
         parsed_response
       end

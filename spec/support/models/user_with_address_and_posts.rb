@@ -1,6 +1,8 @@
 module UserWithAddressAndPosts
   
   class Father < User::Base
+    
+    self.table_name = 'users'
 
     schema(
       posts: Post,

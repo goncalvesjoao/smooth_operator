@@ -54,6 +54,12 @@ class TestServer < Sinatra::Base
     json FactoryGirl.attributes_for(:user_with_address_and_posts)
   end
 
+  get '/users/:id/with_metadata' do
+    user_data = { user: FactoryGirl.attributes_for(:user_with_address_and_posts), status: 1 }
+    json user_data
+  end
+  
+
   put '/users/send_error' do
     data_with_error = { id: 1, errors: { first_name: ["can't be blank"] } }
     json data_with_error

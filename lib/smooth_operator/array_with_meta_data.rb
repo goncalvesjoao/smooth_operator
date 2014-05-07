@@ -10,10 +10,11 @@ module SmoothOperator
 
     def_delegators :internal_array, :length, :<<, :[]
 
-    def initialize(attributes, table_name, object_class)
+    def initialize(attributes, object_class)
       _attributes = attributes.dup
 
-      @table_name, @object_class = table_name, object_class
+      @object_class = object_class
+      @table_name = object_class.table_name
 
       @internal_array = [*_attributes[table_name]].map { |array_entry| object_class.new(array_entry).tap { |object| object.reloaded = true } }
       _attributes.delete(table_name)

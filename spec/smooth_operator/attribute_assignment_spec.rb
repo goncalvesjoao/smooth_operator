@@ -4,6 +4,36 @@ require "spec_helper"
 describe SmoothOperator::AttributeAssignment do
 
   describe "#assign_attributes" do
+    
+    describe "receiving data from server" do
+      subject { User::Base.new }
+
+      context "when receiving the option 'from_server = true'" do
+        before { subject.assign_attributes({}, from_server: true) }
+
+        it "#has_data_from_server and #from_server should return true" do
+          expect(subject.has_data_from_server).to be true
+          expect(subject.from_server).to be true
+        end
+      end
+
+      context "when receiving a Hash with meta_data on it" do
+        before { subject.assign_attributes({ user: attributes_for(:user), status: 1 }) }
+
+        it "#meta_data should reflect the receiving meta_data" do
+          expect(subject.meta_data).to eq({ "status" => 1 })
+        end
+
+        it "subject should NOT contain meta_data" do
+          expect{ subject.status }.to raise_error NoMethodError
+        end
+
+        it "subject should contain all other data" do
+          expect(subject.attributes).to eq(attributes_for(:user))
+        end
+      end
+
+    end
 
     describe "white and black list" do
       subject { UserWithAddressAndPosts::Son.new(attributes_for(:user_with_address_and_posts)) }

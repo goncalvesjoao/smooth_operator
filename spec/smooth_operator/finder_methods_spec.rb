@@ -1,5 +1,20 @@
 require "spec_helper"
 
+shared_examples_for "finder method" do
+  it "it should return a RemoteCall instance with a subject's class instance" do
+    expect(user).to be_instance_of(subject)
+  end
+
+  it "the instance class should be populated with the returned hash" do
+    expect(user.attributes).to eq(attributes_for(:user_with_address_and_posts))
+  end
+
+  it "#has_data_from_server and #from_server should return true" do
+    expect(user.has_data_from_server).to be true
+    expect(user.from_server).to be true
+  end
+end
+
 describe SmoothOperator::FinderMethods do
   subject { UserWithAddressAndPosts::Son }
 
@@ -11,12 +26,22 @@ describe SmoothOperator::FinderMethods do
 
   describe ".find" do
     context "when the server returns a single hash" do
-      it "it should return a RemoteCall instance with a subject's class instance populated with the returned hash" do
-        remote_call = subject.find(5)
-        user = remote_call.object
+      let(:user) { subject.find(5).object }
 
-        expect(user).to be_instance_of(subject)
-        expect(user.attributes).to eq(attributes_for(:user_with_address_and_posts))
+      it_behaves_like "finder method"
+    end
+
+    context "when the server returns a hash with meta_data" do
+      let(:user) { subject.find("5/with_metadata").object }
+
+      it_behaves_like "finder method"
+
+      it "#meta_data should reflect the receiving meta_data" do
+        expect(user.meta_data).to eq({ "status" => 1 })
+      end
+
+      it "user should NOT contain meta_data" do
+        expect{ user.status }.to raise_error NoMethodError
       end
     end
 
