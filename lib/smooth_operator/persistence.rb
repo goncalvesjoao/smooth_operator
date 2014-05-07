@@ -27,7 +27,7 @@ module SmoothOperator
     end
 
 
-    attr_accessor :extra_params
+    attr_accessor :extra_params, :reloaded
 
     def reload(relative_path = nil, data = {}, options = {})
       relative_path = id.to_s if Helpers.blank?(relative_path)
@@ -50,6 +50,12 @@ module SmoothOperator
       return @destroyed if defined?(@destroyed)
 
       @destroyed = false
+    end
+
+    def reloaded?
+      return @reloaded if defined?(@reloaded)
+
+      @reloaded = false
     end
 
     def persisted?
@@ -126,6 +132,7 @@ module SmoothOperator
         returning_data = @last_remote_call.parsed_response
 
         if !@last_remote_call.error? && returning_data.is_a?(Hash)
+          @reloaded = true
           assign_attributes returning_data.include?(model_name) ? returning_data[model_name] : returning_data
         end
 

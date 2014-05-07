@@ -11,9 +11,15 @@ module SmoothOperator
     def find(relative_path, data = {}, options = {})
       relative_path = '' if relative_path == :all
 
+      returning_object = {}
+
       get(relative_path, data, options).tap do |remote_call|
         remote_call.object = build_object(remote_call.parsed_response, options) if remote_call.success?
+
+        returning_object = remote_call
       end
+
+      returning_object
     end
 
 
@@ -27,7 +33,7 @@ module SmoothOperator
       if parsed_response.is_a?(Array)
         parsed_response.map { |array_entry| build_object(array_entry, options) }
       elsif parsed_response.is_a?(Hash)
-        parsed_response.include?(table_name) ? ArrayWithMetaData.new(parsed_response, table_name, self) : new(parsed_response)
+        parsed_response.include?(table_name) ? ArrayWithMetaData.new(parsed_response, table_name, self) : new(parsed_response).tap { |object| object.reloaded = true }
       else
         parsed_response
       end

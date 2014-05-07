@@ -15,7 +15,7 @@ module SmoothOperator
 
       @table_name, @object_class = table_name, object_class
 
-      @internal_array = [*_attributes[table_name]].map { |array_entry| object_class.new(array_entry) }
+      @internal_array = [*_attributes[table_name]].map { |array_entry| object_class.new(array_entry).tap { |object| object.reloaded = true } }
       _attributes.delete(table_name)
 
       @meta_data = _attributes
