@@ -29,6 +29,17 @@ module SmoothOperator
 
     attr_accessor :extra_params
 
+    def reload(relative_path = nil, data = {}, options = {})
+      relative_path = id.to_s if Helpers.blank?(relative_path)
+      success = {}
+
+      make_remote_call(:get, relative_path, data, options) do |remote_call|
+        success = remote_call.status
+      end
+
+      success
+    end
+
     def new_record?
       return @new_record if defined?(@new_record)
 

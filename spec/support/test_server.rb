@@ -1,11 +1,19 @@
 require 'sinatra/base'
 require 'sinatra/json'
+require 'pry'
 
 class TestServer < Sinatra::Base
 
   use Rack::Auth::Basic, "Restricted Area" do |username, password|
     username == 'admin' and password == 'admin'
   end
+
+  
+  get '/posts/:id' do
+    post_data = { id: 1, body: 'test' }
+    json post_data
+  end
+
 
   get '/users/test_hash_with_array' do
     status test_hash_with_array
@@ -69,7 +77,7 @@ class TestServer < Sinatra::Base
   end
 
   not_found do
-    binding.pry
+    # binding.pry
   end
 
 
@@ -116,7 +124,8 @@ class TestServer < Sinatra::Base
   end
 
   if app_file == $0
-    require './spec/spec_helper' unless defined? SmoothOperator
+    # require './spec/spec_helper' unless defined? SmoothOperator
+    # require './spec/require_helper' unless defined? SmoothOperator
     run!
   end
 

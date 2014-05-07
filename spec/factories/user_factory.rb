@@ -9,7 +9,7 @@ FactoryGirl.define do
 
     trait :with_address_and_posts do
       address { { street: 'my_street' } }
-      posts [{ body: 'post1' }, { body: 'post2' }]
+      posts [{ id: 1, body: 'post1' }, { id: 2, body: 'post2' }]
     end
     factory :user_with_address_and_posts, traits: [:with_address_and_posts]
 

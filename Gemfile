@@ -12,4 +12,5 @@ group :development, :test do
   gem "sinatra-contrib"
   gem "rspec", "~> 3.0.0.beta1"
   gem "factory_girl", "~> 4.0"
+  gem "ethon", :git => 'https://github.com/goncalvesjoao/ethon'
 end

@@ -61,9 +61,6 @@ module SmoothOperator
       remote_call
     end
 
-
-    protected ################ PROTECTED ################
-
     def query_string(params)
       params
     end

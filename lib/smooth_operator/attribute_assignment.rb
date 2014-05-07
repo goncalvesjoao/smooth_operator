@@ -118,7 +118,7 @@ module SmoothOperator
       if self.class.dirty_attributes?
         internal_data[attribute_name].set_value(attribute_value)
       else
-        internal_data[attribute_name] = new_attribute_object(attribute_name, attribute_value)
+        internal_data[attribute_name] = new_attribute_object(attribute_name, attribute_value).value
       end
     end
 

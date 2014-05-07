@@ -14,21 +14,25 @@ module SmoothOperator
         
         remote_call = {}
 
-        hydra.queue(request)
+        # hydra.queue(request)
 
         request.on_complete do |typhoeus_response|
-          remote_call_class = if typhoeus_response.timed_out?
+          remote_call_class = if typhoeus_response.return_code == :couldnt_connect
+            RemoteCall::Errors::ConnectionFailed
+          elsif typhoeus_response.timed_out?
             RemoteCall::Errors::Timeout
           else
             RemoteCall::Typhoeus
           end
-binding.pry
+          
           remote_call = remote_call_class.new(typhoeus_response)
 
           yield(remote_call) if block_given?
         end
 
-        hydra.run
+        # hydra.run
+
+        request.run
 
         remote_call
       end
@@ -51,14 +55,14 @@ binding.pry
       def typhoeus_options
         return @typhoeus_options if defined?(@typhoeus_options)
         
-        @typhoeus_options = { method: http_verb, headers: options[:headers] }
+        @typhoeus_options = { method: http_verb, headers: options[:headers].merge({ "Content-type" => "application/x-www-form-urlencoded" }) }
 
         timeout = (options[:timeout] || operator_class.timeout)
 
         @typhoeus_options[:timeout] = timeout if Helpers.present?(timeout)
 
         @typhoeus_options[:body] = body if Helpers.present?(body)
-        @typhoeus_options[:params] = params if Helpers.present?(params)
+        # @typhoeus_options[:params] = params if Helpers.present?(params)
 
         @typhoeus_options
       end

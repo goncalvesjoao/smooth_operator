@@ -24,6 +24,9 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bundler", "~> 1.3"
   
   spec.add_dependency "json"
-  spec.add_dependency 'typhoeus'
-  spec.add_dependency 'faraday', '~> 0.8.9'
+  spec.add_dependency "faraday", "~> 0.8.9"
+  spec.add_dependency "typhoeus", "~> 0.6.8"
+
+  # this is necessary if you want to typhoeus to correctly encode arrays
+  # spec.add_dependency "ethon", :git => 'https://github.com/goncalvesjoao/ethon'
 end
