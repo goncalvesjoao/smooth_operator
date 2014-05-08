@@ -21,6 +21,12 @@ module SmoothOperator
 
       alias :ok? :success?
 
+      def not_success?
+        !success?
+      end
+
+      alias :not_ok? :not_success?
+
       def failure?
         http_status.between?(400, 499)
       end
