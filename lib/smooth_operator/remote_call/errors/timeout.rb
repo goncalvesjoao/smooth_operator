@@ -5,8 +5,12 @@ module SmoothOperator
       class Timeout < Base
 
         def initialize(response)
-          @response = response
+          super
           @http_status = 0
+        end
+
+        def timeout?
+          true
         end
 
       end

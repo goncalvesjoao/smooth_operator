@@ -50,6 +50,10 @@ class TestServer < Sinatra::Base
     json data
   end
   
+  get '/users/bad_json' do
+    'ok'
+  end
+
   get '/users/:id' do
     json FactoryGirl.attributes_for(:user_with_address_and_posts)
   end
@@ -68,6 +72,11 @@ class TestServer < Sinatra::Base
 
   post '/users' do
     common_response
+  end
+  
+  post '/users/timeout' do
+    sleep 1
+    json 'ok'
   end
 
   put '/users/:id' do

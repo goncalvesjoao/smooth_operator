@@ -5,8 +5,12 @@ module SmoothOperator
       class ConnectionFailed < Base
 
         def initialize(response)
-          @response = response
+          super
           @http_status = 0
+        end
+
+        def connection_failed?
+          true
         end
 
       end

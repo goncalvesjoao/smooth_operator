@@ -2,8 +2,6 @@ module User
   
   class Base < SmoothOperator::Base
 
-    # self.timeout = 2
-    
     self.model_name = 'user'
 
     self.endpoint_user = 'admin'
@@ -30,6 +28,15 @@ module User
       self.unknown_hash_class = :none
     end
 
+  end
+
+  class BrokenConnection < SmoothOperator::Base
+    self.endpoint = 'http://localhost:1234/'
+  end
+
+  class TimeoutConnection < Base
+    self.timeout = 0
+    self.model_name = 'user'
   end
 
 end
