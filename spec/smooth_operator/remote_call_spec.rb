@@ -6,12 +6,20 @@ describe SmoothOperator::RemoteCall, current: true do
   context "when the server response has a http code in the 200 range" do
     before { subject.save(nil, { status: 200 }) }
 
-    it "#success? should return true" do
-      expect(subject.last_remote_call.success?).to be true
+    it "#ok? should return true" do
+      expect(subject.last_remote_call.ok?).to be true
     end
 
-    it "#failure? should return false" do
-      expect(subject.last_remote_call.failure?).to be false
+    it "#not_processed? should return false" do
+      expect(subject.last_remote_call.not_processed?).to be false
+    end
+
+    it "#client_error? should return false" do
+      expect(subject.last_remote_call.client_error?).to be false
+    end
+
+    it "#server_error? should return false" do
+      expect(subject.last_remote_call.server_error?).to be false
     end
 
     it "#error? should return false" do
@@ -20,10 +28,6 @@ describe SmoothOperator::RemoteCall, current: true do
 
     it "#not_found? should return false" do
       expect(subject.last_remote_call.not_found?).to be false
-    end
-
-    it "#not_processed? should return false" do
-      expect(subject.last_remote_call.not_processed?).to be false
     end
 
     it "#timeout? should return false" do
@@ -39,27 +43,31 @@ describe SmoothOperator::RemoteCall, current: true do
     end
   end
 
-  context "when the server response has a http code in the 400 range" do
+  context "when the server response has a http code in the 400 range (not 422, 404)" do
     before { subject.save(nil, { status: 400 }) }
 
-    it "#success? should return false" do
-      expect(subject.last_remote_call.success?).to be false
-    end
-
-    it "#failure? should return true" do
-      expect(subject.last_remote_call.failure?).to be true
-    end
-
-    it "#error? should return false" do
-      expect(subject.last_remote_call.error?).to be false
-    end
-
-    it "#not_found? should return false" do
-      expect(subject.last_remote_call.not_found?).to be false
+    it "#ok? should return false" do
+      expect(subject.last_remote_call.ok?).to be false
     end
 
     it "#not_processed? should return false" do
       expect(subject.last_remote_call.not_processed?).to be false
+    end
+
+    it "#client_error? should return true" do
+      expect(subject.last_remote_call.client_error?).to be true
+    end
+
+    it "#server_error? should return false" do
+      expect(subject.last_remote_call.server_error?).to be false
+    end
+
+    it "#error? should return true" do
+      expect(subject.last_remote_call.error?).to be true
+    end
+
+    it "#not_found? should return false" do
+      expect(subject.last_remote_call.not_found?).to be false
     end
 
     it "#timeout? should return false" do
@@ -78,24 +86,28 @@ describe SmoothOperator::RemoteCall, current: true do
   context "when the server response has a http is 404" do
     before { subject.save(nil, { status: 404 }) }
 
-    it "#success? should return false" do
-      expect(subject.last_remote_call.success?).to be false
-    end
-
-    it "#failure? should return true" do
-      expect(subject.last_remote_call.failure?).to be true
-    end
-
-    it "#error? should return false" do
-      expect(subject.last_remote_call.error?).to be false
-    end
-
-    it "#not_found? should return true" do
-      expect(subject.last_remote_call.not_found?).to be true
+    it "#ok? should return false" do
+      expect(subject.last_remote_call.ok?).to be false
     end
 
     it "#not_processed? should return false" do
       expect(subject.last_remote_call.not_processed?).to be false
+    end
+
+    it "#client_error? should return true" do
+      expect(subject.last_remote_call.client_error?).to be true
+    end
+
+    it "#server_error? should return false" do
+      expect(subject.last_remote_call.server_error?).to be false
+    end
+
+    it "#error? should return true" do
+      expect(subject.last_remote_call.error?).to be true
+    end
+
+    it "#not_found? should return true" do
+      expect(subject.last_remote_call.not_found?).to be true
     end
 
     it "#timeout? should return false" do
@@ -114,12 +126,20 @@ describe SmoothOperator::RemoteCall, current: true do
   context "when the server response has a http is 422" do
     before { subject.save(nil, { status: 422 }) }
 
-    it "#success? should return false" do
-      expect(subject.last_remote_call.success?).to be false
+    it "#ok? should return false" do
+      expect(subject.last_remote_call.ok?).to be false
     end
 
-    it "#failure? should return true" do
-      expect(subject.last_remote_call.failure?).to be true
+    it "#not_processed? should return true" do
+      expect(subject.last_remote_call.not_processed?).to be true
+    end
+
+    it "#client_error? should return true" do
+      expect(subject.last_remote_call.client_error?).to be true
+    end
+
+    it "#server_error? should return false" do
+      expect(subject.last_remote_call.server_error?).to be false
     end
 
     it "#error? should return false" do
@@ -128,10 +148,6 @@ describe SmoothOperator::RemoteCall, current: true do
 
     it "#not_found? should return false" do
       expect(subject.last_remote_call.not_found?).to be false
-    end
-
-    it "#not_processed? should return true" do
-      expect(subject.last_remote_call.not_processed?).to be true
     end
 
     it "#timeout? should return false" do
@@ -150,12 +166,20 @@ describe SmoothOperator::RemoteCall, current: true do
   context "when the server response has a http code in the 500 range" do
     before { subject.save(nil, { status: 500 }) }
 
-    it "#success? should return false" do
-      expect(subject.last_remote_call.success?).to be false
+    it "#ok? should return false" do
+      expect(subject.last_remote_call.ok?).to be false
     end
 
-    it "#failure? should return false" do
-      expect(subject.last_remote_call.failure?).to be false
+    it "#not_processed? should return false" do
+      expect(subject.last_remote_call.not_processed?).to be false
+    end
+
+    it "#client_error? should return false" do
+      expect(subject.last_remote_call.client_error?).to be false
+    end
+
+    it "#server_error? should return true" do
+      expect(subject.last_remote_call.server_error?).to be true
     end
 
     it "#error? should return true" do
@@ -164,10 +188,6 @@ describe SmoothOperator::RemoteCall, current: true do
 
     it "#not_found? should return false" do
       expect(subject.last_remote_call.not_found?).to be false
-    end
-
-    it "#not_processed? should return false" do
-      expect(subject.last_remote_call.not_processed?).to be false
     end
 
     it "#timeout? should return false" do
@@ -188,12 +208,20 @@ describe SmoothOperator::RemoteCall, current: true do
 
     before { subject.save }
 
-    it "#success? should return false" do
-      expect(subject.last_remote_call.success?).to be false
+    it "#ok? should return false" do
+      expect(subject.last_remote_call.ok?).to be false
     end
 
-    it "#failure? should return false" do
-      expect(subject.last_remote_call.failure?).to be false
+    it "#not_processed? should return false" do
+      expect(subject.last_remote_call.not_processed?).to be false
+    end
+
+    it "#client_error? should return false" do
+      expect(subject.last_remote_call.client_error?).to be false
+    end
+
+    it "#server_error? should return true" do
+      expect(subject.last_remote_call.server_error?).to be true
     end
 
     it "#error? should return true" do
@@ -202,10 +230,6 @@ describe SmoothOperator::RemoteCall, current: true do
 
     it "#not_found? should return false" do
       expect(subject.last_remote_call.not_found?).to be false
-    end
-
-    it "#not_processed? should return false" do
-      expect(subject.last_remote_call.not_processed?).to be false
     end
 
     it "#timeout? should return false" do
@@ -226,12 +250,20 @@ describe SmoothOperator::RemoteCall, current: true do
     
     before { subject.save('timeout') }
 
-    it "#success? should return false" do
-      expect(subject.last_remote_call.success?).to be false
+    it "#ok? should return false" do
+      expect(subject.last_remote_call.ok?).to be false
     end
 
-    it "#failure? should return false" do
-      expect(subject.last_remote_call.failure?).to be false
+    it "#not_processed? should return false" do
+      expect(subject.last_remote_call.not_processed?).to be false
+    end
+
+    it "#client_error? should return false" do
+      expect(subject.last_remote_call.client_error?).to be false
+    end
+
+    it "#server_error? should return true" do
+      expect(subject.last_remote_call.server_error?).to be true
     end
 
     it "#error? should return true" do
@@ -240,10 +272,6 @@ describe SmoothOperator::RemoteCall, current: true do
 
     it "#not_found? should return false" do
       expect(subject.last_remote_call.not_found?).to be false
-    end
-
-    it "#not_processed? should return false" do
-      expect(subject.last_remote_call.not_processed?).to be false
     end
 
     it "#timeout? should return true" do

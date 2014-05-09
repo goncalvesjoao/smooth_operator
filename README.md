@@ -142,23 +142,30 @@ remote_call = Page.find(:all) # Will make a GET call to 'http://myblog.com/api/v
 pages = remote_call.objects # 'pages = remote_call.data' also works
 
 # If the server response is positive (http code between 200 and 299):
-  remote_call.success? # true
-  remote_call.failure? # false
+  remote_call.ok? # true
+  remote_call.not_processed? # false
   remote_call.error? # false
   remote_call.status # true
   pages = remote_call.data # array of Page instances
   remote_call.http_status # server_response code
 
-# If the server response is negative (http code between 400 and 499):
-  remote_call.success? # false
-  remote_call.failure? # true
+# If the server response is unprocessed entity (http code 422):
+  remote_call.ok? # false
+  remote_call.not_processed? # true
   remote_call.error? # false
   remote_call.status # false
   remote_call.http_status # server_response code
 
-# If the server response is an error (http code between 500 and 599), or the connection broke:
-  remote_call.success? # false
-  remote_call.failure? # false
+# If the server response is client error (http code between 400..499, except 422):
+  remote_call.ok? # false
+  remote_call.not_processed? # false
+  remote_call.error? # true
+  remote_call.status # nil
+  remote_call.http_status # server_response code
+
+# If the server response is server error (http code between 500 and 599), or the connection broke:
+  remote_call.ok? # false
+  remote_call.not_processed? # false
   remote_call.error? # true
   remote_call.status # nil
   remote_call.http_status # server_response code or 0 if connection broke

@@ -24,7 +24,7 @@ shared_examples_for "persistent remote call" do
 
     it "it should return true" do
       execute_method
-      expect(subject.last_remote_call.success?).to be true
+      expect(subject.last_remote_call.ok?).to be true
       expect(subject.last_remote_call.status).to be true
     end
 
@@ -36,12 +36,12 @@ shared_examples_for "persistent remote call" do
     it_behaves_like "successful persistent remote call"
   end
 
-  context "when the response is negative" do
+  context "when the response is unprocessed_entity" do
     let(:method_arguments) { ['', { status: 422 }] }
 
     it "it should return false" do
       execute_method
-      expect(subject.last_remote_call.failure?).to be true
+      expect(subject.last_remote_call.not_processed?).to be true
       expect(subject.last_remote_call.status).to be false
     end
 
@@ -53,11 +53,28 @@ shared_examples_for "persistent remote call" do
     it_behaves_like "successful persistent remote call"
   end
 
+  context "when the response is client side error" do
+    let(:method_arguments) { ['', { status: 404 }] }
+
+    it "it should return nil" do
+      execute_method
+      expect(subject.last_remote_call.client_error?).to be true
+      expect(subject.last_remote_call.error?).to be true
+      expect(subject.last_remote_call.status).to be nil
+    end
+
+    it "it should assert the subject's persistence" do
+      execute_method
+      expect(subject.persisted?).to be(persistence_state[500])
+    end
+  end
+
   context "when the there is a connection error ou http 500" do
     let(:method_arguments) { ['', { status: 500 }] }
 
     it "it should return nil" do
       execute_method
+      expect(subject.last_remote_call.server_error?).to be true
       expect(subject.last_remote_call.error?).to be true
       expect(subject.last_remote_call.status).to be_nil
     end
