@@ -123,16 +123,31 @@ describe SmoothOperator::Persistence, helpers: :persistence do
     end
 
     context "when calling #reload on a nested object" do
-      before do
-        subject.id = 1
-        subject.reload
-        subject.posts.first.reload
+
+      context "without the option 'ignore_parent: true'" do
+        before do
+          subject.id = 1
+          subject.reload
+          subject.posts.first.reload
+        end
+
+        it "it should fetch server data, with NESTED REST url" do
+          expect(subject.posts.first.attributes).to eq({ id: 1, body: 'from_nested_url' })
+        end
       end
 
-      it "it should fetch server data, with the correct nested REST url" do
-        # binding.pry
-        expect(subject.posts.first.attributes).to eq({ id: 1, body: 'from_server' })
+      context "with the option 'ignore_parent: true'" do
+        before do
+          subject.id = 1
+          subject.reload
+          subject.posts.first.reload(nil, nil, { ignore_parent: true })
+        end
+
+        it "it should fetch server data, with REST url" do
+          expect(subject.posts.first.attributes).to eq({ id: 1, body: 'from_resource_url' })
+        end
       end
+
     end
   end
 

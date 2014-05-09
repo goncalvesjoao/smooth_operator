@@ -13,7 +13,7 @@ module SmoothOperator
 
         @connection, @operator_options, @options = strip_options(options)
 
-        @relative_path = build_relative_path(relative_path, options)
+        @relative_path = resource_path(relative_path, options)
 
         @endpoint_user = options[:endpoint_user] || @operator_class.endpoint_user
         
@@ -39,7 +39,7 @@ module SmoothOperator
         [connection, operator_options, options]
       end
 
-      def build_relative_path(relative_path, options)
+      def resource_path(relative_path, options)
         table_name = options[:table_name] || @operator_class.table_name
 
         if Helpers.present?(table_name)

@@ -8,9 +8,13 @@ class TestServer < Sinatra::Base
     username == 'admin' and password == 'admin'
   end
 
-  
+  get '/posts/:id' do
+    post_data = { id: 1, body: 'from_resource_url' }
+    json post_data
+  end
+
   get '/users/:id/posts/:id' do
-    post_data = { id: 1, body: 'from_server' }
+    post_data = { id: 1, body: 'from_nested_url' }
     json post_data
   end
 
