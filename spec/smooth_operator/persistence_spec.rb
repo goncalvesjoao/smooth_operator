@@ -123,7 +123,7 @@ end
 
 describe SmoothOperator::Persistence, helpers: :persistence do
 
-  describe "#reload", current: true do
+  describe "#reload" do
     subject { new_user }
     let(:method_to_execute) { :reload }
 

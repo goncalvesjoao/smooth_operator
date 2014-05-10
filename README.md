@@ -274,8 +274,5 @@ Methods | Behaviour | Arguments | Return
 ## 4) TODO
 
 1. Finish "Methods" and "Behaviours" documentation;
-2. Allow changing the HTTP verb for a specific connection;
-3. FinderMethods specs;
-4. serialization_specs to test the json options for nested classes;
-5. model_schema_specs;
-6. Cache.
+2. ModelSchema specs;
+3. Cache.

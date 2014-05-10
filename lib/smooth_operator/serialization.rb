@@ -3,7 +3,7 @@ module SmoothOperator
   module Serialization
 
     def to_hash(options = nil)
-      Helpers.symbolyze_keys serializable_hash(options)
+      Helpers.symbolyze_keys(serializable_hash(options) || {})
     end
     
     # alias :attributes :to_hash
@@ -12,7 +12,7 @@ module SmoothOperator
     def to_json(options = nil)
       require 'json' unless defined? JSON
       
-      JSON(serializable_hash(options))
+      JSON(serializable_hash(options) || {})
     end
 
     def read_attribute_for_serialization(attribute)
