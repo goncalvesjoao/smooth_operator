@@ -104,11 +104,28 @@ shared_examples_for "save method" do
   end
 end
 
+shared_examples_for "a method that calls the #make_the_call method" do
+  let(:method_arguments) { ['custom_path', { "user" => { "first_name" => "nhoJ" }, "extra_params" => 'extra_params' }, { option1: 'option1', option2: 'option2', http_verb: :get, serializable_options: { only: [:first_name] } }] }
+
+  it "it should pass all arguments to #make_the_call" do
+    expect(subject).to receive(:make_the_call).with(:get, *method_arguments)
+
+    execute_method
+  end
+
+  it "it should pass all arguments to .make_the_call" do
+    expect(subject.class).to receive(:make_the_call).with(:get, *method_arguments)
+
+    execute_method
+  end
+end
+
 
 describe SmoothOperator::Persistence, helpers: :persistence do
 
   describe "#reload", current: true do
     subject { new_user }
+    let(:method_to_execute) { :reload }
 
     context "before calling #reload" do
       it "#has_data_from_server and #from_server should return false" do
@@ -166,6 +183,8 @@ describe SmoothOperator::Persistence, helpers: :persistence do
       end
 
     end
+
+    it_behaves_like "a method that calls the #make_the_call method"
   end
 
   describe ".create" do
@@ -298,14 +317,16 @@ describe SmoothOperator::Persistence, helpers: :persistence do
       subject { new_user }
       let(:persistence_state) { { 200 => true, 422 => false, 500 => false } }
 
-      it_behaves_like "persistent remote call"
-
       it "it should make a post http call" do
         execute_method
         expect(subject.last_remote_call.parsed_response['http_verb']).to eq('post')
       end
 
       it_behaves_like "save method"
+
+      it_behaves_like "persistent remote call"
+
+      it_behaves_like "a method that calls the #make_the_call method"
     end
 
     context "when an instance IS persisted" do
@@ -313,21 +334,21 @@ describe SmoothOperator::Persistence, helpers: :persistence do
         subject { existing_user }
         let(:persistence_state) { { 200 => true, 422 => true, 500 => true } }
 
-        it_behaves_like "persistent remote call"
-
         it "it should make a put http call" do
           execute_method
           expect(subject.last_remote_call.parsed_response['http_verb']).to eq('put')
         end
 
         it_behaves_like "save method"
+
+        it_behaves_like "persistent remote call"
+
+        it_behaves_like "a method that calls the #make_the_call method"
       end
 
       context "and it uses 'patch' http verb to save" do
         subject { existing_user_with_patch }
         let(:persistence_state) { { 200 => true, 422 => true, 500 => true } }
-
-        it_behaves_like "persistent remote call"
 
         it "it should make a patch http call" do
           execute_method
@@ -335,9 +356,12 @@ describe SmoothOperator::Persistence, helpers: :persistence do
         end
 
         it_behaves_like "save method"
+
+        it_behaves_like "persistent remote call"
+
+        it_behaves_like "a method that calls the #make_the_call method"
       end
     end
-
   end
 
   describe "#save!" do
@@ -379,12 +403,14 @@ describe SmoothOperator::Persistence, helpers: :persistence do
       subject { existing_user }
       let(:persistence_state) { { 200 => false, 422 => true, 500 => true } }
 
-      it_behaves_like "persistent remote call"
-
       it "it should make a delete http call" do
         execute_method
         expect(subject.last_remote_call.parsed_response['http_verb']).to eq('delete')
       end
+
+      it_behaves_like "persistent remote call"
+
+      it_behaves_like "a method that calls the #make_the_call method"
     end
 
   end

@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe SmoothOperator::RemoteCall, current: true do
+describe SmoothOperator::RemoteCall do
   subject { UserWithAddressAndPosts::Son.new(attributes_for(:user_with_address_and_posts)) }
 
   context "when the server response has a http code in the 200 range" do

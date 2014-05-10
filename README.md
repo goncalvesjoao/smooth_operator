@@ -120,7 +120,7 @@ post.save("#{post.id}/save_and_add_to_list", { admin: true, post: { author: 'Age
 ### 2.4) Saving using HTTP Patch verb
 ```ruby
 class Page < MyBlogResource
-  self.save_http_verb = :patch
+  self.update_http_verb = :patch
 end
 
 page = Page.find(2)

@@ -19,8 +19,21 @@ describe SmoothOperator::FinderMethods do
   subject { UserWithAddressAndPosts::Son }
 
   describe ".all" do
-    xit "should can .find(:all) with the same arguments that it as received" do
-      
+    context "when NO arguments are passed" do
+      it "it should can .find(:all, {}, {})" do
+        expect(subject).to receive(:find).with(:all, {}, {})
+        subject.all
+      end
+    end
+
+    context "when arguments are passed" do
+      it "it should can .find(:all) with the same arguments that .alll has received" do
+        arguments = [{ id: 2 }, { http_verb: 'head' }]
+
+        expect(subject).to receive(:find).with(:all, *arguments)
+
+        subject.all(*arguments)
+      end
     end
   end
 

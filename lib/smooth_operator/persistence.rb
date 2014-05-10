@@ -8,35 +8,27 @@ module SmoothOperator
 
     module ClassMethods
 
-      def methods_http_verbs
-        @methods_http_verbs ||= { create: :post, save: :put, destroy: :delete }
+      def methods_vs_http_verbs
+        @methods_vs_http_verbs ||= { reload: :get, create: :post, update: :put, destroy: :delete }
       end
 
-      [:create, :save, :destroy].each do |method|
-        define_method("#{method}_http_verb=") { |http_verb| methods_http_verbs[method] = http_verb }
+      [:reload, :create, :update, :destroy].each do |method|
+        define_method("#{method}_http_verb=") { |http_verb| methods_vs_http_verbs[method] = http_verb }
       end
 
       def create(attributes = nil, relative_path = nil, data = {}, options = {})
-        # if attributes.is_a?(Array)
-        #   attributes.map { |array_entry| create(array_entry, relative_path, data, options) }
-        # else
-          new(attributes).tap { |object| object.save(relative_path, data, options) }
-        # end
+        new(attributes).tap { |object| object.save(relative_path, data, options) }
       end
 
     end
 
 
-    attr_accessor :extra_params
-
     def reload(relative_path = nil, data = {}, options = {})
-      raise 'UnknownPath' if !respond_to?(:id) || Helpers.blank?(id)
-
-      relative_path, options = resource_path(relative_path, options)
+      raise 'UnknownPath' if Helpers.blank?(relative_path) && (!respond_to?(:id) || Helpers.blank?(id))
 
       success = {}
 
-      make_remote_call(:get, relative_path, data, options) do |remote_call|
+      make_the_call(*persistent_method_args(:reload, relative_path, data, options)) do |remote_call|
         success = remote_call.status
       end
 
@@ -70,11 +62,9 @@ module SmoothOperator
     def destroy(relative_path = nil, data = {}, options = {})
       return false unless persisted?
 
-      relative_path, options = resource_path(relative_path, options)
-
       success = {}
 
-      success = make_remote_call(self.class.methods_http_verbs[:destroy], relative_path, data, options) do |remote_call|
+      make_the_call(*persistent_method_args(:destroy, relative_path, data, options)) do |remote_call|
         success = remote_call.status
 
         @destroyed = true if success
@@ -87,13 +77,15 @@ module SmoothOperator
     protected ######################### PROTECTED ##################
 
     def create_or_update(relative_path, data, options)
+      data = data_with_object_attributes(data, options)
+
       new_record? ? create(relative_path, data, options) : update(relative_path, data, options)
     end
 
     def create(relative_path, data, options)
       success = {}
       
-      make_remote_call(self.class.methods_http_verbs[:create], relative_path, data, options) do |remote_call|
+      make_the_call(http_verb_for(:create, options), relative_path, data, options) do |remote_call|
         success = remote_call.status
 
         @new_record = false if success
@@ -103,40 +95,16 @@ module SmoothOperator
     end
 
     def update(relative_path, data, options)
-      relative_path, options = resource_path(relative_path, options)
-      
       success = {}
 
-      make_remote_call(self.class.methods_http_verbs[:save], relative_path, data, options) do |remote_call|
+      make_the_call(*persistent_method_args(:update, relative_path, data, options)) do |remote_call|
         success = remote_call.status
       end
 
       success
     end
 
-
-    private ##################### PRIVATE ####################
-
-    def resource_path(relative_path, options)
-      if Helpers.blank?(relative_path)
-        if parent_object.nil? || options[:ignore_parent] == true
-          relative_path = id.to_s
-        else
-          options ||= {}
-          options[:table_name] = ''
-          relative_path = "#{parent_object.table_name}/#{parent_object.id}/#{table_name}/#{id}"
-        end
-      end
-
-      [relative_path, options]
-    end
-
-    def make_remote_call(http_verb, relative_path, data, options)
-      data ||= {}
-      data.merge!(extra_params || {})
-
-      data, options = build_remote_call_args(http_verb, data, options)
-
+    def make_the_call(http_verb, relative_path, data, options)
       self.class.make_the_call(http_verb, relative_path, data, options) do |remote_call|
         @last_remote_call = remote_call
 
@@ -150,13 +118,36 @@ module SmoothOperator
       end
     end
 
-    def build_remote_call_args(http_verb, data, options)
-      return [data, options] if http_verb == :delete
+
+    private ##################### PRIVATE ####################
+
+    def persistent_method_args(method, relative_path, data, options)
+      options ||= {}
+
+      if Helpers.blank?(relative_path)
+        if parent_object.nil? || options[:ignore_parent] == true
+          relative_path = id.to_s
+        else
+          options[:table_name] = ''
+          relative_path = "#{parent_object.table_name}/#{parent_object.id}/#{table_name}/#{id}"
+        end
+      end
+
+      [http_verb_for(method, options), relative_path, data, options]
+    end
+
+    def http_verb_for(method, options)
+      options[:http_verb] || self.class.methods_vs_http_verbs[method]
+    end
+
+    def data_with_object_attributes(data, options)
+      data = Helpers.stringify_keys(data)
 
       hash = serializable_hash(options[:serializable_options]).dup
+
       hash.delete('id')
 
-      [{ model_name => hash }.merge(data), options]
+      { model_name => hash }.merge(data)
     end
 
   end

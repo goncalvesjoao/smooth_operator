@@ -27,7 +27,7 @@ module UserWithAddressAndPosts
 
     self.table_name = 'users'
 
-    self.save_http_verb = :patch
+    self.update_http_verb = :patch
 
   end
   
