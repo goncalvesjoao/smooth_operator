@@ -1,4 +1,3 @@
-require "smooth_operator/operators/base"
 require "smooth_operator/remote_call/base"
 require "smooth_operator/operators/faraday"
 require "smooth_operator/operators/typhoeus"
@@ -9,16 +8,19 @@ module SmoothOperator
 
   module Operator
 
-    HTTP_VERBS = [:get, :post, :put, :patch, :delete]
-
     OPTIONS = [:endpoint, :endpoint_user, :endpoint_pass, :timeout]
 
+    OPTIONS.each do |option|
+      define_method(option) { Helpers.get_instance_variable(self, option, '') }
+    end
 
     attr_writer *OPTIONS
 
-    OPTIONS.each { |option| define_method(option) { Helpers.get_instance_variable(self, option, '') } }
+    HTTP_VERBS = [:get, :post, :put, :patch, :delete]
 
-    HTTP_VERBS.each { |http_verb| define_method(http_verb) { |relative_path = '', params = {}, options = {}| make_the_call(http_verb, relative_path, params, options) } }
+    HTTP_VERBS.each do |http_verb|
+      define_method(http_verb) { |relative_path = '', params = {}, options = {}| make_the_call(http_verb, relative_path, params, options) }
+    end
 
     def headers
       Helpers.get_instance_variable(self, :headers, {})
@@ -26,33 +28,19 @@ module SmoothOperator
 
     attr_writer :headers
 
-    
-    def generate_parallel_connection
-      generate_connection(:typhoeus)
-    end
-
-    def generate_connection(adapter = nil, options = nil)
-      adapter ||= :net_http
-      options ||= {}
-      url, timeout = (options[:endpoint] || self.endpoint), (options[:timeout] || self.timeout)
-
-      ::Faraday.new(url: url) do |builder|
-        builder.options[:timeout] = timeout unless Helpers.blank?(timeout)
-        builder.request :url_encoded
-        builder.adapter adapter
-      end
-    end
 
     def make_the_call(http_verb, relative_path = '', data = {}, options = {})
-      if Helpers.present?(options[:hydra])
-        operator_call = Operators::Typhoeus.new(self, http_verb, relative_path, data, options)
-      else
-        operator_call = Operators::Faraday.new(self, http_verb, relative_path, data, options)
-      end
+      operator_args = operator_method_args(http_verb, relative_path, data, options)
 
+      if Helpers.present?(operator_args[4][:hydra])
+        operator_call = Operators::Typhoeus
+      else
+        operator_call = Operators::Faraday
+      end
+      
       remote_call = {}
 
-      operator_call.make_the_call do |_remote_call|
+      operator_call.make_the_call(*operator_args) do |_remote_call|
         remote_call = _remote_call
 
         yield(remote_call) if block_given?
@@ -63,6 +51,48 @@ module SmoothOperator
 
     def query_string(params)
       params
+    end
+
+
+    protected #################### PROTECTED ##################
+
+    def operator_method_args(http_verb, relative_path, data, options)
+      options = populate_options(options)
+
+      [http_verb, resource_path(relative_path, options), *strip_params(http_verb, data), options]
+    end
+
+
+    private #################### PRIVATE ##################
+
+    def populate_options(options)
+      options ||= {}
+
+      OPTIONS.each { |option| options[option] ||= send(option) }
+
+      options[:headers] = headers.merge(options[:headers] || {})
+      
+      options
+    end
+
+    def resource_path(relative_path, options)
+      table_name = options[:table_name] || self.table_name
+
+      if Helpers.present?(table_name)
+        Helpers.present?(relative_path) ? "#{table_name}/#{relative_path}" : table_name
+      else
+        relative_path.to_s
+      end
+    end
+
+    def strip_params(http_verb, data)
+      data ||= {}
+      
+      if [:get, :head, :delete].include?(http_verb)
+        [query_string(data), nil]
+      else
+        [query_string({}), data]
+      end
     end
 
   end

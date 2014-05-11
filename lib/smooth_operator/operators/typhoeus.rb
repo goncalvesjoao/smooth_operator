@@ -5,7 +5,7 @@ module SmoothOperator
 
   module Operators
 
-    class Typhoeus < Base
+    class Typhoeus
 
       def make_the_call
         set_basic_authentication

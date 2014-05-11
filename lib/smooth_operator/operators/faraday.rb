@@ -6,13 +6,33 @@ module SmoothOperator
 
   module Operators
 
-    class Faraday < Base
+    module Faraday
 
-      def make_the_call
+      extend self
+
+      # def generate_parallel_connection
+      #   generate_connection(:typhoeus)
+      # end
+
+      def generate_connection(adapter = nil, options = nil)
+        adapter ||= :net_http
+
+        ::Faraday.new(url: options[:endpoint]) do |builder|
+          builder.options[:timeout] = options[:timeout].to_i unless Helpers.blank?(options[:timeout])
+          builder.request :url_encoded
+          builder.adapter adapter
+        end
+      end
+
+      def make_the_call(http_verb, resource_path, params, body, options)
+        connection, request_options, options = strip_options(options)
+
         remote_call = begin
-          set_basic_authentication
+          set_basic_authentication(connection, options)
 
-          response = connection.send(http_verb, relative_path) { |request| request_configuration(request) }
+          response = connection.send(http_verb, resource_path) do |request|
+            request_configuration(request, request_options, options, params, body)
+          end
 
           RemoteCall::Faraday.new(response)
         rescue ::Faraday::Error::ConnectionFailed
@@ -29,12 +49,20 @@ module SmoothOperator
 
       protected ################ PROTECTED ################
 
-      def set_basic_authentication
-        connection.basic_auth(endpoint_user, endpoint_pass) if Helpers.present?(endpoint_user)
+      def strip_options(options)
+        request_options = options.delete(:request_options) || {}
+        
+        connection = options.delete(:connection) || generate_connection(nil, options)
+
+        [connection, request_options, options]
       end
 
-      def request_configuration(request)
-        operator_options.each { |key, value| request.options.send("#{key}=", value) }
+      def set_basic_authentication(connection, options)
+        connection.basic_auth(options[:endpoint_user], options[:endpoint_pass]) if Helpers.present?(options[:endpoint_user])
+      end
+
+      def request_configuration(request, request_options, options, params, body)
+        request_options.each { |key, value| request.options.send("#{key}=", value) }
         
         options[:headers].each { |key, value| request.headers[key] = value }
         
