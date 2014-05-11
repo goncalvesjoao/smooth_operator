@@ -18,7 +18,10 @@ module UserWithAddressAndPosts
     schema(
       age: :int,
       dob: :date,
-      manager: :bool
+      price: :float,
+      manager: :bool,
+      date: :datetime,
+      first_name: :string
     )
 
   end

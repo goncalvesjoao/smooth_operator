@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["João Gonçalves"]
   spec.email         = ["goncalves.joao@gmail.com"]
   spec.description   = %q{ActiveResource alternative}
-  spec.summary       = %q{Simple and fully customizable alternative to ActiveResource, using faraday gem to stablish parallel remote calls"}
+  spec.summary       = %q{Simple and fully customizable alternative to ActiveResource, using faraday gem to stablish remote calls"}
   spec.homepage      = "https://github.com/goncalvesjoao/smooth_operator"
   spec.license       = "MIT"
 

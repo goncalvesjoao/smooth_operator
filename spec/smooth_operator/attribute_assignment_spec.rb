@@ -157,6 +157,50 @@ describe SmoothOperator::AttributeAssignment do
 
       end
 
+      context "that is declared (in schema) as an float" do
+
+        it "when the attributes's value is '1', should be converted to 1" do
+          expect(subject.new(price: '1').price).to eq(1.0)
+        end
+
+        it "when the attributes's value is '-1', should be converted to -1" do
+          expect(subject.new(price: '-1').price).to eq(-1.0)
+        end
+
+        it "when the attributes's value is 's-10s', should be converted to -10" do
+          expect(subject.new(price: 's-10s').price).to eq(-10.0)
+        end
+
+        it "when the attributes's value is ' 10s', should be converted to 10" do
+          expect(subject.new(price: ' 10s').price).to eq(10.0)
+        end
+
+        it "when the attributes's value is 123, should be converted to 123" do
+          expect(subject.new(price: 123).price).to eq(123.0)
+        end
+
+        it "when the attributes's value is -5, should be converted to -5" do
+          expect(subject.new(price: -5).price).to eq(-5.0)
+        end
+
+        it "when the attributes's value is '12.3', should be converted to 12.3" do
+          expect(subject.new(price: '12.3').price).to eq(12.3)
+        end
+
+        it "when the attributes's value is 's12.3s', should be converted to 12.3" do
+          expect(subject.new(price: 's12.3s').price).to eq(12.3)
+        end
+
+        it "when the attributes's value is 's12,3s', should be converted to 12.3" do
+          expect(subject.new(price: 's12,3s').price).to eq(12.3)
+        end
+
+        it "when the attributes's value is 1.2, should be converted to 1.2" do
+          expect(subject.new(price: 1.2).price).to eq(1.2)
+        end
+
+      end
+
       context "that is declared (in schema) as an boolean" do
 
         it "when the attributes's value is true, should be converted to true" do
@@ -241,6 +285,33 @@ describe SmoothOperator::AttributeAssignment do
 
         it "if the attribute's value is an invalid date string, the returning value should be nil" do
           expect(subject.new(dob: '2s-2-2222').dob).to be_nil
+        end
+
+      end
+
+      context "that is declared (in schema) as a datetime" do
+
+        it "if the attribute's value is a valid datetime string" do
+          date = subject.new(date: '2-2-2222 12:30').date
+
+          expect(date).to be_instance_of(DateTime)
+          expect(date.day).to be(2)
+          expect(date.month).to be(2)
+          expect(date.year).to be(2222)
+          expect(date.hour).to be(12)
+          expect(date.min).to be(30)
+        end
+
+        it "if the attribute's value is a valid datetime" do
+          date_now = DateTime.now
+          date = subject.new(date: date_now).date
+
+          expect(date).to be_instance_of(DateTime)
+          expect(date).to eq(date_now)
+        end
+
+        it "if the attribute's value is an invalid datetime string, the returning value should be nil" do
+          expect(subject.new(date: '2s-2-2222').date).to be_nil
         end
 
       end

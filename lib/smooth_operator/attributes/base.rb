@@ -42,12 +42,6 @@ module SmoothOperator
         end
       end
 
-      def to_int(string)
-        return string if string.is_a?(Fixnum)
-
-        to_float(string).to_i
-      end
-
       def to_date(string)
         return string if string.is_a?(Date)
 
@@ -66,12 +60,18 @@ module SmoothOperator
         ['1', 'true'].include?(value) ? true : ['0', 'false'].include?(value) ? false : nil
       end
 
+      def to_int(string)
+        return string if string.is_a?(Fixnum)
+
+        to_float(string).to_i
+      end
+
       def to_float(string)
         return string if string.is_a?(Float)
 
-        return 0 if string.nil? || !string.is_a?(String)
+        return 0 if string.nil? || !(string.is_a?(String) || string.is_a?(Fixnum))
         
-        value = string.scan(/-*\d+[,.]*\d*/).flatten.map(&:to_f).first
+        value = string.to_s.gsub(',', '.').scan(/-*\d+[.]*\d*/).flatten.map(&:to_f).first
 
         value.nil? ? 0 : value
       end
