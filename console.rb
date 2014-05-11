@@ -7,7 +7,7 @@ require 'spec/require_helper'
 
 FactoryGirl.find_definitions
 
-LocalhostServer.new(TestServer.new, 4567)
+# LocalhostServer.new(TestServer.new, 4567)
 
 #User::Base.post('', { user: { age: 1, posts: [{ body: 'post1' }, 2] } })
 

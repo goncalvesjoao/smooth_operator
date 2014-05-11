@@ -35,7 +35,7 @@ module User
   end
 
   class TimeoutConnection < Base
-    self.timeout = 0
+    self.timeout = 1
     self.model_name = 'user'
   end
 

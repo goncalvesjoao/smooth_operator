@@ -79,7 +79,7 @@ class TestServer < Sinatra::Base
   end
   
   post '/users/timeout' do
-    sleep 1
+    sleep 2
     json 'ok'
   end
 

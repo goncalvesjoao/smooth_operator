@@ -12,11 +12,11 @@ module SmoothOperator
       def make_the_call(http_verb, resource_path, params, body, options)
         request = ::Typhoeus::Request.new *typhoeus_request_args(http_verb, resource_path, params, body, options)
         
-        # hydra = options[:hydra] || ::Typhoeus::Hydra::hydra
+        hydra = options[:hydra] || ::Typhoeus::Hydra::hydra
 
         _remote_call = {}
 
-        # hydra.queue(request)
+        hydra.queue(request)
 
         request.on_complete do |typhoeus_response|          
           _remote_call = remote_call(typhoeus_response)
@@ -24,9 +24,9 @@ module SmoothOperator
           yield(_remote_call) if block_given?
         end
 
-        # hydra.run
+        hydra.run
 
-        request.run
+        # request.run
 
         _remote_call
       end
@@ -57,7 +57,8 @@ module SmoothOperator
         typhoeus_options[:timeout] = options[:timeout] if Helpers.present?(options[:timeout])
 
         typhoeus_options[:body] = body if Helpers.present?(body)
-        # @typhoeus_options[:params] = params if Helpers.present?(params)
+        
+        typhoeus_options[:params] = params if Helpers.present?(params)
 
         typhoeus_options[:userpwd] = "#{options[:endpoint_user]}:#{options[:endpoint_pass]}" if Helpers.present?(options[:endpoint_user])
 
