@@ -5,70 +5,71 @@ module SmoothOperator
 
   module Operators
 
-    class Typhoeus
+    module Typhoeus
 
-      def make_the_call
-        set_basic_authentication
+      extend self
 
-        request = ::Typhoeus::Request.new(url, typhoeus_options)
+      def make_the_call(http_verb, resource_path, params, body, options)
+        request = ::Typhoeus::Request.new *typhoeus_request_args(http_verb, resource_path, params, body, options)
         
-        remote_call = {}
+        # hydra = options[:hydra] || ::Typhoeus::Hydra::hydra
+
+        _remote_call = {}
 
         # hydra.queue(request)
 
-        request.on_complete do |typhoeus_response|
-          remote_call_class = if typhoeus_response.return_code == :couldnt_connect
-            RemoteCall::Errors::ConnectionFailed
-          elsif typhoeus_response.timed_out?
-            RemoteCall::Errors::Timeout
-          else
-            RemoteCall::Typhoeus
-          end
-          
-          remote_call = remote_call_class.new(typhoeus_response)
+        request.on_complete do |typhoeus_response|          
+          _remote_call = remote_call(typhoeus_response)
 
-          yield(remote_call) if block_given?
+          yield(_remote_call) if block_given?
         end
 
         # hydra.run
 
         request.run
 
-        remote_call
+        _remote_call
       end
 
 
       protected ################ PROTECTED ################
 
-      def set_basic_authentication
-        typhoeus_options[:userpwd] = "#{endpoint_user}:#{endpoint_pass}" if Helpers.present?(endpoint_user)
+      def typhoeus_request_args(http_verb, relative_path, params, body, options)
+        [url(options, relative_path), build_typhoeus_options(http_verb, params, body, options)]
       end
 
-      def url
-        url = (options[:endpoint] || operator_class.endpoint)
+      def remote_call(typhoeus_response)
+        if typhoeus_response.return_code == :couldnt_connect
+          RemoteCall::Errors::ConnectionFailed
+        elsif typhoeus_response.timed_out?
+          RemoteCall::Errors::Timeout
+        else
+          RemoteCall::Typhoeus
+        end.new(typhoeus_response)
+      end
+
+
+      private ################### PRIVATE ###############
+
+      def build_typhoeus_options(http_verb, params, body, options)
+        typhoeus_options = { method: http_verb, headers: options[:headers].merge({ "Content-type" => "application/x-www-form-urlencoded" }) }
+
+        typhoeus_options[:timeout] = options[:timeout] if Helpers.present?(options[:timeout])
+
+        typhoeus_options[:body] = body if Helpers.present?(body)
+        # @typhoeus_options[:params] = params if Helpers.present?(params)
+
+        typhoeus_options[:userpwd] = "#{options[:endpoint_user]}:#{options[:endpoint_pass]}" if Helpers.present?(options[:endpoint_user])
+
+        typhoeus_options
+      end
+
+      def url(options, relative_path)
+        url = options[:endpoint]
         
         slice = url[-1] != '/' ? '/' : ''
 
         url = "#{url}#{slice}#{relative_path}" if Helpers.present?(relative_path)
-      end
-
-      def typhoeus_options
-        return @typhoeus_options if defined?(@typhoeus_options)
-        
-        @typhoeus_options = { method: http_verb, headers: options[:headers].merge({ "Content-type" => "application/x-www-form-urlencoded" }) }
-
-        timeout = (options[:timeout] || operator_class.timeout)
-
-        @typhoeus_options[:timeout] = timeout if Helpers.present?(timeout)
-
-        @typhoeus_options[:body] = body if Helpers.present?(body)
-        # @typhoeus_options[:params] = params if Helpers.present?(params)
-
-        @typhoeus_options
-      end
-
-      def hydra
-        @hydra ||= operator_options[:hydra] || ::Typhoeus::Hydra::hydra
       end
 
     end

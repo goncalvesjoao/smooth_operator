@@ -33,9 +33,9 @@ module SmoothOperator
       operator_args = operator_method_args(http_verb, relative_path, data, options)
 
       if Helpers.present?(operator_args[4][:hydra])
-        operator_call = Operators::Typhoeus
-      else
         operator_call = Operators::Faraday
+      else
+        operator_call = Operators::Typhoeus
       end
       
       remote_call = {}
