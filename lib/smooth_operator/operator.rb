@@ -15,12 +15,17 @@ module SmoothOperator
     end
 
     attr_writer *OPTIONS
-
-    HTTP_VERBS = [:get, :post, :put, :patch, :delete]
-
-    HTTP_VERBS.each do |http_verb|
-      define_method(http_verb) { |relative_path = '', params = {}, options = {}| make_the_call(http_verb, relative_path, params, options) }
+    
+    %w[get post put patch delete].each do |method|
+      class_eval <<-RUBY, __FILE__, __LINE__ + 1
+        def #{method}(relative_path = '', params = {}, options = {})
+          make_the_call(:#{method}, relative_path, params, options) do |remote_call|
+            block_given? ? yield(remote_call) : remote_call
+          end
+        end
+      RUBY
     end
+
 
     def headers
       Helpers.get_instance_variable(self, :headers, {})
@@ -38,15 +43,9 @@ module SmoothOperator
         operator_call = Operators::Faraday
       end
       
-      remote_call = {}
-
-      operator_call.make_the_call(*operator_args) do |_remote_call|
-        remote_call = _remote_call
-
-        yield(remote_call) if block_given?
+      operator_call.make_the_call(*operator_args) do |remote_call|
+        block_given? ? yield(remote_call) : remote_call
       end
-
-      remote_call
     end
 
     def query_string(params)

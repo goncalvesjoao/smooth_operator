@@ -26,13 +26,9 @@ module SmoothOperator
     def reload(relative_path = nil, data = {}, options = {})
       raise 'UnknownPath' if Helpers.blank?(relative_path) && (!respond_to?(:id) || Helpers.blank?(id))
 
-      success = {}
-
       make_the_call(*persistent_method_args(:reload, relative_path, data, options)) do |remote_call|
-        success = remote_call.status
+        block_given? ? yield(remote_call) : remote_call.status
       end
-
-      success
     end
 
     def new_record?
@@ -52,56 +48,46 @@ module SmoothOperator
     end
 
     def save(relative_path = nil, data = {}, options = {})
-      create_or_update(relative_path, data, options)
+      data = data_with_object_attributes(data, options)
+
+      if new_record?
+        create(relative_path, data, options) { |remote_call| block_given? ? yield(remote_call) : remote_call.status }
+      else
+        update(relative_path, data, options) { |remote_call| block_given? ? yield(remote_call) : remote_call.status }
+      end
     end
 
     def save!(relative_path = nil, data = {}, options = {})
-      create_or_update(relative_path, data, options) || raise('RecordNotSaved')
+      save(relative_path, data, options) do |remote_call|
+        block_given? ? yield(remote_call) : remote_call.status
+      end || raise('RecordNotSaved')
     end
 
     def destroy(relative_path = nil, data = {}, options = {})
       return false unless persisted?
 
-      success = {}
-
       make_the_call(*persistent_method_args(:destroy, relative_path, data, options)) do |remote_call|
-        success = remote_call.status
+        @destroyed = true if remote_call.status
 
-        @destroyed = true if success
+        block_given? ? yield(remote_call) : remote_call.status
       end
-
-      success
     end
 
 
     protected ######################### PROTECTED ##################
 
-    def create_or_update(relative_path, data, options)
-      data = data_with_object_attributes(data, options)
-
-      new_record? ? create(relative_path, data, options) : update(relative_path, data, options)
-    end
-
     def create(relative_path, data, options)
-      success = {}
-      
       make_the_call(http_verb_for(:create, options), relative_path, data, options) do |remote_call|
-        success = remote_call.status
+        @new_record = false if remote_call.status
 
-        @new_record = false if success
+        block_given? ? yield(remote_call) : remote_call
       end
-
-      success
     end
 
     def update(relative_path, data, options)
-      success = {}
-
       make_the_call(*persistent_method_args(:update, relative_path, data, options)) do |remote_call|
-        success = remote_call.status
+        block_given? ? yield(remote_call) : remote_call
       end
-
-      success
     end
 
     def make_the_call(http_verb, relative_path, data, options)

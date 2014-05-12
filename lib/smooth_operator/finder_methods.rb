@@ -11,15 +11,11 @@ module SmoothOperator
     def find(relative_path, data = {}, options = {})
       relative_path = '' if relative_path == :all
 
-      returning_object = {}
-
-      get(relative_path, data, options).tap do |remote_call|
+      get(relative_path, data, options) do |remote_call|
         remote_call.object = build_object(remote_call.parsed_response, options) if remote_call.ok?
 
-        returning_object = remote_call
+        block_given? ? yield(remote_call) : remote_call
       end
-
-      returning_object
     end
 
 

@@ -14,7 +14,7 @@ module SmoothOperator
         
         hydra = options[:hydra] || ::Typhoeus::Hydra::hydra
 
-        _remote_call = {}
+        _remote_call = nil
 
         hydra.queue(request)
 
@@ -24,9 +24,7 @@ module SmoothOperator
           yield(_remote_call) if block_given?
         end
 
-        hydra.run
-
-        # request.run
+        hydra.run if Helpers.blank?(options[:hydra])
 
         _remote_call
       end

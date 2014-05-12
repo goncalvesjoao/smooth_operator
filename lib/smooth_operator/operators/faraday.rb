@@ -41,9 +41,7 @@ module SmoothOperator
           RemoteCall::Errors::Timeout.new(response)
         end
 
-        yield(remote_call) if block_given?
-
-        remote_call
+        block_given? ? yield(remote_call) : remote_call
       end
 
 
