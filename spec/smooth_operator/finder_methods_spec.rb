@@ -90,14 +90,12 @@ describe SmoothOperator::FinderMethods do
       end
     end
 
-    context "when the server returns an array with nested object on each entry, with the same name has the resource", current: true do
-      it "it should return a RemoteCall instance an instance of ArrayWithMetaData" do
-        remote_call = subject.find('with_metadata')
+    context "when the server returns an array with nested object on each entry, with the same name has the resource" do
+      it "it should return an Array with Class instances" do
+        remote_call = subject.find('array_with_nested_users')
         users = remote_call.data
 
-        expect(users).to be_instance_of(SmoothOperator::ArrayWithMetaData)
-        expect(users.page).to be(1)
-        expect(users.total).to be(6)
+        expect(users).to be_instance_of(Array)
         users.each { |user| expect(user).to be_instance_of(subject) }
       end
     end
