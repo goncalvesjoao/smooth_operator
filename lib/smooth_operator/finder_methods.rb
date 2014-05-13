@@ -21,13 +21,13 @@ module SmoothOperator
 
     protected #################### PROTECTED ##################
 
-    def build_object(parsed_response, options)
+    def build_object(parsed_response, options, from_array = false)
       options ||={}
 
       if parsed_response.is_a?(Array)
-        parsed_response.map { |array_entry| build_object(array_entry, options) }
+        parsed_response.map { |array_entry| build_object(array_entry, options, true) }
       elsif parsed_response.is_a?(Hash)
-        if parsed_response.include?(table_name)
+        if !from_array && parsed_response.include?(table_name)
           ArrayWithMetaData.new(parsed_response, self)
         else
           new(parsed_response, from_server: true)

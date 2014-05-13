@@ -45,12 +45,25 @@ class TestServer < Sinatra::Base
     json users
   end
 
+  get '/users/array_with_nested_users' do
+    nested_users = [{ id: 1, first_name: '1' }, { id: 2, first_name: '2' }]
+
+    users = [{ id: 1, users: nested_users}, { id: 2, users: nested_users}]
+
+    json users
+  end
+
   get '/users/misc_array' do
     json [FactoryGirl.attributes_for(:user_with_address_and_posts), 2]
   end
 
   get '/users/with_metadata' do
-    data = { page: 1, total: 6, users: [{ id: 1 }, { id: 2 }] }
+    nested_users = [{ id: 1, first_name: '1' }, { id: 2, first_name: '2' }]
+
+    users = [{ id: 1, users: nested_users}, { id: 2, users: nested_users}]
+
+    data = { page: 1, total: 6, users: users }
+    
     json data
   end
   

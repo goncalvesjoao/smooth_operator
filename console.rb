@@ -25,5 +25,7 @@ LocalhostServer.new(TestServer.new, 4567)
 #user = UserWithAddressAndPosts::Son.new(FactoryGirl.attributes_for(:user_with_address_and_posts))
 #user.save('', { status: 200 })
 
+# "[{\"patient_id\"=>33, \"messages\"=>[{\"id\"=>\"53722c20cb38247c36000003\", \"title\"=>\"Joao Goncalves\", \"created_at\"=>\"2014-05-13T14:28:48Z\"}, {\"id\"=>\"53722bfccb382485d5000002\", \"title\"=>\"Joao Goncalves\", \"created_at\"=>\"2014-05-13T14:28:12Z\"}, {\"id\"=>\"53722b91cb3824e913000001\", \"title\"=>\"Joao Goncalves\", \"created_at\"=>\"2014-05-13T14:26:25Z\"}]}]"
+
 binding.pry
 
