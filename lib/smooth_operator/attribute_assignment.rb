@@ -141,7 +141,7 @@ module SmoothOperator
 
     def update_internal_data(attribute_name, attribute_value)
       if self.class.dirty_attributes?
-        internal_data[attribute_name].set_value(attribute_value, self.class.unknown_hash_class, self)
+        internal_data[attribute_name].set_value(attribute_value, self)
       else
         internal_data[attribute_name] = new_attribute_object(attribute_name, attribute_value).value
       end
@@ -150,7 +150,7 @@ module SmoothOperator
     def new_attribute_object(attribute_name, attribute_value)
       attribute_class = self.class.dirty_attributes? ?  Attributes::Dirty : Attributes::Normal
       
-      attribute_class.new(attribute_name, attribute_value, internal_structure[attribute_name], self.class.unknown_hash_class, self)
+      attribute_class.new(attribute_name, attribute_value, self)
     end
 
   end

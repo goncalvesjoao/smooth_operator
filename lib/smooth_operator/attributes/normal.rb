@@ -5,8 +5,8 @@ module SmoothOperator
 
       attr_reader :value
 
-      def initialize(name, value, type, unknown_hash_class, parent_object)
-        @value = cast_to_type(name, value, type, unknown_hash_class, parent_object)
+      def initialize(name, value, parent_object)
+        @value = cast_to_type(name, value, parent_object)
       end
 
     end

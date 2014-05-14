@@ -3,16 +3,16 @@ module SmoothOperator
 
     class Dirty < Base
 
-      attr_reader :original_name, :original_value, :first_value, :value, :type
+      attr_reader :original_name, :original_value, :first_value, :value
 
-      def initialize(name, value, type, unknown_hash_class, parent_object)
-        @original_name, @original_value, @type = name, value, type
+      def initialize(name, value, parent_object)
+        @original_name, @original_value = name, value
 
-        @first_value = set_value(value, unknown_hash_class, parent_object)
+        @first_value = set_value(value, parent_object)
       end
 
-      def set_value(new_value, unknown_hash_class, parent_object)
-        @value = cast_to_type(original_name, new_value, type, unknown_hash_class, parent_object)
+      def set_value(new_value, parent_object)
+        @value = cast_to_type(original_name, new_value, parent_object)
       end
 
       def changed?
