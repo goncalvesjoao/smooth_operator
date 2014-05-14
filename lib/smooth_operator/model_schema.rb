@@ -14,22 +14,26 @@ module SmoothOperator
       @internal_structure ||= self.class.internal_structure.dup
     end
 
-    def table_name
-      @table_name ||= self.class.table_name.dup
+    def resources_name
+      @resources_name ||= self.class.resources_name.dup
     end
 
-    def model_name
-      @model_name ||= table_name.singularize
+    def resource_name
+      @resource_name ||= resources_name.singularize
     end
 
     
     module ClassMethods
-
-      attr_writer :table_name
-
-      def table_name
-        @table_name ||= self.model_name.to_s.underscore.pluralize
+      
+      def resources_name
+        @resources_name ||= self.resource_name.pluralize
       end
+      attr_writer :resources_name
+
+      def resource_name
+        @resource_name ||= self.model_name.to_s.underscore.pluralize
+      end
+      attr_writer :resource_name
 
       def schema(structure)
         internal_structure.merge! Helpers.stringify_keys(structure)

@@ -2,7 +2,7 @@ class Address < SmoothOperator::Base
 
   self.dirty_attributes
 
-  self.model_name = :none
+  self.resource_name = ''
 
   self.endpoint_user = 'admin'
   self.endpoint_pass = 'admin'

@@ -2,7 +2,7 @@ module User
   
   class Base < SmoothOperator::Base
 
-    self.model_name = 'user'
+    self.resource_name = 'user'
 
     self.endpoint_user = 'admin'
 
@@ -36,7 +36,7 @@ module User
 
   class TimeoutConnection < Base
     self.timeout = 1
-    self.model_name = 'user'
+    self.resource_name = 'user'
   end
 
 end

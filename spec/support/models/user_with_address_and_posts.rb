@@ -2,7 +2,7 @@ module UserWithAddressAndPosts
   
   class Father < User::Base
     
-    self.table_name = 'users'
+    self.resources_name = 'users'
 
     schema(
       posts: Post,
@@ -13,7 +13,7 @@ module UserWithAddressAndPosts
 
   class Son < Father
 
-    self.table_name = 'users'
+    self.resources_name = 'users'
 
     schema(
       age: :int,
@@ -28,7 +28,7 @@ module UserWithAddressAndPosts
 
   class WithPatch < Son
 
-    self.table_name = 'users'
+    self.resources_name = 'users'
 
     self.update_http_verb = :patch
 

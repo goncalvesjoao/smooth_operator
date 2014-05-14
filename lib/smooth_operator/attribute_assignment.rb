@@ -63,8 +63,8 @@ module SmoothOperator
       
       attributes = _attributes = Helpers.stringify_keys(_attributes)
 
-      if _attributes.include?(model_name)
-        attributes = _attributes.delete(model_name)
+      if _attributes.include?(resource_name)
+        attributes = _attributes.delete(resource_name)
         @_meta_data = _attributes
       end
       

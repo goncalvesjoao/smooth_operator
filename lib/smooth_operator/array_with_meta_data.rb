@@ -6,7 +6,7 @@ module SmoothOperator
 
     include Enumerable
 
-    attr_reader :meta_data, :internal_array, :table_name, :object_class
+    attr_reader :meta_data, :internal_array, :object_class
 
     def_delegators :internal_array, :length, :<<, :[]
 
@@ -14,10 +14,10 @@ module SmoothOperator
       _attributes = attributes.dup
 
       @object_class = object_class
-      @table_name = object_class.table_name
+      resources_name = object_class.resources_name
 
-      @internal_array = [*_attributes[table_name]].map { |array_entry| object_class.new(array_entry).tap { |object| object.reloaded = true } }
-      _attributes.delete(table_name)
+      @internal_array = [*_attributes[resources_name]].map { |array_entry| object_class.new(array_entry).tap { |object| object.reloaded = true } }
+      _attributes.delete(resources_name)
 
       @meta_data = _attributes
     end

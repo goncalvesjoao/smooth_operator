@@ -78,7 +78,7 @@ describe SmoothOperator::FinderMethods do
       end
     end
 
-    context "when the server returns a hash with a key (equal to subject's call.table_name) containing an array" do
+    context "when the server returns a hash with a key (equal to subject's call.resources_name) containing an array" do
       it "it should return a RemoteCall instance an instance of ArrayWithMetaData" do
         remote_call = subject.find('with_metadata')
         users = remote_call.data

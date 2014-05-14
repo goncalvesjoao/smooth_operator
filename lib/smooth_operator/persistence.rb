@@ -114,8 +114,8 @@ module SmoothOperator
         if parent_object.nil? || options[:ignore_parent] == true
           relative_path = id.to_s
         else
-          options[:table_name] = ''
-          relative_path = "#{parent_object.table_name}/#{parent_object.id}/#{table_name}/#{id}"
+          options[:resources_name] = ''
+          relative_path = "#{parent_object.resources_name}/#{parent_object.id}/#{resources_name}/#{id}"
         end
       end
 
@@ -133,7 +133,7 @@ module SmoothOperator
 
       hash.delete('id')
 
-      { model_name => hash }.merge(data)
+      { resource_name => hash }.merge(data)
     end
 
   end
