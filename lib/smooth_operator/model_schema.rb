@@ -71,7 +71,10 @@ module SmoothOperator
           namespace ||= self.parents.detect do |n|
             n.respond_to?(:use_relative_model_naming?) && n.use_relative_model_naming?
           end
-          ActiveModel::Name.new(self, namespace, @_model_name)
+
+          ActiveModel::Name.new(self, namespace, @_model_name).tap do |model_name|
+            def model_name.human(options = {}); @klass.send(:_translate, "models.#{i18n_key}", options); end
+          end
         end
       end
 
