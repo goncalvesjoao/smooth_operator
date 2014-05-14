@@ -129,6 +129,34 @@ describe SmoothOperator::AttributeAssignment do
     context "when there is a known schema and the received hash has an attribute" do
       subject { UserWithAddressAndPosts::Son }
 
+      context "that is declared (in schema) as an nil" do
+
+        it "when the attributes's value is '1', should return '1'" do
+          expect(subject.new(complex_field: '1').complex_field).to eq('1')
+        end
+
+        it "when the attributes's value is ['1', '2'], should return ['1', '2']" do
+          expect(subject.new(complex_field: ['1', '2']).complex_field).to eq(['1', '2'])
+        end
+
+        it "when the attributes's value is 1, should be converted to 1" do
+          expect(subject.new(complex_field: 1).complex_field).to eq(1)
+        end
+
+        it "when the attributes's value is { first_name: ['1', '2'] }, should be converted to { first_name: ['1', '2'] }" do
+          expect(subject.new(complex_field: { first_name: ['1', '2'] }).complex_field).to eq({ first_name: ['1', '2'] })
+        end
+
+        it "when the attributes's value is -1, should be converted to -1" do
+          expect(subject.new(complex_field: -1).complex_field).to eq(-1)
+        end
+
+        it "when the attributes's value is 0.35, should be converted to 0.35" do
+          expect(subject.new(complex_field: 0.35).complex_field).to eq(0.35)
+        end
+
+      end
+
       context "that is declared (in schema) as an integer" do
 
         it "when the attributes's value is '1', should be converted to 1" do

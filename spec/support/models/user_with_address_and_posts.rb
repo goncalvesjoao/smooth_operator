@@ -19,6 +19,7 @@ module UserWithAddressAndPosts
       price: :float,
       manager: :bool,
       date: :datetime,
+      complex_field: nil,
       first_name: :string
     )
 

@@ -42,7 +42,7 @@ module SmoothOperator
       end
 
       def internal_structure
-        Helpers.get_instance_variable(self, :internal_structure, {})
+        Helpers.get_instance_variable(self, :internal_structure, { "errors" => nil })
       end
 
       def known_attributes

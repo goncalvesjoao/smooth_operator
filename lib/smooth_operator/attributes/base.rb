@@ -6,7 +6,9 @@ module SmoothOperator
       protected ##################### PROTECTED ########################
 
       def cast_to_type(name, value, parent_object)
-        type, unknown_hash_class = parent_object.internal_structure[name], parent_object.class.unknown_hash_class
+        known_by_schema, type, unknown_hash_class = parent_object.internal_structure.include?(name), parent_object.internal_structure[name], parent_object.class.unknown_hash_class
+
+        return Helpers.duplicate(value) if known_by_schema && type.nil?
 
         case value
         when Array
