@@ -25,13 +25,13 @@ module SmoothOperator
     
     module ClassMethods
       
-      def resources_name
-        @resources_name ||= self.resource_name.pluralize
+      def resources_name(default_bypass = nil)
+        @resources_name ||= (Helpers.super_method(self, :resources_name, true) || (default_bypass ? nil : self.resource_name.pluralize))
       end
       attr_writer :resources_name
 
-      def resource_name
-        @resource_name ||= self.model_name.to_s.underscore.pluralize
+      def resource_name(default_bypass = nil)
+        @resource_name ||= (Helpers.super_method(self, :resource_name, true) || (default_bypass ? nil : self.model_name.to_s.underscore.pluralize))
       end
       attr_writer :resource_name
 

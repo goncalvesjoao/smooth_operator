@@ -36,7 +36,6 @@ module User
 
   class TimeoutConnection < Base
     self.timeout = 1
-    self.resource_name = 'user'
   end
 
 end

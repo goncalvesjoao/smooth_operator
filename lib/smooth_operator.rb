@@ -18,6 +18,8 @@ module SmoothOperator
 
     attr_reader :last_remote_call
 
+    self.strict_behaviour = true
+
   end
   
 end

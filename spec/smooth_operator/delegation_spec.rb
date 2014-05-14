@@ -54,34 +54,83 @@ describe SmoothOperator::Delegation do
       end
     end
 
+    context "when .strict_behaviour is true" do
+      subject { UserWithAddressAndPosts::Son.new(attributes_for(:user_with_address_and_posts)) }
 
-    subject { UserWithAddressAndPosts::Son.new(attributes_for(:user_with_address_and_posts)) }
+      context "when calling a method that doesn't match the initialized attributes but matches the schema" do
+        it 'it should return nil' do
+          expect(subject.manager).to eq(nil)
+        end
 
-    context "when calling a method that doesn't match the initialized attributes but matches the schema" do
-      it 'it should return nil' do
-        expect(subject.manager).to eq(nil)
+        it "#respond_to? must return true" do
+          expect(subject.respond_to?(:manager)).to eq(true)
+        end
+      end
+
+      context "when calling a method that doesn't match either the schema nor the initialized attributes" do
+        it 'it should raise NoMethodError' do
+          expect { subject.unknown_method }.to raise_error NoMethodError
+        end
+
+        it "#respond_to? must return false" do
+          expect(subject.respond_to?(:unknown_method)).to eq(false)
+        end
+      end
+
+      context "when setting a new attribute not declared on schema" do
+        before { subject.unknown_attribute = 'unknown_value' }
+
+        it "#known_attributes must reflect that new attribute" do
+          expect(subject.known_attributes.to_a).to include('unknown_attribute')
+        end
+        
+        it "#respond_to? must return true" do
+          expect(subject.respond_to?(:unknown_attribute)).to eq(true)
+        end
+        
+        it "calling a method with the same name must return that attribute's value" do
+          expect(subject.unknown_attribute).to eq('unknown_value')
+        end
       end
     end
 
-    context "when calling a method that doesn't match either the schema nor the initialized attributes" do
-      it 'it should raise NoMethodError' do
-        expect { subject.unknown_method }.to raise_error NoMethodError
-      end
-    end
+    context "when .strict_behaviour is false" do
+      subject { UserWithAddressAndPosts::SoftBehaviour.new(attributes_for(:user_with_address_and_posts)) }
 
-    context "when setting a new attribute not declared on schema" do
-      before { subject.unknown_attribute = 'unknown_value' }
+      context "when calling a method that doesn't match the initialized attributes but matches the schema" do
+        it 'it should return nil' do
+          expect(subject.manager).to eq(nil)
+        end
 
-      it "#known_attributes must reflect that new attribute" do
-        expect(subject.known_attributes.to_a).to include('unknown_attribute')
+        it "#respond_to? must return true" do
+          expect(subject.respond_to?(:manager)).to eq(true)
+        end
       end
-      
-      it "#respond_to? must return true" do
-        expect(subject.respond_to?(:unknown_attribute)).to eq(true)
+
+      context "when calling a method that doesn't match either the schema nor the initialized attributes" do
+        it 'it should return nil' do
+          expect(subject.unknown_method).to eq(nil)
+        end
+
+        it "#respond_to? must return false" do
+          expect(subject.respond_to?(:unknown_method)).to eq(false)
+        end
       end
-      
-      it "calling a method with the same name must return that attribute's value" do
-        expect(subject.unknown_attribute).to eq('unknown_value')
+
+      context "when setting a new attribute not declared on schema" do
+        before { subject.unknown_attribute = 'unknown_value' }
+
+        it "#known_attributes must reflect that new attribute" do
+          expect(subject.known_attributes.to_a).to include('unknown_attribute')
+        end
+        
+        it "#respond_to? must return true" do
+          expect(subject.respond_to?(:unknown_attribute)).to eq(true)
+        end
+        
+        it "calling a method with the same name must return that attribute's value" do
+          expect(subject.unknown_attribute).to eq('unknown_value')
+        end
       end
     end
 

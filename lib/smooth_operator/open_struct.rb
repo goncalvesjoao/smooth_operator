@@ -15,6 +15,14 @@ module SmoothOperator
       include Serialization
       include AttributeAssignment
 
+      def self.strict_behaviour=(value)
+        @strict_behaviour = value
+      end
+
+      def self.strict_behaviour
+        Helpers.get_instance_variable(self, :strict_behaviour, false)
+      end
+
     end
 
     class Dirty < Base

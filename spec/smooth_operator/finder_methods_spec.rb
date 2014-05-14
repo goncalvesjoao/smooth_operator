@@ -54,7 +54,7 @@ describe SmoothOperator::FinderMethods do
       end
 
       it "user should NOT contain meta_data" do
-        expect{ user.status }.to raise_error NoMethodError
+        expect { user.status }.to raise_error NoMethodError
       end
     end
 

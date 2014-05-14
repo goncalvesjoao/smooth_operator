@@ -17,7 +17,7 @@ module SmoothOperator
       when :setter
         return push_to_internal_data(method_name, args.first)
       else
-        return get_internal_data(method_name) if respond_to?(method_name)
+        return get_internal_data(method_name) if !self.class.strict_behaviour || respond_to?(method_name)
       end
 
       result.nil? ? super : result
