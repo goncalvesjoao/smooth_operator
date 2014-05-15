@@ -70,7 +70,7 @@ module SmoothOperator
       
       options.each { |key, value| @_options[key] = value } if options.is_a?(Hash)
 
-      attributes.each { |name, value| push_to_internal_data(name, value) }
+      attributes.each { |name, value| push_to_internal_data(name, value, true) }
     end
 
     def parent_object
@@ -99,7 +99,7 @@ module SmoothOperator
       end
     end
 
-    def push_to_internal_data(attribute_name, attribute_value)
+    def push_to_internal_data(attribute_name, attribute_value, cast = false)
       attribute_name = attribute_name.to_s
 
       return nil unless allowed_attribute(attribute_name)
@@ -107,9 +107,9 @@ module SmoothOperator
       known_attributes.add attribute_name
       
       if internal_data[attribute_name].nil?
-        initiate_internal_data(attribute_name, attribute_value)
+        initiate_internal_data(attribute_name, attribute_value, cast)
       else
-        update_internal_data(attribute_name, attribute_value)
+        update_internal_data(attribute_name, attribute_value, cast)
       end
     end
 
@@ -133,17 +133,21 @@ module SmoothOperator
 
     private ######################## PRIVATE #############################
 
-    def initiate_internal_data(attribute_name, attribute_value)
-      internal_data[attribute_name] = new_attribute_object(attribute_name, attribute_value)
-      
-      internal_data[attribute_name] = internal_data[attribute_name].value unless self.class.dirty_attributes?
+    def initiate_internal_data(attribute_name, attribute_value, cast)
+      if cast
+        internal_data[attribute_name] = new_attribute_object(attribute_name, attribute_value)
+        
+        internal_data[attribute_name] = internal_data[attribute_name].value unless self.class.dirty_attributes?
+      else
+        internal_data[attribute_name] = attribute_value
+      end
     end
 
-    def update_internal_data(attribute_name, attribute_value)
+    def update_internal_data(attribute_name, attribute_value, cast)
       if self.class.dirty_attributes?
         internal_data[attribute_name].set_value(attribute_value, self)
       else
-        internal_data[attribute_name] = new_attribute_object(attribute_name, attribute_value).value
+        internal_data[attribute_name] = cast ? new_attribute_object(attribute_name, attribute_value).value : attribute_value
       end
     end
 
