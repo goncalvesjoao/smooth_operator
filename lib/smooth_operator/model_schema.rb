@@ -13,15 +13,6 @@ module SmoothOperator
     def internal_structure
       @internal_structure ||= self.class.internal_structure.dup
     end
-
-    def resources_name
-      @resources_name ||= self.class.resources_name.dup
-    end
-
-    def resource_name
-      @resource_name ||= resources_name.singularize
-    end
-
     
     module ClassMethods
       
@@ -31,7 +22,7 @@ module SmoothOperator
       attr_writer :resources_name
 
       def resource_name(default_bypass = nil)
-        @resource_name ||= (Helpers.super_method(self, :resource_name, true) || (default_bypass ? nil : self.model_name.to_s.underscore.pluralize))
+        @resource_name ||= (Helpers.super_method(self, :resource_name, true) || (default_bypass ? nil : self.model_name.to_s.underscore))
       end
       attr_writer :resource_name
 

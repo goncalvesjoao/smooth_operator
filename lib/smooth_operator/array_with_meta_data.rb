@@ -14,10 +14,10 @@ module SmoothOperator
       _attributes = attributes.dup
 
       @object_class = object_class
-      resources_name = object_class.resources_name
+      _resources_name = object_class.resources_name
 
-      @internal_array = [*_attributes[resources_name]].map { |array_entry| object_class.new(array_entry).tap { |object| object.reloaded = true } }
-      _attributes.delete(resources_name)
+      @internal_array = [*_attributes[_resources_name]].map { |array_entry| object_class.new(array_entry).tap { |object| object.reloaded = true } }
+      _attributes.delete(_resources_name)
 
       @meta_data = _attributes
     end

@@ -115,7 +115,7 @@ module SmoothOperator
           relative_path = id.to_s
         else
           options[:resources_name] = ''
-          relative_path = "#{parent_object.resources_name}/#{parent_object.id}/#{resources_name}/#{id}"
+          relative_path = "#{parent_object.class.resources_name}/#{parent_object.id}/#{self.class.resources_name}/#{id}"
         end
       end
 
@@ -133,7 +133,7 @@ module SmoothOperator
 
       hash.delete('id')
 
-      { resource_name => hash }.merge(data)
+      { self.class.resource_name => hash }.merge(data)
     end
 
   end

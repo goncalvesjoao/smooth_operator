@@ -75,10 +75,10 @@ module SmoothOperator
     end
 
     def resource_path(relative_path, options)
-      resources_name = options[:resources_name] || self.resources_name
+      _resources_name = options[:resources_name] || self.resources_name
 
-      if Helpers.present?(resources_name)
-        Helpers.present?(relative_path) ? "#{resources_name}/#{relative_path}" : resources_name
+      if Helpers.present?(_resources_name)
+        Helpers.present?(relative_path) ? "#{_resources_name}/#{relative_path}" : _resources_name
       else
         relative_path.to_s
       end
