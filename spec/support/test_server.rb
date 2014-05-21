@@ -81,7 +81,7 @@ class TestServer < Sinatra::Base
   end
   
 
-  put '/users/send_error' do
+  put '/users/:id/send_error' do
     data_with_error = { id: 1, errors: [{ first_name: ["can't be blank"] }] }
     json data_with_error
   end
@@ -92,7 +92,8 @@ class TestServer < Sinatra::Base
   end
   
   post '/users/timeout' do
-    sleep 2
+    # sleep 2 # for typhoeus tests
+    sleep 1
     json 'ok'
   end
 

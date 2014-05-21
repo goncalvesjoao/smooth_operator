@@ -232,7 +232,6 @@ Methods | Behaviour | Arguments | Return
 
 Methods | Behaviour | Arguments | Return
 ------- | --------- | ------ | ---------
-.all | calls .find(:all, data, options) | Hash data = {}, Hash options = {} | Class instance, Array of Class instances or an ArrayWithMetaData instance
 .find | If relative_path == :all, sets relative_path = ''. Makes a Get call and initiates Class objects with the server's response data. See 4.3) and 4.4) for more behaviour info. | String relative_path, Hash data = {}, Hash options = {} | Class instance, Array of Class instances or an ArrayWithMetaData instance
 
 ---

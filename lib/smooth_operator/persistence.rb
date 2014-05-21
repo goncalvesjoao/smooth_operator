@@ -77,7 +77,7 @@ module SmoothOperator
     protected ######################### PROTECTED ##################
 
     def create(relative_path, data, options)
-      make_the_call(http_verb_for(:create, options), relative_path, data, options) do |remote_call|
+      make_the_call(*persistent_method_args(:create, relative_path, data, options)) do |remote_call|
         @new_record = false if remote_call.status
 
         block_given? ? yield(remote_call) : remote_call
@@ -110,16 +110,23 @@ module SmoothOperator
     def persistent_method_args(method, relative_path, data, options)
       options ||= {}
 
-      if Helpers.blank?(relative_path)
-        if parent_object.nil? || options[:ignore_parent] == true
-          relative_path = id.to_s
-        else
-          options[:resources_name] = ''
-          relative_path = "#{parent_object.class.resources_name}/#{parent_object.id}/#{self.class.resources_name}/#{id}"
-        end
+      relative_path = resource_path(relative_path)
+
+      if !parent_object.nil? && options[:ignore_parent] != true
+        options[:resources_name] ||= "#{parent_object.class.resources_name}/#{parent_object.id}/#{self.class.resources_name}"
       end
 
       [http_verb_for(method, options), relative_path, data, options]
+    end
+
+    def resource_path(relative_path)
+      relative_path = if Helpers.present?(relative_path) && relative_path[0] == '/'
+        relative_path[1..-1]
+      elsif persisted?
+        Helpers.present?(relative_path) ? "#{id}/#{relative_path}" : id.to_s
+      end
+
+      relative_path
     end
 
     def http_verb_for(method, options)

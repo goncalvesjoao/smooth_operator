@@ -105,16 +105,22 @@ shared_examples_for "save method" do
 end
 
 shared_examples_for "a method that calls the #make_the_call method" do
-  let(:method_arguments) { ['custom_path', { "user" => { "first_name" => "nhoJ" }, "extra_params" => 'extra_params' }, { option1: 'option1', option2: 'option2', http_verb: :get, serializable_options: { only: [:first_name] } }] }
+  let(:method_arguments) { ['/custom_path', { "user" => { "first_name" => "nhoJ" }, "extra_params" => 'extra_params' }, { option1: 'option1', option2: 'option2', http_verb: :get, serializable_options: { only: [:first_name] } }] }
 
   it "it should pass all arguments to #make_the_call" do
-    expect(subject).to receive(:make_the_call).with(:get, *method_arguments)
+    _method_arguments = method_arguments.dup
+    _method_arguments[0] = _method_arguments[0][1..-1]
+
+    expect(subject).to receive(:make_the_call).with(:get, *_method_arguments)
 
     execute_method
   end
 
   it "it should pass all arguments to .make_the_call" do
-    expect(subject.class).to receive(:make_the_call).with(:get, *method_arguments)
+    _method_arguments = method_arguments.dup
+    _method_arguments[0] = _method_arguments[0][1..-1]
+
+    expect(subject.class).to receive(:make_the_call).with(:get, *_method_arguments)
 
     execute_method
   end

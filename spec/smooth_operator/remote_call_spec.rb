@@ -248,7 +248,7 @@ describe SmoothOperator::RemoteCall do
   context "when the connection exceeds the timeout" do
     subject { User::TimeoutConnection.new }
     
-    before { subject.save('timeout') }
+    before { subject.save('/timeout') }
 
     it "#ok? should return false" do
       expect(subject.last_remote_call.ok?).to be false
@@ -309,7 +309,7 @@ describe SmoothOperator::RemoteCall do
     context "when a server connection fails" do
       subject { User::TimeoutConnection.new }
     
-      before { subject.save('timeout') }
+      before { subject.save('/timeout') }
 
       it "should return 0" do
         expect(subject.last_remote_call.http_status).to be 0
