@@ -58,7 +58,7 @@ module SmoothOperator
       present?(string) && string[0] == '/'
     end
 
-    def remote_initial_slash(string)
+    def remove_initial_slash(string)
       string[1..-1]
     end
     

@@ -11,7 +11,11 @@ module SmoothOperator
     def make_the_call(http_verb, relative_path = '', data = {}, options = {})
       options ||= {}
 
-      relative_path = resource_path(relative_path, options)
+      relative_path = resource_path(relative_path)
+
+      if !parent_object.nil? && options[:ignore_parent] != true
+        options[:resources_name] ||= "#{parent_object.class.resources_name}/#{parent_object.id}/#{self.class.resources_name}"
+      end
 
       self.class.make_the_call(http_verb, relative_path, data, options) do |remote_call|
         yield(remote_call)
@@ -20,18 +24,14 @@ module SmoothOperator
 
     protected ######################## PROTECTED ###################
 
-    def resource_path(relative_path, options)
+    def resource_path(relative_path)
       if Helpers.absolute_path?(relative_path)
-        relative_path = Helpers.remote_initial_slash(relative_path)
+        Helpers.remove_initial_slash(relative_path)
       elsif persisted?
-        relative_path = Helpers.present?(relative_path) ? "#{id}/#{relative_path}" : id.to_s
+        Helpers.present?(relative_path) ? "#{id}/#{relative_path}" : id.to_s
+      else
+        relative_path
       end
-      
-      if !parent_object.nil? && options[:ignore_parent] != true
-        options[:resources_name] ||= "#{parent_object.class.resources_name}/#{parent_object.id}/#{self.class.resources_name}"
-      end
-
-      relative_path
     end
 
 

@@ -109,7 +109,7 @@ shared_examples_for "a method that calls the #make_the_call method" do
 
   it "it should pass all arguments to #make_the_call" do
     _method_arguments = method_arguments.dup
-    _method_arguments[0] = SmoothOperator::Helpers.remote_initial_slash(_method_arguments[0])
+    _method_arguments[0] = SmoothOperator::Helpers.remove_initial_slash(_method_arguments[0])
 
     expect(subject.class).to receive(:make_the_call).with(:get, *_method_arguments)
 
@@ -118,7 +118,7 @@ shared_examples_for "a method that calls the #make_the_call method" do
 
   it "it should pass all arguments to .make_the_call" do
     _method_arguments = method_arguments.dup
-    _method_arguments[0] = SmoothOperator::Helpers.remote_initial_slash(_method_arguments[0])
+    _method_arguments[0] = SmoothOperator::Helpers.remove_initial_slash(_method_arguments[0])
 
     expect(subject.class).to receive(:make_the_call).with(:get, *_method_arguments)
 
