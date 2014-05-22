@@ -111,6 +111,10 @@ module SmoothOperator
       else
         update_internal_data(attribute_name, attribute_value, cast)
       end
+
+      if self.class.respond_to?(:identificator) && attribute_name == self.class.identificator
+        new_record?(true)
+      end
     end
 
     

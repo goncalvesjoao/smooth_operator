@@ -9,18 +9,22 @@ module SmoothOperator
     attr_reader :last_remote_call
 
 
+    def get_identificator
+      get_internal_data(self.class.identificator)
+    end
+
     def reload(relative_path = nil, data = {}, options = {})
-      raise 'UnknownPath' if Helpers.blank?(relative_path) && (!respond_to?(:id) || Helpers.blank?(id))
+      raise 'UnknownPath' if Helpers.blank?(relative_path) && (!respond_to?(self.class.identificator) || Helpers.blank?(get_identificator))
 
       persistence_call(:reload, relative_path, data, options) do |remote_call|
         block_given? ? yield(remote_call) : remote_call.status
       end
     end
 
-    def new_record?
-      return @new_record if defined?(@new_record)
+    def new_record?(bypass_cache = false)
+      return @new_record if !bypass_cache && defined?(@new_record)
 
-      @new_record = Helpers.blank?(get_internal_data("id"))
+      @new_record = Helpers.blank?(get_identificator)
     end
 
     def destroyed?
@@ -97,7 +101,7 @@ module SmoothOperator
 
       hash = serializable_hash(options[:serializable_options]).dup
 
-      hash.delete('id')
+      hash.delete(self.class.identificator)
 
       { self.class.resource_name => hash }.merge(data)
     end
@@ -108,9 +112,15 @@ module SmoothOperator
       METHODS_VS_HTTP_VERBS = { reload: :get, create: :post, update: :put, destroy: :delete }
       
       def methods_vs_http_verbs
-        @methods_vs_http_verbs ||= METHODS_VS_HTTP_VERBS.dup
+        Helpers.get_instance_variable(self, :methods_vs_http_verbs, METHODS_VS_HTTP_VERBS.dup)
       end
       
+      def identificator
+        Helpers.get_instance_variable(self, :identificator, 'id')
+      end
+
+      attr_writer :identificator
+
       METHODS_VS_HTTP_VERBS.keys.each do |method|
         define_method("#{method}_http_verb=") { |http_verb| methods_vs_http_verbs[method] = http_verb }
       end
