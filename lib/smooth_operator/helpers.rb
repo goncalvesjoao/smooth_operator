@@ -53,6 +53,14 @@ module SmoothOperator
     def present?(object)
       !blank?(object)
     end
+
+    def absolute_path?(string)
+      present?(string) && string[0] == '/'
+    end
+
+    def remote_initial_slash(string)
+      string[1..-1]
+    end
     
   end
   

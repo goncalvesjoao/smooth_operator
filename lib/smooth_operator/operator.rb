@@ -21,12 +21,12 @@ module SmoothOperator
     protected ######################## PROTECTED ###################
 
     def resource_path(relative_path, options)
-      if Helpers.present?(relative_path) && relative_path[0] == '/'
-        relative_path = relative_path[1..-1]
+      if Helpers.absolute_path?(relative_path)
+        relative_path = Helpers.remote_initial_slash(relative_path)
       elsif persisted?
         relative_path = Helpers.present?(relative_path) ? "#{id}/#{relative_path}" : id.to_s
       end
-
+      
       if !parent_object.nil? && options[:ignore_parent] != true
         options[:resources_name] ||= "#{parent_object.class.resources_name}/#{parent_object.id}/#{self.class.resources_name}"
       end
