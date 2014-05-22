@@ -14,6 +14,7 @@ module SmoothOperator
       @internal_structure ||= self.class.internal_structure.dup
     end
     
+    
     module ClassMethods
       
       def resources_name(default_bypass = nil)

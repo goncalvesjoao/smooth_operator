@@ -6,27 +6,13 @@ module SmoothOperator
       base.extend(ClassMethods)
     end
 
-    module ClassMethods
-
-      def methods_vs_http_verbs
-        @methods_vs_http_verbs ||= { reload: :get, create: :post, update: :put, destroy: :delete }
-      end
-
-      [:reload, :create, :update, :destroy].each do |method|
-        define_method("#{method}_http_verb=") { |http_verb| methods_vs_http_verbs[method] = http_verb }
-      end
-
-      def create(attributes = nil, relative_path = nil, data = {}, options = {})
-        new(attributes).tap { |object| object.save(relative_path, data, options) }
-      end
-
-    end
+    attr_reader :last_remote_call
 
 
     def reload(relative_path = nil, data = {}, options = {})
       raise 'UnknownPath' if Helpers.blank?(relative_path) && (!respond_to?(:id) || Helpers.blank?(id))
 
-      make_the_call(*persistent_method_args(:reload, relative_path, data, options)) do |remote_call|
+      persistence_call(:reload, relative_path, data, options) do |remote_call|
         block_given? ? yield(remote_call) : remote_call.status
       end
     end
@@ -66,7 +52,7 @@ module SmoothOperator
     def destroy(relative_path = nil, data = {}, options = {})
       return false unless persisted?
 
-      make_the_call(*persistent_method_args(:destroy, relative_path, data, options)) do |remote_call|
+      persistence_call(:destroy, relative_path, data, options) do |remote_call|
         @destroyed = true if remote_call.status
 
         block_given? ? yield(remote_call) : remote_call.status
@@ -77,7 +63,7 @@ module SmoothOperator
     protected ######################### PROTECTED ##################
 
     def create(relative_path, data, options)
-      make_the_call(*persistent_method_args(:create, relative_path, data, options)) do |remote_call|
+      persistence_call(:create, relative_path, data, options) do |remote_call|
         @new_record = false if remote_call.status
 
         block_given? ? yield(remote_call) : remote_call
@@ -85,52 +71,25 @@ module SmoothOperator
     end
 
     def update(relative_path, data, options)
-      make_the_call(*persistent_method_args(:update, relative_path, data, options)) do |remote_call|
+      persistence_call(:update, relative_path, data, options) do |remote_call|
         block_given? ? yield(remote_call) : remote_call
       end
     end
 
-    def make_the_call(http_verb, relative_path, data, options)
-      self.class.make_the_call(http_verb, relative_path, data, options) do |remote_call|
+    def persistence_call(method, relative_path, data, options)
+      options ||= {}
+
+      http_verb = options[:http_verb] || self.class.methods_vs_http_verbs[method]
+
+      make_the_call(http_verb, relative_path, data, options) do |remote_call|
         @last_remote_call = remote_call
 
-        returning_data = @last_remote_call.parsed_response
-
-        if !@last_remote_call.error? && returning_data.is_a?(Hash)
-          assign_attributes returning_data, from_server: true
+        if !@last_remote_call.error? && @last_remote_call.parsed_response.is_a?(Hash)
+          assign_attributes @last_remote_call.parsed_response, from_server: true
         end
 
         yield(remote_call)
       end
-    end
-
-
-    private ##################### PRIVATE ####################
-
-    def persistent_method_args(method, relative_path, data, options)
-      options ||= {}
-
-      relative_path = resource_path(relative_path)
-
-      if !parent_object.nil? && options[:ignore_parent] != true
-        options[:resources_name] ||= "#{parent_object.class.resources_name}/#{parent_object.id}/#{self.class.resources_name}"
-      end
-
-      [http_verb_for(method, options), relative_path, data, options]
-    end
-
-    def resource_path(relative_path)
-      relative_path = if Helpers.present?(relative_path) && relative_path[0] == '/'
-        relative_path[1..-1]
-      elsif persisted?
-        Helpers.present?(relative_path) ? "#{id}/#{relative_path}" : id.to_s
-      end
-
-      relative_path
-    end
-
-    def http_verb_for(method, options)
-      options[:http_verb] || self.class.methods_vs_http_verbs[method]
     end
 
     def data_with_object_attributes(data, options)
@@ -141,6 +100,25 @@ module SmoothOperator
       hash.delete('id')
 
       { self.class.resource_name => hash }.merge(data)
+    end
+    
+    
+    module ClassMethods
+      
+      METHODS_VS_HTTP_VERBS = { reload: :get, create: :post, update: :put, destroy: :delete }
+      
+      def methods_vs_http_verbs
+        @methods_vs_http_verbs ||= METHODS_VS_HTTP_VERBS.dup
+      end
+      
+      METHODS_VS_HTTP_VERBS.keys.each do |method|
+        define_method("#{method}_http_verb=") { |http_verb| methods_vs_http_verbs[method] = http_verb }
+      end
+      
+      def create(attributes = nil, relative_path = nil, data = {}, options = {})
+        new(attributes).tap { |object| object.save(relative_path, data, options) }
+      end
+      
     end
 
   end

@@ -4,10 +4,6 @@ module SmoothOperator
   
   module FinderMethods
 
-    # def all(data = {}, options = {})
-    #   find(:all, data, options)
-    # end
-
     def find(relative_path, data = {}, options = {})
       relative_path = '' if relative_path == :all
 
@@ -22,19 +18,24 @@ module SmoothOperator
     protected #################### PROTECTED ##################
 
     def build_object(parsed_response, options, from_array = false)
-      options ||={}
-
       if parsed_response.is_a?(Array)
         parsed_response.map { |array_entry| build_object(array_entry, options, true) }
       elsif parsed_response.is_a?(Hash)
-        if !from_array && parsed_response.include?(resources_name)
-          ArrayWithMetaData.new(parsed_response, self)
+        if parsed_response.include?(object_class.resources_name) && !from_array
+          ArrayWithMetaData.new(parsed_response, object_class)
         else
-          new(parsed_response, from_server: true)
+          object_class.new(parsed_response, from_server: true)
         end
       else
         parsed_response
       end
+    end
+
+
+    private #################### PRIVATE ##################
+
+    def object_class
+      @object_class ||= self.class == Class ? self : self.class
     end
 
   end

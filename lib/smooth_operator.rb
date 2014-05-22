@@ -10,13 +10,12 @@ module SmoothOperator
   
   class Base < OpenStruct::Base
 
-    extend Operator
     extend FinderMethods
     extend Translation if defined? I18n
 
+    include Operator
     include Persistence
-
-    attr_reader :last_remote_call
+    include FinderMethods
 
     self.strict_behaviour = true
 

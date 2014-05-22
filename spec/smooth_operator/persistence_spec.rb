@@ -111,7 +111,7 @@ shared_examples_for "a method that calls the #make_the_call method" do
     _method_arguments = method_arguments.dup
     _method_arguments[0] = _method_arguments[0][1..-1]
 
-    expect(subject).to receive(:make_the_call).with(:get, *_method_arguments)
+    expect(subject.class).to receive(:make_the_call).with(:get, *_method_arguments)
 
     execute_method
   end

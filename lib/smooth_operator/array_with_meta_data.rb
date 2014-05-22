@@ -6,15 +6,12 @@ module SmoothOperator
 
     include Enumerable
 
-    attr_reader :meta_data, :internal_array, :object_class
+    attr_reader :meta_data, :internal_array
 
     def_delegators :internal_array, :length, :<<, :[]
 
     def initialize(attributes, object_class)
-      _attributes = attributes.dup
-
-      @object_class = object_class
-      _resources_name = object_class.resources_name
+      _attributes, _resources_name = attributes.dup, object_class.resources_name
 
       @internal_array = [*_attributes[_resources_name]].map { |array_entry| object_class.new(array_entry).tap { |object| object.reloaded = true } }
       _attributes.delete(_resources_name)
