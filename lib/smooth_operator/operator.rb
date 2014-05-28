@@ -14,7 +14,7 @@ module SmoothOperator
       relative_path = resource_path(relative_path)
       
       if !parent_object.nil? && options[:ignore_parent] != true
-        options[:resources_name] ||= "#{parent_object.class.resources_name}/#{parent_object.get_identificator}/#{self.class.resources_name}"
+        options[:resources_name] ||= "#{parent_object.class.resources_name}/#{parent_object.get_primary_key}/#{self.class.resources_name}"
       end
       
       self.class.make_the_call(http_verb, relative_path, data, options) do |remote_call|
@@ -28,7 +28,7 @@ module SmoothOperator
       if Helpers.absolute_path?(relative_path)
         Helpers.remove_initial_slash(relative_path)
       elsif persisted?
-        Helpers.present?(relative_path) ? "#{get_identificator}/#{relative_path}" : get_identificator.to_s
+        Helpers.present?(relative_path) ? "#{get_primary_key}/#{relative_path}" : get_primary_key.to_s
       else
         relative_path
       end

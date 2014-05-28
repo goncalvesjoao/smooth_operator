@@ -60,14 +60,14 @@ module SmoothOperator
 
     def assign_attributes(_attributes = {}, options = {})
       return nil unless _attributes.is_a?(Hash)
-      
+
       attributes = _attributes = Helpers.stringify_keys(_attributes)
 
       if _attributes.include?(self.class.resource_name)
         attributes = _attributes.delete(self.class.resource_name)
         @_meta_data = _attributes
       end
-      
+
       options.each { |key, value| @_options[key] = value } if options.is_a?(Hash)
 
       attributes.each { |name, value| push_to_internal_data(name, value, true) }
@@ -103,21 +103,20 @@ module SmoothOperator
       attribute_name = attribute_name.to_s
 
       return nil unless allowed_attribute(attribute_name)
-      
+
       known_attributes.add attribute_name
-      
+
       if internal_data[attribute_name].nil?
         initiate_internal_data(attribute_name, attribute_value, cast)
       else
         update_internal_data(attribute_name, attribute_value, cast)
       end
 
-      if self.class.respond_to?(:identificator) && attribute_name == self.class.identificator
+      if self.class.respond_to?(:smooth_operator?) && attribute_name == self.class.primary_key
         new_record?(true)
       end
     end
 
-    
     protected #################### PROTECTED METHODS DOWN BELOW ######################
 
     def before_initialize(attributes, options); end

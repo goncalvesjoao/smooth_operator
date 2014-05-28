@@ -7,7 +7,6 @@ require "smooth_operator/open_struct"
 require "smooth_operator/finder_methods"
 
 module SmoothOperator
-  
   class Base < OpenStruct::Base
 
     extend FinderMethods
@@ -19,6 +18,9 @@ module SmoothOperator
 
     self.strict_behaviour = true
 
+    def self.smooth_operator?
+      true
+    end
+
   end
-  
 end
