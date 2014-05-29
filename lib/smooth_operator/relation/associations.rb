@@ -47,7 +47,7 @@ module SmoothOperator
           if reflections[relation_name.to_sym].has_many?
             ArrayRelation.new(data || [], relation_name)
           else
-            SingleRelation.new(data, relation_name)
+            Helpers.present?(data) ? SingleRelation.new(data, relation_name) : nil
           end
         end
 
