@@ -68,7 +68,7 @@ module SmoothOperator
 
       options.each { |key, value| @_options[key] = value } if options.is_a?(Hash)
 
-      attributes.each { |name, value| push_to_internal_data(name, value, true) }
+      attributes.each { |name, value| push_to_internal_data(name, value) }
     end
 
     def parent_object

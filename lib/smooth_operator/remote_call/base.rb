@@ -14,7 +14,6 @@ module SmoothOperator
         @response = response
       end
 
-
       def ok?
         http_status.between?(200, 299) || http_status == 304
       end
@@ -35,7 +34,6 @@ module SmoothOperator
         http_status.between?(500, 599) || http_status == 0
       end
 
-
       def not_found?
         http_status == 404
       end
@@ -48,12 +46,11 @@ module SmoothOperator
         false
       end
 
-
       def parsed_response
         return nil if body.nil?
-        
+
         require 'json' unless defined? JSON
-        
+
         begin
           JSON.parse(body)
         rescue JSON::ParserError
@@ -74,7 +71,5 @@ module SmoothOperator
       end
 
     end
-
   end
-
 end

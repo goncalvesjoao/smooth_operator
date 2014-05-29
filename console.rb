@@ -29,16 +29,6 @@ LocalhostServer.new(TestServer.new, 4567)
 
 post = Post.new(comments: [{ id: 1, name: '1' }, { id: 2, name: '2' }], address: { id: 1, name: 'address' })
 
-class Test < SimpleDelegator
-  def reload
-    "TODO"
-  end
-end
-
-class Test2 < Test
-  def reload2
-    "TODO2"
-  end
-end
+comments_attributes = { "0" => { id: 1, name: '3' }, "1" => { name: '4' } }
 
 binding.pry

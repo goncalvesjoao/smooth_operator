@@ -10,5 +10,5 @@ class Address < SmoothOperator::Base
   self.endpoint = 'http://localhost:4567/'
 
   self.headers = { "X-APPTOKEN" => "joaquim_app_token", "X-LAYERTOKEN" => "joaquim_layer_token" }
-  
+
 end

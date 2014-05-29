@@ -4,8 +4,12 @@ module SmoothOperator
   module Relation
     class ArrayRelation < SingleRelation
 
-      def reload2
-        "TODO2"
+      def data
+        super || []
+      end
+
+      def reload
+        "TODO"
       end
 
     end

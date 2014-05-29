@@ -21,25 +21,39 @@ module SmoothOperator
       self.class.internal_structure[attribute.to_s]
     end
 
-    def push_to_internal_data(attribute_name, attribute_value, cast = false)
+    def push_to_internal_data(attribute_name, attribute_value)
       attribute_name = attribute_name.to_s
 
       return nil unless allowed_attribute(attribute_name)
 
       known_attributes.add attribute_name
 
-      initiate_or_update_internal_data(attribute_name, attribute_value, cast)
+      attribute_name, attribute_value = extract_nested_attributes(attribute_name, attribute_value)
+
+      initiate_or_update_internal_data(attribute_name, attribute_value)
 
       new_record_or_mark_for_destruction?(attribute_name, attribute_value)
     end
 
     protected #################### PROTECTED METHODS DOWN BELOW ######################
 
-    def initiate_or_update_internal_data(attribute_name, attribute_value, cast)
+    def extract_nested_attributes(attribute_name, attribute_value)
+      if !!(attribute_name =~ /_attributes$/)
+        attribute_name = attribute_name[0..-12]
+
+        if self.class.reflect_on_association(attribute_name.to_sym).has_many?
+          attribute_value = attribute_value.values
+        end
+      end
+
+      [attribute_name, attribute_value]
+    end
+
+    def initiate_or_update_internal_data(attribute_name, attribute_value)
       if internal_data[attribute_name].nil?
-        initiate_internal_data(attribute_name, attribute_value, cast)
+        initiate_internal_data(attribute_name, attribute_value)
       else
-        update_internal_data(attribute_name, attribute_value, cast)
+        update_internal_data(attribute_name, attribute_value)
       end
     end
 
@@ -53,21 +67,17 @@ module SmoothOperator
 
     private ######################## PRIVATE #############################
 
-    def initiate_internal_data(attribute_name, attribute_value, cast)
-      if cast
-        internal_data[attribute_name] = new_attribute_object(attribute_name, attribute_value)
+    def initiate_internal_data(attribute_name, attribute_value)
+      internal_data[attribute_name] = new_attribute_object(attribute_name, attribute_value)
 
-        internal_data[attribute_name] = internal_data[attribute_name].value unless self.class.dirty_attributes?
-      else
-        internal_data[attribute_name] = attribute_value
-      end
+      internal_data[attribute_name] = internal_data[attribute_name].value unless self.class.dirty_attributes?
     end
 
-    def update_internal_data(attribute_name, attribute_value, cast)
+    def update_internal_data(attribute_name, attribute_value)
       if self.class.dirty_attributes?
         internal_data[attribute_name].set_value(attribute_value, self)
       else
-        internal_data[attribute_name] = cast ? new_attribute_object(attribute_name, attribute_value).value : attribute_value
+        internal_data[attribute_name] = new_attribute_object(attribute_name, attribute_value).value
       end
     end
 

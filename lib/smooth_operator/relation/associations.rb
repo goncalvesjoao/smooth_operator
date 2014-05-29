@@ -10,11 +10,27 @@ module SmoothOperator
       end
 
       def get_relation(relation_name)
-        relations[relation_name] ||= self.class.build_relation(relation_name, get_internal_data(relation_name))
+        if relations.include?(relation_name)
+          relations[relation_name]
+        else
+          relations[relation_name] = build_relation(relation_name)
+        end
       end
 
       def self.included(base)
         base.extend(ClassMethods)
+      end
+
+      protected ################### PROTECTED ###################
+
+      def build_relation(relation_name)
+        if self.class.reflect_on_association(relation_name.to_sym).has_many?
+          ArrayRelation.new(self, relation_name)
+        elsif Helpers.present? get_internal_data(relation_name)
+          SingleRelation.new(self, relation_name)
+        else
+          nil
+        end
       end
 
       module ClassMethods
@@ -41,14 +57,6 @@ module SmoothOperator
 
         def reflect_on_all_associations(macro = nil)
           macro ? reflections.values.select { |reflection| reflection.macro == macro } : reflections.values
-        end
-
-        def build_relation(relation_name, data)
-          if reflections[relation_name.to_sym].has_many?
-            ArrayRelation.new(data || [], relation_name)
-          else
-            Helpers.present?(data) ? SingleRelation.new(data, relation_name) : nil
-          end
         end
 
         protected ###################### PROTECTED ###################
