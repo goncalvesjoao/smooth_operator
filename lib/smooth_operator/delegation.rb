@@ -3,7 +3,11 @@ module SmoothOperator
   module Delegation
 
     def respond_to?(method)
-      known_attributes.include?(method.to_s) ? true : super
+      if known_attribute?(method)
+        true
+      else
+        self.class.reflect_on_association(method) ? true : super
+      end
     end
 
     def method_missing(method, *args, &block)
@@ -17,7 +21,11 @@ module SmoothOperator
       when :setter
         return push_to_internal_data(method_name, args.first)
       else
-        return get_internal_data(method_name) if !self.class.strict_behaviour || respond_to?(method_name)
+        if Helpers.safe_call(self.class, :reflect_on_association, method)
+          return get_relation(method_name)
+        elsif !self.class.strict_behaviour || known_attribute?(method_name)
+          return get_internal_data(method_name)
+        end
       end
 
       result.nil? ? super : result
@@ -28,7 +36,7 @@ module SmoothOperator
 
     def parse_method(method)
       method = method.to_s
-      
+
       if method?(method, /=$/)
         [:setter, method[0..-2]]
       elsif method?(method, /_was$/)

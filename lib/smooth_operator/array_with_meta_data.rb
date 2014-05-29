@@ -1,7 +1,6 @@
 module SmoothOperator
-
   class ArrayWithMetaData < OpenStruct::Base
-    
+
     extend Forwardable
 
     include Enumerable
@@ -19,16 +18,14 @@ module SmoothOperator
       @meta_data = _attributes
     end
 
-
     def each
       internal_array.each { |array_entry| yield array_entry }
     end
-    
+
     def method_missing(method, *args, &block)
       _method = method.to_s
       meta_data.include?(_method) ? meta_data[_method] : super
     end
 
   end
-
 end

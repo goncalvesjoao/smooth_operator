@@ -3,7 +3,15 @@ module SmoothOperator
   module Helpers
 
     extend self
-    
+
+    def safe_call(object, method, *args)
+      if object.respond_to?(method)
+        object.send(method, *args)
+      else
+        false
+      end
+    end
+
     def super_method(object, method_name, *args)
       object.superclass.send(method_name, *args) if object.superclass.respond_to?(method_name)
     end
@@ -35,6 +43,11 @@ module SmoothOperator
       end
     end
 
+    def plural?(string)
+      string = string.to_s
+      string == string.pluralize
+    end
+
     def duplicate(object)
       object.dup rescue object
     end
@@ -61,7 +74,6 @@ module SmoothOperator
     def remove_initial_slash(string)
       string[1..-1]
     end
-    
+
   end
-  
 end

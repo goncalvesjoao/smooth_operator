@@ -4,7 +4,7 @@ require "spec_helper"
 describe SmoothOperator::AttributeAssignment do
 
   describe "#assign_attributes" do
-    
+
     describe "receiving data from server" do
       subject { User::Base.new }
 
@@ -70,7 +70,7 @@ describe SmoothOperator::AttributeAssignment do
     end
 
     context "when one of the attribute's value, is an hash and is unknown to the schema" do
-      context "when the .unknown_hash_class is unused" do
+      context "when the .unknown_hash_class is unused", current: true do
         subject { User::Base.new(address: { street: 'something', postal_code: { code: '123' } }) }
 
         it "a new instance of OpenStruct will be initialized with that hash" do
@@ -83,7 +83,7 @@ describe SmoothOperator::AttributeAssignment do
           expect(address.postal_code.code).to eq('123')
         end
       end
-      
+
       context "when the .unknown_hash_class is set to SmoothOperator::OpenStruct::Base" do
         subject { User::UnknownHashClass::OpenStructBase.new(address: { street: 'something', postal_code: { code: '123' } }) }
 
@@ -246,7 +246,7 @@ describe SmoothOperator::AttributeAssignment do
         it "when the attributes's value is 'false', should be converted to false" do
           expect(subject.new(manager: 'false').manager).to be(false)
         end
-        
+
         it "when the attributes's value is '1', should be converted to true" do
           expect(subject.new(manager: '1').manager).to be(true)
         end
@@ -264,7 +264,7 @@ describe SmoothOperator::AttributeAssignment do
         end
 
       end
-      
+
       context "that is declared (in schema) as an existing class" do
 
         it "if the attribute's value is an hash a new instance of that class will be initialized with that hash" do
@@ -280,12 +280,12 @@ describe SmoothOperator::AttributeAssignment do
 
         it "if the attribute's value is an array, a new instance of that class will be initialized for each array entry" do
           posts = subject.new(posts: [{ body: 'post1' }, { body: 'post2' }]).posts
-          
+
           expect(posts.length).to be(2)
 
           expect(posts[0]).to be_instance_of(Post)
           expect(posts[0].body).to eq('post1')
-          
+
           expect(posts[1]).to be_instance_of(Post)
           expect(posts[1].body).to eq('post2')
         end

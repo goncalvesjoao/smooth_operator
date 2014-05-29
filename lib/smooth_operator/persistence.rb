@@ -1,5 +1,4 @@
 module SmoothOperator
-
   module Persistence
 
     def self.included(base)
@@ -7,7 +6,6 @@ module SmoothOperator
     end
 
     attr_reader :last_remote_call
-
 
     def get_primary_key
       get_internal_data(self.class.primary_key)
@@ -25,6 +23,12 @@ module SmoothOperator
       return @new_record if !bypass_cache && defined?(@new_record)
 
       @new_record = Helpers.blank?(get_primary_key)
+    end
+
+    def marked_for_destruction?(bypass_cache = false)
+      return @marked_for_destruction if !bypass_cache && defined?(@marked_for_destruction)
+
+      @marked_for_destruction = ["true", "1", true].include?(get_internal_data(self.class.destroy_key))
     end
 
     def destroyed?
@@ -105,32 +109,36 @@ module SmoothOperator
 
       { self.class.resource_name => hash }.merge(data)
     end
-    
-    
+
+
     module ClassMethods
-      
+
       METHODS_VS_HTTP_VERBS = { reload: :get, create: :post, update: :put, destroy: :delete }
-      
+
       def methods_vs_http_verbs
         Helpers.get_instance_variable(self, :methods_vs_http_verbs, METHODS_VS_HTTP_VERBS.dup)
       end
-      
+
       def primary_key
         Helpers.get_instance_variable(self, :primary_key, 'id')
       end
 
       attr_writer :primary_key
 
+      def destroy_key
+        Helpers.get_instance_variable(self, :destroy_key, '_destroy')
+      end
+
+      attr_writer :destroy_key
+
       METHODS_VS_HTTP_VERBS.keys.each do |method|
         define_method("#{method}_http_verb=") { |http_verb| methods_vs_http_verbs[method] = http_verb }
       end
-      
+
       def create(attributes = nil, relative_path = nil, data = {}, options = {})
         new(attributes).tap { |object| object.save(relative_path, data, options) }
       end
-      
+
     end
-
   end
-
 end

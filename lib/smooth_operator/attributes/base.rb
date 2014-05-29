@@ -6,7 +6,7 @@ module SmoothOperator
       protected ##################### PROTECTED ########################
 
       def cast_to_type(name, value, parent_object)
-        known_by_schema, type, unknown_hash_class = parent_object.internal_structure.include?(name), parent_object.internal_structure[name], parent_object.class.unknown_hash_class
+        known_by_schema, type, unknown_hash_class = parent_object.known_by_schema?(name), parent_object.get_attribute_type(name), parent_object.class.unknown_hash_class
 
         return Helpers.duplicate(value) if known_by_schema && type.nil?
 
@@ -25,7 +25,7 @@ module SmoothOperator
 
         when :string, :text, String
           value.to_s
-        
+
         when :int, :integer, Integer, Fixnum
           to_int(value)
 
@@ -74,7 +74,7 @@ module SmoothOperator
         return string if string.is_a?(Float)
 
         return 0 if string.nil? || !(string.is_a?(String) || string.is_a?(Fixnum))
-        
+
         value = string.to_s.gsub(',', '.').scan(/-*\d+[.]*\d*/).flatten.map(&:to_f).first
 
         value.nil? ? 0 : value

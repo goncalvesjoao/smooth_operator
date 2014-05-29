@@ -1,22 +1,24 @@
 module SmoothOperator
-
   module ModelSchema
 
     def self.included(base)
       base.extend(ClassMethods)
     end
 
+    def known_attribute?(attribute)
+      known_attributes.include?(attribute.to_s)
+    end
+
+    def known_by_schema?(attribute)
+      self.class.internal_structure.include?(attribute.to_s)
+    end
+
     def known_attributes
       @known_attributes ||= self.class.known_attributes.dup
     end
 
-    def internal_structure
-      @internal_structure ||= self.class.internal_structure.dup
-    end
-    
-    
     module ClassMethods
-      
+
       def resources_name(default_bypass = nil)
         return @resources_name if defined?(@resources_name)
 
@@ -58,7 +60,6 @@ module SmoothOperator
       def model_name=(name)
         @_model_name = name
       end
-      
 
       protected ############## PROTECTED #############
 
@@ -77,5 +78,4 @@ module SmoothOperator
     end
 
   end
-
 end
