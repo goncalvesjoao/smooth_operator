@@ -3,11 +3,7 @@ module SmoothOperator
   module Delegation
 
     def respond_to?(method, include_private = false)
-      if known_attribute?(method)
-        true
-      else
-        self.class.reflect_on_association(method) ? true : super
-      end
+      known_attribute?(method) ? true : super
     end
 
     def method_missing(method, *args, &block)
@@ -21,9 +17,7 @@ module SmoothOperator
       when :setter
         return push_to_internal_data(method_name, args.first)
       else
-        if Helpers.safe_call(self.class, :reflect_on_association, method)
-          return get_relation(method_name)
-        elsif !self.class.strict_behaviour || known_attribute?(method_name)
+        if !self.class.strict_behaviour || known_attribute?(method_name)
           return get_internal_data(method_name)
         end
       end

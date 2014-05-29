@@ -11,12 +11,12 @@ module SmoothOperator
   class Base < OpenStruct::Base
 
     extend FinderMethods
+    extend Relation::Associations
     extend Translation if defined? I18n
 
     include Operator
     include Persistence
     include FinderMethods
-    include Relation::Associations
 
     self.strict_behaviour = true
 
