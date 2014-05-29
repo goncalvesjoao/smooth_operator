@@ -25,4 +25,14 @@ module SmoothOperator
     end
 
   end
+
+  if defined?(ActiveModel)
+    class Rails < Base
+
+      include ActiveModel::Validations
+      include ActiveModel::Validations::Callbacks
+      include ActiveModel::Conversion
+
+    end
+  end
 end

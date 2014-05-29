@@ -5,18 +5,17 @@ require "smooth_operator/remote_call/errors/timeout"
 require "smooth_operator/remote_call/errors/connection_failed"
 
 module SmoothOperator
-
   module Operator
 
     def make_the_call(http_verb, relative_path = '', data = {}, options = {})
       options ||= {}
-      
+
       relative_path = resource_path(relative_path)
-      
+
       if !parent_object.nil? && options[:ignore_parent] != true
         options[:resources_name] ||= "#{parent_object.class.resources_name}/#{parent_object.get_primary_key}/#{self.class.resources_name}"
       end
-      
+
       self.class.make_the_call(http_verb, relative_path, data, options) do |remote_call|
         yield(remote_call)
       end
@@ -34,13 +33,12 @@ module SmoothOperator
       end
     end
 
-
     ########################### MODULES BELLOW ###############################
 
     module HttpMethods
 
       HTTP_VERBS = %w[get post put patch delete]
-      
+
       HTTP_VERBS.each do |method|
         class_eval <<-RUBY, __FILE__, __LINE__ + 1
           def #{method}(relative_path = '', params = {}, options = {})
@@ -78,7 +76,7 @@ module SmoothOperator
         else
           operator_call = Operators::Faraday
         end
-        
+
         operator_call.make_the_call(*operator_args) do |remote_call|
           block_given? ? yield(remote_call) : remote_call
         end
@@ -88,7 +86,6 @@ module SmoothOperator
         params
       end
 
-
       protected #################### PROTECTED ##################
 
       def operator_method_args(http_verb, relative_path, data, options)
@@ -96,7 +93,6 @@ module SmoothOperator
 
         [http_verb, resource_path(relative_path, options), *strip_params(http_verb, data), options]
       end
-
 
       private #################### PRIVATE ##################
 
@@ -106,7 +102,7 @@ module SmoothOperator
         OPTIONS.each { |option| options[option] ||= send(option) }
 
         options[:headers] = headers.merge(options[:headers] || {})
-        
+
         options
       end
 
@@ -122,17 +118,15 @@ module SmoothOperator
 
       def strip_params(http_verb, data)
         data ||= {}
-        
+
         if [:get, :head, :delete].include?(http_verb)
           [query_string(data), nil]
         else
           [query_string({}), data]
         end
       end
-
     end
 
-    
     include HttpMethods
 
     def self.included(base)

@@ -1,13 +1,7 @@
 module SmoothOperator
-  class ArrayWithMetaData < OpenStruct::Base
-
-    extend Forwardable
-
-    include Enumerable
+  class ArrayWithMetaData < ::SimpleDelegator
 
     attr_reader :meta_data, :internal_array
-
-    def_delegators :internal_array, :length, :<<, :[]
 
     def initialize(attributes, object_class)
       _attributes, _resources_name = attributes.dup, object_class.resources_name
@@ -16,10 +10,8 @@ module SmoothOperator
       _attributes.delete(_resources_name)
 
       @meta_data = _attributes
-    end
 
-    def each
-      internal_array.each { |array_entry| yield array_entry }
+      super(@internal_array)
     end
 
     def method_missing(method, *args, &block)

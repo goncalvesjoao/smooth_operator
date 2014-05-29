@@ -3,7 +3,6 @@ require 'smooth_operator/attributes/dirty'
 require 'smooth_operator/attributes/normal'
 
 module SmoothOperator
-
   module AttributeAssignment
 
     def self.included(base)
