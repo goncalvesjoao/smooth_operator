@@ -40,29 +40,33 @@ module SmoothOperator
 
         reflections.merge!(association => reflection)
 
-        defining_methods(reflection, association)
+        if reflection.has_many?
+          define_has_many_association_method(reflection, association)
+        else
+          define_single_association_method(reflection, association)
+        end
       end
 
       private ####################### PRIVATE ######################
 
-      def defining_methods(reflection, association)
-        if reflection.has_many?
-          define_method(association) do
-            array_relation = instance_variable_get("@association")
+      def define_has_many_association_method(reflection, association)
+        define_method(association) do
+          array_relation = instance_variable_get("@#{association}")
 
-            if array_relation.nil?
-              array_relation = ArrayRelation.new(self, association)
+          if array_relation.nil?
+            array_relation = ArrayRelation.new(self, association)
 
-              instance_variable_set("@association", array_relation)
-            end
-
-            array_relation
+            instance_variable_set("@#{association}", array_relation)
           end
-        else
-          define_method(association) { get_internal_data(association.to_s) }
 
-          define_method("build_#{reflection.single_name}") { |attributes = {}| reflection.klass.new(attributes) }
+          array_relation
         end
+      end
+
+      def define_single_association_method(reflection, association)
+        define_method(association) { get_internal_data(association.to_s) }
+
+        define_method("build_#{reflection.single_name}") { |attributes = {}| reflection.klass.new(attributes) }
       end
 
       def parse_options(options, default_options)
