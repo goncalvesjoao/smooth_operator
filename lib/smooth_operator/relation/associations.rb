@@ -54,19 +54,21 @@ module SmoothOperator
         protected ###################### PROTECTED ###################
 
         def accepts_nested_objects(nested_object_name, macro, options = {})
-          default_options = { macro: macro }
-          options = options.is_a?(Hash) ? options.merge(default_options) : default_options
-          options = Helpers.symbolyze_keys(options)
+          options = parse_options(options, { macro: macro })
 
           reflection = AssociationReflection.new(nested_object_name, Reflection.new(name, {}), options)
 
-          self.send(:attr_accessor, "#{nested_object_name}_attributes".to_sym)
-          self.instance_variable_set("@reflections", reflections.merge(nested_object_name => reflection))
-
-          define_method("existing_#{nested_object_name}") { existing_nested_objects(nested_object_name) }
-          define_method("build_#{reflection.single_name}") { |attributes = {}, nested_object = nil| build_nested_object(nested_object_name, attributes, nested_object) }
+          reflections.merge!(nested_object_name => reflection)
 
           schema(nested_object_name => reflection.klass)
+        end
+
+        private ####################### PRIVATE ######################
+
+        def parse_options(options, default_options)
+          options = options.is_a?(Hash) ? options.merge(default_options) : default_options
+
+          Helpers.symbolyze_keys(options)
         end
 
       end
