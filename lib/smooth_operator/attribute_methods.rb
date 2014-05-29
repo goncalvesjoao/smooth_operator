@@ -28,29 +28,24 @@ module SmoothOperator
 
       known_attributes.add attribute_name
 
+      initiate_or_update_internal_data(attribute_name, attribute_value, cast)
+
+      new_record_or_mark_for_destruction?(attribute_name, attribute_value)
+    end
+
+    protected #################### PROTECTED METHODS DOWN BELOW ######################
+
+    def initiate_or_update_internal_data(attribute_name, attribute_value, cast)
       if internal_data[attribute_name].nil?
         initiate_internal_data(attribute_name, attribute_value, cast)
       else
         update_internal_data(attribute_name, attribute_value, cast)
       end
-
-      if self.class.respond_to?(:smooth_operator?)
-        trigger_necessary_events(attribute_name, attribute_value)
-      end
     end
 
-    def column_for_attribute(attribute_name)
-      if defined?(ActiveRecord)
-        type = get_attribute_type(attribute_name)
-        ActiveRecord::ConnectionAdapters::Column.new(attribute_name.to_sym, type, type)
-      else
-        nil
-      end
-    end
+    def new_record_or_mark_for_destruction?(attribute_name, attribute_value)
+      return nil unless self.class.respond_to?(:smooth_operator?)
 
-    protected #################### PROTECTED METHODS DOWN BELOW ######################
-
-    def trigger_necessary_events(attribute_name, attribute_value)
       mark_for_destruction?(attribute_value) if attribute_name == self.class.destroy_key
 
       new_record?(true) if attribute_name == self.class.primary_key

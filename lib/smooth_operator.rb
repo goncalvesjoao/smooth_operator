@@ -33,6 +33,12 @@ module SmoothOperator
       include ActiveModel::Validations::Callbacks
       include ActiveModel::Conversion
 
+      def column_for_attribute(attribute_name)
+        type = get_attribute_type(attribute_name)
+
+        ActiveRecord::ConnectionAdapters::Column.new(attribute_name.to_sym, type, type)
+      end
+
     end
   end
 end
