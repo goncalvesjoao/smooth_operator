@@ -2,7 +2,7 @@ module SmoothOperator
 
   module Delegation
 
-    def respond_to?(method)
+    def respond_to?(method, include_private = false)
       if known_attribute?(method)
         true
       else
