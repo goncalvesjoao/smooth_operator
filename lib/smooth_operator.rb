@@ -1,3 +1,4 @@
+require "smooth_operator/schema"
 require "smooth_operator/version"
 require "smooth_operator/helpers"
 require "smooth_operator/operator"
@@ -14,6 +15,7 @@ module SmoothOperator
     extend Relation::Associations
     extend Translation if defined? I18n
 
+    include Schema
     include Operator
     include Persistence
     include FinderMethods

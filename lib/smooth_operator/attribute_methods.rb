@@ -1,6 +1,24 @@
 module SmoothOperator
   module AttributeMethods
 
+    module ClassMethods
+      def known_attributes
+        Helpers.get_instance_variable(self, :known_attributes, Set.new)
+      end
+    end
+
+    def self.included(base)
+      base.extend(ClassMethods)
+    end
+
+    def known_attribute?(attribute)
+      known_attributes.include?(attribute.to_s)
+    end
+
+    def known_attributes
+      @known_attributes ||= self.class.known_attributes.dup
+    end
+
     def internal_data
       @internal_data ||= {}
     end
@@ -15,10 +33,6 @@ module SmoothOperator
       else
         internal_data[field].send(method)
       end
-    end
-
-    def get_attribute_type(attribute)
-      self.class.internal_structure[attribute.to_s]
     end
 
     def push_to_internal_data(attribute_name, attribute_value)

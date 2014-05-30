@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe SmoothOperator::ModelSchema do
+describe SmoothOperator::ModelName do
 
   describe "#known_attributes" do
     let(:initial_attributes_keys) { attributes_for(:user).keys.map(&:to_s) }
