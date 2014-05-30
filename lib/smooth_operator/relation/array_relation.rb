@@ -26,7 +26,19 @@ module SmoothOperator
         new_array_entry
       end
 
+      undef :is_a?
+
       protected ############### PROTECTED ###############
+
+      # def method_missing(method, *args, &block)
+      #   if get_array.respond_to?(method)
+      #     puts "if true #{method} - #{args}"
+      #     get_array.send(method, *args)
+      #   else
+      #     puts "if else #{method}"
+      #     super
+      #   end
+      # end
 
       def get_array
         data = object.get_internal_data(association.to_s)

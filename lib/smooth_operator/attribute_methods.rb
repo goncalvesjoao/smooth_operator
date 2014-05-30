@@ -46,7 +46,7 @@ module SmoothOperator
     def new_record_or_mark_for_destruction?(attribute_name, attribute_value)
       return nil unless self.class.respond_to?(:smooth_operator?)
 
-      mark_for_destruction?(attribute_value) if attribute_name == self.class.destroy_key
+      marked_for_destruction?(attribute_value) if attribute_name == self.class.destroy_key
 
       new_record?(true) if attribute_name == self.class.primary_key
     end
