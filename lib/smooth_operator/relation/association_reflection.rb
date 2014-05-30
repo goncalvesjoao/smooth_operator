@@ -56,6 +56,10 @@ module SmoothOperator
         macro == :belongs_to
       end
 
+      def collection?
+        has_many?
+      end
+
       private ################################# private
 
       def macro_default(association)

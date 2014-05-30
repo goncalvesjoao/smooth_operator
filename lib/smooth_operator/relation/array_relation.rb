@@ -16,14 +16,26 @@ module SmoothOperator
         object.class.reflect_on_association(association).klass.new(attributes)
       end
 
-      alias :build :new
+      def build(attributes = {})
+        new_array, new_array_entry = get_array, new(attributes)
+
+        new_array.push new_array_entry
+
+        object.send("#{association}=", new_array)
+
+        new_array_entry
+      end
 
       protected ############### PROTECTED ###############
 
-      def refresh
+      def get_array
         data = object.get_internal_data(association.to_s)
 
-        __setobj__(data.nil? ? [] : [*data])
+        data.nil? ? [] : [*data]
+      end
+
+      def refresh
+        __setobj__ get_array
       end
 
     end
