@@ -1,21 +1,11 @@
 module SmoothOperator
   module Relation
-    class ArrayRelation
+    class ArrayRelation < ::SimpleDelegator
 
       attr_reader :object, :association
 
       def initialize(object, association)
         @object, @association = object, association
-      end
-
-      def method_missing(method, *args, &block)
-        data.respond_to?(method) ? data.send(method, *args) : super
-      end
-
-      def data
-        data = object.get_internal_data(association.to_s)
-
-        data.nil? ? [] : [*data]
       end
 
       def reload
@@ -27,6 +17,14 @@ module SmoothOperator
       end
 
       alias :build :new
+
+      protected ############### PROTECTED ###############
+
+      def refresh
+        data = object.get_internal_data(association.to_s)
+
+        __setobj__(data.nil? ? [] : [*data])
+      end
 
     end
   end

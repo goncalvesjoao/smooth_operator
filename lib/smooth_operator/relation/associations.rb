@@ -45,6 +45,10 @@ module SmoothOperator
         else
           define_single_association_method(reflection, association)
         end
+
+        self.send(:attr_reader, "#{association}_attributes".to_sym)
+
+        define_attributes_setter_methods(reflection, association)
       end
 
       private ####################### PRIVATE ######################
@@ -59,6 +63,8 @@ module SmoothOperator
             instance_variable_set("@#{association}", array_relation)
           end
 
+          array_relation.send(:refresh)
+
           array_relation
         end
       end
@@ -67,6 +73,16 @@ module SmoothOperator
         define_method(association) { get_internal_data(association.to_s) }
 
         define_method("build_#{reflection.single_name}") { |attributes = {}| reflection.klass.new(attributes) }
+      end
+
+      def define_attributes_setter_methods(reflection, association)
+        define_method("#{association}_attributes=") do |attributes|
+          instance_variable_set("@#{association}_attributes", attributes)
+
+          attributes = attributes.values if reflection.has_many?
+
+          push_to_internal_data(association.to_s, attributes)
+        end
       end
 
       def parse_options(options, default_options)

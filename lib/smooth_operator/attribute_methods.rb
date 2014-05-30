@@ -28,26 +28,12 @@ module SmoothOperator
 
       known_attributes.add attribute_name
 
-      attribute_name, attribute_value = extract_nested_attributes(attribute_name, attribute_value)
-
       initiate_or_update_internal_data(attribute_name, attribute_value)
 
       new_record_or_mark_for_destruction?(attribute_name, attribute_value)
     end
 
     protected #################### PROTECTED METHODS DOWN BELOW ######################
-
-    def extract_nested_attributes(attribute_name, attribute_value)
-      if !!(attribute_name =~ /_attributes$/)
-        attribute_name = attribute_name[0..-12]
-
-        if self.class.reflect_on_association(attribute_name.to_sym).has_many?
-          attribute_value = attribute_value.values
-        end
-      end
-
-      [attribute_name, attribute_value]
-    end
 
     def initiate_or_update_internal_data(attribute_name, attribute_value)
       if internal_data[attribute_name].nil?
