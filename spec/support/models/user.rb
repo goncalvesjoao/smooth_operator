@@ -1,5 +1,5 @@
 module User
-  
+
   class Base < SmoothOperator::Base
 
     self.resource_name = 'user'
@@ -19,9 +19,9 @@ module User
   end
 
   module UnknownHashClass
-    
+
     class OpenStructBase < User::Base
-      self.unknown_hash_class = SmoothOperator::OpenStruct::Base
+      self.unknown_hash_class = SmoothOperator::OpenStruct
     end
 
     class None < User::Base

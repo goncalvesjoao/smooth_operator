@@ -62,10 +62,6 @@ module SmoothOperator
         error? ? nil : ok?
       end
 
-      def objects
-        object.respond_to?(:length) ? object : []
-      end
-
       def data
         object.nil? ? parsed_response : object
       end

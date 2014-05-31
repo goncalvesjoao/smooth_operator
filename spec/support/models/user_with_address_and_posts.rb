@@ -1,7 +1,7 @@
 module UserWithAddressAndPosts
-  
+
   class Father < User::Base
-    
+
     self.resource_name = 'user'
 
     schema(
@@ -36,10 +36,10 @@ module UserWithAddressAndPosts
     self.update_http_verb = :patch
 
   end
-  
+
 
   module UserBlackListed
-    
+
     class Father < ::UserWithAddressAndPosts::Son
 
       attributes_black_list_add "last_name"
@@ -55,7 +55,7 @@ module UserWithAddressAndPosts
   end
 
   module UserWhiteListed
-    
+
     class Father < ::UserWithAddressAndPosts::Son
 
       attributes_white_list_add "id"
@@ -69,20 +69,12 @@ module UserWithAddressAndPosts
     end
 
   end
-  
+
   class UserWithMyMethod < UserWithAddressAndPosts::Son
 
     def my_method
       'my_method'
     end
-
-  end
-
-  class DirtyAttributes < UserWithAddressAndPosts::Son
-
-    self.dirty_attributes
-
-    self.unknown_hash_class = SmoothOperator::OpenStruct::Dirty
 
   end
 

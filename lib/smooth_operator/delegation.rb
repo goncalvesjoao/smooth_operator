@@ -1,5 +1,4 @@
 module SmoothOperator
-
   module Delegation
 
     def respond_to?(method, include_private = false)
@@ -7,48 +6,30 @@ module SmoothOperator
     end
 
     def method_missing(method, *args, &block)
-      method_type, method_name = *parse_method(method)
+      method_name = method.to_s
 
-      result = case method_type
-      when :was
-        get_internal_data(method_name, :was)
-      when :changed
-        get_internal_data(method_name, :changed?)
-      when :setter
-        return push_to_internal_data(method_name, args.first)
+      if !! ((method.to_s) =~ /=$/) #setter method
+        internal_data_push(method_name[0..-2], args.first)
+      elsif !self.class.strict_behaviour || known_attribute?(method_name)
+        internal_data_get(method_name)
       else
-        if !self.class.strict_behaviour || known_attribute?(method_name)
-          return get_internal_data(method_name)
-        end
-      end
-
-      result.nil? ? super : result
-    end
-
-
-    protected #################### PROTECTED ################
-
-    def parse_method(method)
-      method = method.to_s
-
-      if method?(method, /=$/)
-        [:setter, method[0..-2]]
-      elsif method?(method, /_was$/)
-        [:was, method[0..-5]]
-      elsif method?(method, /_changed\?$/)
-        [:changed, method[0..-10]]
-      else
-        [nil, method]
+        super
       end
     end
 
+    def self.included(base)
+      base.extend(ClassMethods)
+    end
 
-    private #################### PRIVATE ################
+    module ClassMethods
 
-    def method?(method, regex)
-      !! ((method.to_s) =~ regex)
+      def strict_behaviour
+        Helpers.get_instance_variable(self, :strict_behaviour, false)
+      end
+
+      attr_writer :strict_behaviour
+
     end
 
   end
-
 end

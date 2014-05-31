@@ -7,28 +7,20 @@ module SmoothOperator
 
     attr_reader :last_remote_call
 
-    def get_primary_key
-      get_internal_data(self.class.primary_key)
+    def new_record?(ignore_cache = false)
+      return @new_record if !ignore_cache && defined?(@new_record)
+
+      @new_record = Helpers.has_primary_key?(self)
     end
 
-    def reload(relative_path = nil, data = {}, options = {})
-      raise 'UnknownPath' if Helpers.blank?(relative_path) && (!respond_to?(self.class.primary_key) || Helpers.blank?(get_primary_key))
-
-      persistence_call(:reload, relative_path, data, options) do |remote_call|
-        block_given? ? yield(remote_call) : remote_call.status
+    def marked_for_destruction?(ignore_cache = false)
+      if !ignore_cache && defined?(@marked_for_destruction)
+        return @marked_for_destruction
       end
-    end
 
-    def new_record?(bypass_cache = false)
-      return @new_record if !bypass_cache && defined?(@new_record)
+      _destroy = internal_data_get(self.class.destroy_key)
 
-      @new_record = Helpers.blank?(get_primary_key)
-    end
-
-    def marked_for_destruction?(bypass_cache = false)
-      return @marked_for_destruction if !bypass_cache && defined?(@marked_for_destruction)
-
-      @marked_for_destruction = ["true", "1", true].include?(get_internal_data(self.class.destroy_key))
+      @marked_for_destruction = TypeCasting::TRUE_VALUES.include?(_destroy)
     end
 
     def destroyed?
@@ -41,13 +33,28 @@ module SmoothOperator
       !(new_record? || destroyed?)
     end
 
-    def save(relative_path = nil, data = {}, options = {})
-      data = data_with_object_attributes(data, options)
+    def known_attribute?(attribute)
+      super ||
+      [self.class.primary_key, self.class.destroy_key].include?(attribute.to_s)
+    end
 
-      if new_record?
-        create(relative_path, data, options) { |remote_call| block_given? ? yield(remote_call) : remote_call.status }
-      else
-        update(relative_path, data, options) { |remote_call| block_given? ? yield(remote_call) : remote_call.status }
+    def reload(relative_path = nil, data = {}, options = {})
+      if Helpers.blank?(relative_path) && Helpers.has_primary_key?(self)
+        raise 'UnknownPath'
+      end
+
+      _persistence_call(:reload, relative_path, data, options) do |remote_call|
+        block_given? ? yield(remote_call) : remote_call.status
+      end
+    end
+
+    def save(relative_path = nil, data = {}, options = {})
+      data = resource_attributes(data, options)
+
+      method = new_record? ? :create : :update
+
+      send(method, relative_path, data, options) do |remote_call|
+        block_given? ? yield(remote_call) : remote_call.status
       end
     end
 
@@ -60,18 +67,17 @@ module SmoothOperator
     def destroy(relative_path = nil, data = {}, options = {})
       return false unless persisted?
 
-      persistence_call(:destroy, relative_path, data, options) do |remote_call|
+      _persistence_call(:destroy, relative_path, data, options) do |remote_call|
         @destroyed = true if remote_call.status
 
         block_given? ? yield(remote_call) : remote_call.status
       end
     end
 
-
     protected ######################### PROTECTED ##################
 
     def create(relative_path, data, options)
-      persistence_call(:create, relative_path, data, options) do |remote_call|
+      _persistence_call(:create, relative_path, data, options) do |remote_call|
         @new_record = false if remote_call.status
 
         block_given? ? yield(remote_call) : remote_call
@@ -79,28 +85,12 @@ module SmoothOperator
     end
 
     def update(relative_path, data, options)
-      persistence_call(:update, relative_path, data, options) do |remote_call|
+      _persistence_call(:update, relative_path, data, options) do |remote_call|
         block_given? ? yield(remote_call) : remote_call
       end
     end
 
-    def persistence_call(method, relative_path, data, options)
-      options ||= {}
-
-      http_verb = options[:http_verb] || self.class.methods_vs_http_verbs[method]
-
-      make_the_call(http_verb, relative_path, data, options) do |remote_call|
-        @last_remote_call = remote_call
-
-        if !@last_remote_call.error? && @last_remote_call.parsed_response.is_a?(Hash)
-          assign_attributes @last_remote_call.parsed_response, from_server: true
-        end
-
-        yield(remote_call)
-      end
-    end
-
-    def data_with_object_attributes(data, options)
+    def resource_attributes(data, options)
       data = Helpers.stringify_keys(data)
 
       hash = serializable_hash(options[:serializable_options]).dup
@@ -110,6 +100,23 @@ module SmoothOperator
       { self.class.resource_name => hash }.merge(data)
     end
 
+    private ##################### PRIVATE ##################
+
+    def _persistence_call(method, relative_path, data, options)
+      options ||= {}
+
+      http_verb = options[:http_verb] || self.class.methods_vs_http_verbs[method]
+
+      make_the_call(http_verb, relative_path, data, options) do |remote_call|
+        @last_remote_call = remote_call
+
+        if !@last_remote_call.error? && @last_remote_call.parsed_response.is_a?(Hash)
+          assign_attributes @last_remote_call.parsed_response, data_from_server: true
+        end
+
+        yield(remote_call)
+      end
+    end
 
     module ClassMethods
 
@@ -132,11 +139,15 @@ module SmoothOperator
       attr_writer :destroy_key
 
       METHODS_VS_HTTP_VERBS.keys.each do |method|
-        define_method("#{method}_http_verb=") { |http_verb| methods_vs_http_verbs[method] = http_verb }
+        define_method("#{method}_http_verb=") do |http_verb|
+          methods_vs_http_verbs[method] = http_verb
+        end
       end
 
       def create(attributes = nil, relative_path = nil, data = {}, options = {})
-        new(attributes).tap { |object| object.save(relative_path, data, options) }
+        new(attributes).tap do |object|
+          object.save(relative_path, data, options)
+        end
       end
 
     end

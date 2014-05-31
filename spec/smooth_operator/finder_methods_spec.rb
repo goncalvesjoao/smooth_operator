@@ -8,11 +8,6 @@ shared_examples_for "finder method" do
   it "the instance class should be populated with the returned hash" do
     expect(user.attributes).to eq(attributes_for(:user_with_address_and_posts))
   end
-
-  it "#has_data_from_server and #from_server should return true" do
-    expect(user.has_data_from_server).to be true
-    expect(user.from_server).to be true
-  end
 end
 
 describe SmoothOperator::FinderMethods do
@@ -39,13 +34,13 @@ describe SmoothOperator::FinderMethods do
 
   describe ".find" do
     context "when the server returns a single hash" do
-      let(:user) { subject.find(5).object }
+      let(:user) { subject.find(5).data }
 
       it_behaves_like "finder method"
     end
 
     context "when the server returns a hash with meta_data" do
-      let(:user) { subject.find("5/with_metadata").object }
+      let(:user) { subject.find("5/with_metadata").data }
 
       it_behaves_like "finder method"
 
@@ -61,7 +56,7 @@ describe SmoothOperator::FinderMethods do
     context "when the server returns an array" do
       it "it should return a RemoteCall instance an array that contains a subject's class instance, one for every array's entry" do
         remote_call = subject.find(:all)
-        users = remote_call.objects
+        users = remote_call.data
 
         expect(users).to be_instance_of(Array)
         expect(users[0]).to be_instance_of(subject)
@@ -70,7 +65,7 @@ describe SmoothOperator::FinderMethods do
 
       it "if any of the array entries is not a hash, it shall not be converted or alteread" do
         remote_call = subject.find('misc_array')
-        users = remote_call.objects
+        users = remote_call.data
 
         expect(users).to be_instance_of(Array)
         expect(users[0]).to be_instance_of(subject)

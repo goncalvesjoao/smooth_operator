@@ -1,7 +1,5 @@
 class Address < SmoothOperator::Base
 
-  self.dirty_attributes
-
   self.resource_name = ''
 
   self.endpoint_user = 'admin'

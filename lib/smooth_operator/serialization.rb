@@ -5,13 +5,13 @@ module SmoothOperator
     def to_hash(options = nil)
       Helpers.symbolyze_keys(serializable_hash(options) || {})
     end
-    
+
     # alias :attributes :to_hash
     def attributes; to_hash; end
-    
+
     def to_json(options = nil)
       require 'json' unless defined? JSON
-      
+
       JSON(serializable_hash(options) || {})
     end
 
@@ -23,8 +23,8 @@ module SmoothOperator
       hash = {}
       options ||= {}
 
-      attribute_names(options).each do |attribute_name|
-        hash[attribute_name] = read_attribute_for_hashing(attribute_name, options)
+      _attribute_names(options).each do |attribute_name|
+        hash[attribute_name] = _read_attribute_for_hashing(attribute_name, options)
       end
 
       method_names(options).each do |method_name|
@@ -36,9 +36,9 @@ module SmoothOperator
 
 
     protected ##################### PROTECTED ###################
-    
+
     # TODO: COMPLEX METHOD
-    def attribute_names(options)
+    def _attribute_names(options)
       attribute_names = internal_data.keys.sort
 
       if only = options[:only]
@@ -54,19 +54,19 @@ module SmoothOperator
       [*options[:methods]].select { |n| respond_to?(n) }
     end
 
-    def read_attribute_for_hashing(attribute_name, options)
+    def _read_attribute_for_hashing(attribute_name, options)
       object = read_attribute_for_serialization(attribute_name)
 
       _options = options[attribute_name] || options[attribute_name.to_sym]
 
       if object.is_a?(Array)
-        object.map { |array_entry| attribute_to_hash(array_entry, _options) }
+        object.map { |array_entry| _attribute_to_hash(array_entry, _options) }
       else
-        attribute_to_hash(object, _options)
+        _attribute_to_hash(object, _options)
       end
     end
 
-    def attribute_to_hash(object, options = nil)
+    def _attribute_to_hash(object, options = nil)
       if object.respond_to?(:serializable_hash)
         Helpers.symbolyze_keys(object.serializable_hash(options))
       else

@@ -9,16 +9,18 @@ require "smooth_operator/finder_methods"
 require "smooth_operator/relation/associations"
 
 module SmoothOperator
-  class Base < OpenStruct::Base
+  class Base < OpenStruct
 
+    extend Schema
     extend FinderMethods
+    extend Operator::HttpMethods
     extend Relation::Associations
     extend Translation if defined? I18n
 
-    include Schema
     include Operator
     include Persistence
     include FinderMethods
+    include Operator::HttpMethods
 
     self.strict_behaviour = true
 
@@ -36,10 +38,29 @@ module SmoothOperator
       include ActiveModel::Conversion
 
       def column_for_attribute(attribute_name)
-        type = get_attribute_type(attribute_name)
+        type = self.class.attribute_type(attribute_name)
 
         ActiveRecord::ConnectionAdapters::Column.new(attribute_name.to_sym, type, type)
       end
+
+      def save(relative_path = nil, data = {}, options = {})
+        # clear_server_errors
+        return false unless before_save
+
+        save_result = valid? ? super : false
+
+        # import_server_errors
+
+        after_save if valid? && save_result
+
+        save_result
+      end
+
+      def before_save
+        true
+      end
+
+      def after_save; end
 
     end
   end

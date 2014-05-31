@@ -1,22 +1,34 @@
 module SmoothOperator
-  class ArrayWithMetaData < ::SimpleDelegator
+  class ArrayWithMetaData < SimpleDelegator
 
     attr_reader :meta_data, :internal_array
 
     def initialize(attributes, object_class)
-      _attributes, _resources_name = attributes.dup, object_class.resources_name
+      resources_name = object_class.resources_name
 
-      @internal_array = [*_attributes[_resources_name]].map { |array_entry| object_class.new(array_entry).tap { |object| object.reloaded = true } }
-      _attributes.delete(_resources_name)
+      @internal_array = [*attributes[resources_name]].map do |array_entry|
+        object_class.new(array_entry)
+      end
 
-      @meta_data = _attributes
+      attributes.delete(resources_name)
+
+      @meta_data = attributes
+      
+      define_metada_methods
 
       super(@internal_array)
     end
 
-    def method_missing(method, *args, &block)
-      _method = method.to_s
-      meta_data.include?(_method) ? meta_data[_method] : super
+    protected ############# PROTECTED ###################
+
+    def define_metada_methods
+      @meta_data.keys.each do |method|
+        instance_eval <<-RUBY, __FILE__, __LINE__ + 1
+          def #{method}
+            @meta_data['#{method}']
+          end
+        RUBY
+      end
     end
 
   end

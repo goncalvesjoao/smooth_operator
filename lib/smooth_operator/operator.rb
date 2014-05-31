@@ -12,8 +12,10 @@ module SmoothOperator
 
       relative_path = resource_path(relative_path)
 
-      if !parent_object.nil? && options[:ignore_parent] != true
-        options[:resources_name] ||= "#{parent_object.class.resources_name}/#{parent_object.get_primary_key}/#{self.class.resources_name}"
+      if !_parent_object.nil? && options[:ignore_parent] != true
+        id = Helpers.primary_key(_parent_object)
+
+        options[:resources_name] ||= "#{_parent_object.class.resources_name}/#{id}/#{self.class.resources_name}"
       end
 
       self.class.make_the_call(http_verb, relative_path, data, options) do |remote_call|
@@ -27,10 +29,16 @@ module SmoothOperator
       if Helpers.absolute_path?(relative_path)
         Helpers.remove_initial_slash(relative_path)
       elsif persisted?
-        Helpers.present?(relative_path) ? "#{get_primary_key}/#{relative_path}" : get_primary_key.to_s
+        id = Helpers.primary_key(self)
+
+        Helpers.present?(relative_path) ? "#{id}/#{relative_path}" : id.to_s
       else
         relative_path
       end
+    end
+
+    def self.included(base)
+      base.extend(ClassMethods)
     end
 
     ########################### MODULES BELLOW ###############################
@@ -66,7 +74,6 @@ module SmoothOperator
       end
 
       attr_writer :headers
-
 
       def make_the_call(http_verb, relative_path = '', data = {}, options = {})
         operator_args = operator_method_args(http_verb, relative_path, data, options)
@@ -127,13 +134,5 @@ module SmoothOperator
       end
     end
 
-    include HttpMethods
-
-    def self.included(base)
-      base.extend(ClassMethods)
-      base.extend(HttpMethods)
-    end
-
   end
-
 end

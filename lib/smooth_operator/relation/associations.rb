@@ -70,12 +70,12 @@ module SmoothOperator
       end
 
       def define_single_association_method(reflection, association)
-        define_method(association) { get_internal_data(association.to_s) }
+        define_method(association) { internal_data_get(association.to_s) }
 
         define_method("build_#{association}") do |attributes = {}|
           new_instance = reflection.klass.new(attributes)
 
-          push_to_internal_data(association, new_instance)
+          internal_data_push(association, new_instance)
 
           new_instance
         end
@@ -87,7 +87,7 @@ module SmoothOperator
 
           attributes = attributes.values if reflection.has_many?
 
-          push_to_internal_data(association.to_s, attributes)
+          internal_data_push(association.to_s, attributes)
         end
       end
 

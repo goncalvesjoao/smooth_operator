@@ -8,15 +8,6 @@ describe SmoothOperator::AttributeAssignment do
     describe "receiving data from server" do
       subject { User::Base.new }
 
-      context "when receiving the option 'from_server = true'" do
-        before { subject.assign_attributes({}, from_server: true) }
-
-        it "#has_data_from_server and #from_server should return true" do
-          expect(subject.has_data_from_server).to be true
-          expect(subject.from_server).to be true
-        end
-      end
-
       context "when receiving a Hash with meta_data on it" do
         before { subject.assign_attributes({ user: attributes_for(:user), status: 1 }) }
 
@@ -84,16 +75,16 @@ describe SmoothOperator::AttributeAssignment do
         end
       end
 
-      context "when the .unknown_hash_class is set to SmoothOperator::OpenStruct::Base" do
+      context "when the .unknown_hash_class is set to SmoothOperator::OpenStruct" do
         subject { User::UnknownHashClass::OpenStructBase.new(address: { street: 'something', postal_code: { code: '123' } }) }
 
-        it "a new instance of SmoothOperator::OpenStruct::Base will be initialized with that hash" do
+        it "a new instance of SmoothOperator::OpenStruct will be initialized with that hash" do
           address = subject.address
 
-          expect(address).to be_instance_of(SmoothOperator::OpenStruct::Base)
+          expect(address).to be_instance_of(SmoothOperator::OpenStruct)
           expect(address.street).to eq('something')
 
-          expect(address.postal_code).to be_instance_of(SmoothOperator::OpenStruct::Base)
+          expect(address.postal_code).to be_instance_of(SmoothOperator::OpenStruct)
           expect(address.postal_code.code).to eq('123')
         end
       end

@@ -133,13 +133,6 @@ describe SmoothOperator::Persistence, helpers: :persistence do
     subject { new_user }
     let(:method_to_execute) { :reload }
 
-    context "before calling #reload" do
-      it "#has_data_from_server and #from_server should return false" do
-        expect(subject.from_server).to be_falsey
-        expect(subject.has_data_from_server).to be_falsey
-      end
-    end
-
     context "when subject doesn't has an id" do
       it "it should raise 'UnknownPath'" do
         expect{ subject.reload }.to raise_error 'UnknownPath'
@@ -154,11 +147,6 @@ describe SmoothOperator::Persistence, helpers: :persistence do
 
       it "it should fetch server data" do
         expect(subject.attributes).to eq(attributes_for(:user_with_address_and_posts))
-      end
-
-      it "#has_data_from_server and #from_server should return true" do
-        expect(subject.from_server).to be true
-        expect(subject.has_data_from_server).to be true
       end
     end
 
@@ -194,7 +182,7 @@ describe SmoothOperator::Persistence, helpers: :persistence do
   end
 
   describe ".create" do
-    
+
     subject { created_subject }
     let(:method_arguments) { [] }
 
@@ -263,7 +251,7 @@ describe SmoothOperator::Persistence, helpers: :persistence do
         expect(subject.destroyed?).to be(true)
       end
     end
-  
+
     context "after a failed execution of #destroy" do
       subject { existing_user }
       before  { subject.destroy('', { status: 422 }) }
@@ -387,7 +375,7 @@ describe SmoothOperator::Persistence, helpers: :persistence do
   end
 
   describe "#destroy" do
-    
+
     let(:method_to_execute) { :destroy }
     let(:method_arguments) { [] }
 

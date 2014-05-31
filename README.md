@@ -139,7 +139,7 @@ page.save # will make a http PATCH call to 'http://myblog.com/api/v0/pages/2'
 remote_call = Page.find(:all) # Will make a GET call to 'http://myblog.com/api/v0/pages'
                               # and will return a SmoothOperator::RemoteCall instance
 
-pages = remote_call.objects # 'pages = remote_call.data' also works
+pages = remote_call.data
 
 # If the server response is positive (http code between 200 and 299):
   remote_call.ok? # true
@@ -179,7 +179,7 @@ pages = remote_call.objects # 'pages = remote_call.data' also works
 remote_call = Page.find(2) # Will make a GET call to 'http://myblog.com/api/v0/pages/2'
                            # and will return a SmoothOperator::RemoteCall instance
 
-page = remote_call.object # 'page = remote_call.data' also works
+page = remote_call.data
 ```
 
 ---

@@ -4,16 +4,18 @@ module SmoothOperator
 
     extend self
 
-    def safe_call(object, method, *args)
-      if object.respond_to?(method)
-        object.send(method, *args)
-      else
-        false
-      end
+    def primary_key(object)
+      object.internal_data_get(object.class.primary_key)
+    end
+
+    def has_primary_key?(object)
+      blank? primary_key(object)
     end
 
     def super_method(object, method_name, *args)
-      object.superclass.send(method_name, *args) if object.superclass.respond_to?(method_name)
+      if object.superclass.respond_to?(method_name)
+        object.superclass.send(method_name, *args)
+      end
     end
 
     def get_instance_variable(object, variable, default_value)
@@ -56,7 +58,7 @@ module SmoothOperator
       case object
       when String
         object.to_s == ''
-      when Array
+      when Array, Hash
         object.empty?
       else
         object.nil?

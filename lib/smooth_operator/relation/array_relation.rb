@@ -1,6 +1,6 @@
 module SmoothOperator
   module Relation
-    class ArrayRelation < ::SimpleDelegator
+    class ArrayRelation < SimpleDelegator
 
       attr_reader :object, :association
 
@@ -30,18 +30,8 @@ module SmoothOperator
 
       protected ############### PROTECTED ###############
 
-      # def method_missing(method, *args, &block)
-      #   if get_array.respond_to?(method)
-      #     puts "if true #{method} - #{args}"
-      #     get_array.send(method, *args)
-      #   else
-      #     puts "if else #{method}"
-      #     super
-      #   end
-      # end
-
       def get_array
-        data = object.get_internal_data(association.to_s)
+        data = object.internal_data_get(association.to_s)
 
         data.nil? ? [] : [*data]
       end

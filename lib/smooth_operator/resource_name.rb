@@ -1,5 +1,5 @@
 module SmoothOperator
-  module ModelName
+  module ResourceName
 
     def resources_name(default_bypass = nil)
       return @resources_name if defined?(@resources_name)
@@ -40,7 +40,7 @@ module SmoothOperator
         end
 
         ActiveModel::Name.new(self, namespace, @_model_name).tap do |model_name|
-          def model_name.human(options = {}); @klass.send(:_translate, "models.#{i18n_key}", options); end
+          def model_name.human(options = {}); SmoothOperator::Translation::HelperMethods.translate("models.#{i18n_key}", options); end
         end
       end
     end
