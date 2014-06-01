@@ -2,15 +2,23 @@ module SmoothOperator
   module Validations
 
     def valid?(context = nil)
-      Helpers.blank?(_internal_errors)
+      Helpers.blank?(induced_errors)
     end
 
     def invalid?
       !valid?
     end
 
-    def _internal_errors
-      @_internal_errors ||= {}
+    def induced_errors
+      @induced_errors ||= {}
+    end
+
+    def clear_induced_errors
+      @induced_errors = {}
+    end
+
+    def induce_errors(value)
+      @induced_errors = value
     end
 
     def self.included(base)

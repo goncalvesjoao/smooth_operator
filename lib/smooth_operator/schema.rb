@@ -6,8 +6,7 @@ module SmoothOperator
     end
 
     def internal_structure
-      Helpers.get_instance_variable(self, :internal_structure,
-        { primary_key => nil })
+      Helpers.get_instance_variable(self, :internal_structure, {})
     end
 
     def known_attribute?(attribute)

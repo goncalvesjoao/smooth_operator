@@ -38,6 +38,8 @@ module SmoothOperator
       include ActiveModel::Validations::Callbacks
       include ActiveModel::Conversion
 
+      validate :validate_induced_errors, :validate_nested_objects
+
       def column_for_attribute(attribute_name)
         type = self.class.attribute_type(attribute_name)
 
@@ -45,12 +47,11 @@ module SmoothOperator
       end
 
       def save(relative_path = nil, data = {}, options = {})
-        # clear_server_errors
         return false unless before_save
 
-        save_result = valid? ? super : false
+        clear_induced_errors
 
-        # import_server_errors
+        save_result = valid? ? super : false
 
         after_save if valid? && save_result
 
@@ -62,6 +63,22 @@ module SmoothOperator
       end
 
       def after_save; end
+
+      protected ################# PROTECTED ###################
+
+      def validate_induced_errors
+        induced_errors.each do |key, value|
+          [*value].each do |_value|
+            self.errors.add(key, _value) unless self.errors.added?(key, _value)
+          end
+        end
+
+        Helpers.blank?(induced_errors)
+      end
+
+      def validate_nested_objects
+        # nested_objects.map { |reflection, nested_object| nested_object.valid? }.all?
+      end
 
     end
   end

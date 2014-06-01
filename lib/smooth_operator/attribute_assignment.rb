@@ -23,7 +23,7 @@ module SmoothOperator
         @_meta_data = _attributes
       end
 
-      @_internal_errors = attributes.delete(self.class.errors_key)
+      induce_errors(attributes.delete(self.class.errors_key))
 
       options.each { |key, value| @_options[key] = value } if options.is_a? Hash
 
