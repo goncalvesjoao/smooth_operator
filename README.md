@@ -1,11 +1,13 @@
-# SmoothOperator
+# SmoothOperator [![Code Climate](https://codeclimate.com/repos/536a7b9f6956801228014b02/badges/13f79897976274a9de33/gpa.png)](https://codeclimate.com/repos/536a7b9f6956801228014b02/feed)
 
 Ruby gem, that mimics the ActiveRecord behaviour but through external API's.
 It's a lightweight and flexible alternative to ActiveResource, that responds to a REST API like you expect it too.
 
-Depends only on Faraday gem, no need for ActiveSupport or any other Active* gem.
+Be sure to check out this micro-services example: https://github.com/goncalvesjoao/micro-services-example
 
-Although if I18n is present it will respond to .human_attribute_name method and if ActiveModel is present it will make use of 'ActiveModel::Name' to improve .model_name method.
+Where a Rails4 app lists/creates/edits and destroys blog posts from a Padrino (aka Sinatra) app, using SmoothOperator::Rails instead of ActiveRecord classes.
+
+It also contains other cool examples like parallel requests and using HTTP Patch verb for saving instead of PUT, etc. etc.
 
 ---
 
