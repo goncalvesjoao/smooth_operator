@@ -8,11 +8,11 @@ Be sure to check out this micro-services example: https://github.com/goncalvesjo
 Where a Rails4 app lists/creates/edits and destroys blog posts from a Padrino (aka Sinatra) app, using SmoothOperator::Rails instead of ActiveRecord::Base classes.
 
 This micro-services example will also feature other cool stuff like:
-- Parallel requests;
+- parallel requests;
 - using HTTP PATCH verb for saving instead of PUT;
-- Form errors with simple_form gem;
-- Creating nested objects using cocoon gem;
-- Endless pagination with kaminari gem
+- form errors with simple_form gem;
+- nested objects using cocoon gem;
+- endless-pagination with kaminari gem
 - and others...
 
 ---
