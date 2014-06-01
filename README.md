@@ -5,9 +5,9 @@ It's a lightweight and flexible alternative to ActiveResource, that responds to 
 
 Be sure to check out this micro-services example: https://github.com/goncalvesjoao/micro-services-example
 
-Where a Rails4 app lists/creates/edits and destroys blog posts from a Padrino (aka Sinatra) app, using SmoothOperator::Rails instead of ActiveRecord classes.
+Where a Rails4 app lists/creates/edits and destroys blog posts from a Padrino (aka Sinatra) app, using SmoothOperator::Rails instead of ActiveRecord::Base classes.
 
-It also contains other cool examples like parallel requests and using HTTP Patch verb for saving instead of PUT, etc. etc.
+It also contains other cool examples like parallel requests and using HTTP PATCH verb for saving instead of PUT, etc. etc.
 
 ---
 
