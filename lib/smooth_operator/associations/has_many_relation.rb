@@ -1,6 +1,6 @@
 module SmoothOperator
-  module Relation
-    class ArrayRelation < SimpleDelegator
+  module Associations
+    class HasManyRelation < SimpleDelegator
 
       attr_reader :object, :association
 

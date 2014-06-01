@@ -1,5 +1,5 @@
 module SmoothOperator
-  module Relation
+  module Associations
     class Reflection
 
       attr_reader :name, :klass, :options

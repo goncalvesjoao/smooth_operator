@@ -1,7 +1,7 @@
-require "smooth_operator/relation/reflection"
+require "smooth_operator/associations/reflection"
 
 module SmoothOperator
-  module Relation
+  module Associations
     class AssociationReflection < Reflection
 
       attr_reader :related_reflection, :macro

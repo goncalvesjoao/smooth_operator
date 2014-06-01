@@ -5,22 +5,23 @@ require "smooth_operator/operator"
 require "smooth_operator/persistence"
 require "smooth_operator/translation"
 require "smooth_operator/open_struct"
+require "smooth_operator/http_methods"
+require "smooth_operator/associations"
 require "smooth_operator/finder_methods"
-require "smooth_operator/relation/associations"
 
 module SmoothOperator
   class Base < OpenStruct
 
     extend Schema
+    extend HttpMethods
+    extend Associations
     extend FinderMethods
-    extend Operator::HttpMethods
-    extend Relation::Associations
     extend Translation if defined? I18n
 
     include Operator
+    include HttpMethods
     include Persistence
     include FinderMethods
-    include Operator::HttpMethods
 
     self.strict_behaviour = true
 
