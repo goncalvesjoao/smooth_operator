@@ -13,7 +13,7 @@ module SmoothOperator
       attributes.delete(resources_name)
 
       @meta_data = attributes
-      
+
       define_metada_methods
 
       super(@internal_array)

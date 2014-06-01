@@ -34,10 +34,6 @@ module SmoothOperator
       end
     end
 
-    def _parent_object
-      _options[:parent_object]
-    end
-
     protected ################# PROTECTED METHODS DOWN BELOW ###################
 
     def before_initialize(attributes, options); end

@@ -12,10 +12,12 @@ module SmoothOperator
 
       relative_path = resource_path(relative_path)
 
-      if !_parent_object.nil? && options[:ignore_parent] != true
-        id = Helpers.primary_key(_parent_object)
+      parent_object = _options[:parent_object]
 
-        options[:resources_name] ||= "#{_parent_object.class.resources_name}/#{id}/#{self.class.resources_name}"
+      if !parent_object.nil? && options[:ignore_parent] != true
+        id = Helpers.primary_key(parent_object)
+
+        options[:resources_name] ||= "#{parent_object.class.resources_name}/#{id}/#{self.class.resources_name}"
       end
 
       self.class.make_the_call(http_verb, relative_path, data, options) do |remote_call|

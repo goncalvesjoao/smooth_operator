@@ -43,7 +43,7 @@ module SmoothOperator
         raise 'UnknownPath'
       end
 
-      _persistence_call(:reload, relative_path, data, options) do |remote_call|
+      make_a_persistence_call(:reload, relative_path, data, options) do |remote_call|
         block_given? ? yield(remote_call) : remote_call.status
       end
     end
@@ -67,7 +67,7 @@ module SmoothOperator
     def destroy(relative_path = nil, data = {}, options = {})
       return false unless persisted?
 
-      _persistence_call(:destroy, relative_path, data, options) do |remote_call|
+      make_a_persistence_call(:destroy, relative_path, data, options) do |remote_call|
         @destroyed = true if remote_call.status
 
         block_given? ? yield(remote_call) : remote_call.status
@@ -77,7 +77,7 @@ module SmoothOperator
     protected ######################### PROTECTED ##################
 
     def create(relative_path, data, options)
-      _persistence_call(:create, relative_path, data, options) do |remote_call|
+      make_a_persistence_call(:create, relative_path, data, options) do |remote_call|
         @new_record = false if remote_call.status
 
         block_given? ? yield(remote_call) : remote_call
@@ -85,7 +85,7 @@ module SmoothOperator
     end
 
     def update(relative_path, data, options)
-      _persistence_call(:update, relative_path, data, options) do |remote_call|
+      make_a_persistence_call(:update, relative_path, data, options) do |remote_call|
         block_given? ? yield(remote_call) : remote_call
       end
     end
@@ -102,7 +102,7 @@ module SmoothOperator
 
     private ##################### PRIVATE ##################
 
-    def _persistence_call(method, relative_path, data, options)
+    def make_a_persistence_call(method, relative_path, data, options)
       options ||= {}
 
       http_verb = options[:http_verb] || self.class.methods_vs_http_verbs[method]
