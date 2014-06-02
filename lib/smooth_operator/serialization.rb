@@ -22,58 +22,63 @@ module SmoothOperator
       hash = {}
       options ||= {}
 
-      _attribute_names(options).each do |attribute_name|
-        hash[attribute_name] = _read_attribute_for_hashing(attribute_name, options)
+      HelperMethods.attribute_names(self, options).each do |attribute_name|
+        hash[attribute_name] = HelperMethods
+          .read_attribute_for_hashing(self, attribute_name, options)
       end
 
-      method_names(options).each do |method_name|
+      HelperMethods.method_names(self, options).each do |method_name|
         hash[method_name.to_s] = send(method_name)
       end
 
       hash
     end
 
-    protected ##################### PROTECTED ###################
+    module HelperMethods
 
-    # TODO: THIS MUST GO TO A HELPER_METHODS MODULE
+      extend self
 
-    # TODO: COMPLEX METHOD
-    def _attribute_names(options)
-      attribute_names = internal_data.keys.sort
+      def attribute_names(object, options)
+        attribute_names = object.internal_data.keys.sort
 
-      if only = options[:only]
-        attribute_names &= [*only].map(&:to_s)
-      elsif except = options[:except]
-        attribute_names -= [*except].map(&:to_s)
+        if only = options[:only]
+          white_list = [*only].map(&:to_s)
+
+          attribute_names &= white_list
+        elsif except = options[:except]
+          black_list = [*except].map(&:to_s)
+
+          attribute_names -= black_list
+        end
+
+        attribute_names
       end
 
-      attribute_names
-    end
-
-    def method_names(options)
-      [*options[:methods]].select { |n| respond_to?(n) }
-    end
-
-    def _read_attribute_for_hashing(attribute_name, options)
-      object = read_attribute_for_serialization(attribute_name)
-
-      _options = options[attribute_name] || options[attribute_name.to_sym]
-
-      if object.is_a?(Array)
-        object.map { |array_entry| _attribute_to_hash(array_entry, _options) }
-      else
-        _attribute_to_hash(object, _options)
+      def method_names(object, options)
+        [*options[:methods]].select { |n| object.respond_to?(n) }
       end
-    end
 
-    def _attribute_to_hash(object, options = nil)
-      if object.respond_to?(:serializable_hash)
-        Helpers.symbolyze_keys(object.serializable_hash(options))
-      else
-        object
+      def read_attribute_for_hashing(parent_object, attribute_name, options)
+        object = parent_object.read_attribute_for_serialization(attribute_name)
+
+        _options = options[attribute_name] || options[attribute_name.to_sym]
+
+        if object.is_a?(Array)
+          object.map { |array_entry| attribute_to_hash(array_entry, _options) }
+        else
+          attribute_to_hash(object, _options)
+        end
       end
+
+      def attribute_to_hash(object, options = nil)
+        if object.respond_to?(:serializable_hash)
+          Helpers.symbolyze_keys(object.serializable_hash(options))
+        else
+          object
+        end
+      end
+
     end
 
   end
-
 end

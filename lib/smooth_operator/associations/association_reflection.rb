@@ -60,6 +60,10 @@ module SmoothOperator
         has_many?
       end
 
+      def rails_serialization?
+        options[:rails_serialization] == true
+      end
+
       private ################################# private
 
       def foreign_key_default
