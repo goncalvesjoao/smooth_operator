@@ -28,6 +28,12 @@ module SmoothOperator
       macro ? reflections.values.select { |reflection| reflection.macro == macro } : reflections.values
     end
 
+    def rails_serialization
+      Helpers.get_instance_variable(self, :rails_serialization, false)
+    end
+
+    attr_writer :rails_serialization
+
     protected ###################### PROTECTED ###################
 
     # TODO: THIS MUST GO TO A HELPER_METHODS MODULE
@@ -94,6 +100,10 @@ module SmoothOperator
 
     def parse_options(options, default_options)
       options = options.is_a?(Hash) ? options.merge(default_options) : default_options
+
+      if options[:rails_serialization].nil?
+        options[:rails_serialization] = rails_serialization
+      end
 
       Helpers.symbolyze_keys(options)
     end

@@ -6,8 +6,10 @@ class Post < SmoothOperator::Base
 
   self.endpoint = 'http://localhost:4567/'
 
-  has_many :comments
+  self.rails_serialization = true
 
-  belongs_to :address
+  has_many :comments#, rails_serialization: true
+
+  belongs_to :address#, rails_serialization: true
 
 end

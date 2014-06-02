@@ -4,6 +4,10 @@ module SmoothOperator
 
     extend self
 
+    def generated_id
+      Time.now.to_f.to_s.split('.')[1]
+    end
+
     def primary_key(object)
       object.internal_data_get(object.class.primary_key)
     end

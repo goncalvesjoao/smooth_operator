@@ -21,13 +21,17 @@ module SmoothOperator
     def serializable_hash(options = nil)
       hash = {}
       options ||= {}
+      method_names = HelperMethods.method_names(self, options)
+      attribute_names = HelperMethods.attribute_names(self, options)
 
-      HelperMethods.attribute_names(self, options).each do |attribute_name|
-        hash[attribute_name] = HelperMethods
-          .read_attribute_for_hashing(self, attribute_name, options)
+      attribute_names.each do |attribute_name|
+        attribute_name, attribute_value = HelperMethods
+          .serialize_normal_or_rails_way(self, attribute_name, options)
+
+        hash[attribute_name] = attribute_value
       end
 
-      HelperMethods.method_names(self, options).each do |method_name|
+      method_names.each do |method_name|
         hash[method_name.to_s] = send(method_name)
       end
 
@@ -58,15 +62,45 @@ module SmoothOperator
         [*options[:methods]].select { |n| object.respond_to?(n) }
       end
 
-      def read_attribute_for_hashing(parent_object, attribute_name, options)
+      def serialize_normal_or_rails_way(object, attribute_name, options)
+        _attribute_name, attribute_sym = attribute_name, attribute_name.to_sym
+
+        reflection = object.class.reflect_on_association(attribute_sym)
+
+        attribute_options = options[attribute_sym]
+
+        if reflection && reflection.rails_serialization?
+          attribute_value = serialize_has_many_attribute(object, reflection, attribute_name, attribute_options)
+
+          _attribute_name = "#{attribute_name}_attributes"
+        end
+
+        attribute_value ||= serialize_normal_attribute(object, attribute_name, attribute_options)
+
+        [_attribute_name, attribute_value]
+      end
+
+      def serialize_has_many_attribute(parent_object, reflection, attribute_name, options)
+        return nil unless reflection.has_many?
+
         object = parent_object.read_attribute_for_serialization(attribute_name)
 
-        _options = options[attribute_name] || options[attribute_name.to_sym]
+        object.reduce({}) do |hash, array_entry|
+          id = Helpers.present?(array_entry.id) ? array_entry.id : Helpers.generated_id
+
+          hash[id.to_s] = attribute_to_hash(array_entry, options)
+
+          hash
+        end
+      end
+
+      def serialize_normal_attribute(parent_object, attribute_name, options)
+        object = parent_object.read_attribute_for_serialization(attribute_name)
 
         if object.is_a?(Array)
-          object.map { |array_entry| attribute_to_hash(array_entry, _options) }
+          object.map { |array_entry| attribute_to_hash(array_entry, options) }
         else
-          attribute_to_hash(object, _options)
+          attribute_to_hash(object, options)
         end
       end
 

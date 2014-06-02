@@ -43,6 +43,7 @@ module SmoothOperator
         @_meta_data = _attributes
       else
         attributes = _attributes
+        @_meta_data = {}
       end
 
       attributes
