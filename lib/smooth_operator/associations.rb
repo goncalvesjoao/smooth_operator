@@ -4,16 +4,16 @@ require "smooth_operator/associations/association_reflection"
 module SmoothOperator
   module Associations
 
-    def has_many(nested_object_name, options = {})
-      accepts_nested_objects(nested_object_name, :has_many, options)
+    def has_many(association, options = {})
+      accepts_nested_objects(association, :has_many, options)
     end
 
-    def has_one(nested_object_name, options = {})
-      accepts_nested_objects(nested_object_name, :has_one, options)
+    def has_one(association, options = {})
+      accepts_nested_objects(association, :has_one, options)
     end
 
-    def belongs_to(nested_object_name, options = {})
-      accepts_nested_objects(nested_object_name, :belongs_to, options)
+    def belongs_to(association, options = {})
+      accepts_nested_objects(association, :belongs_to, options)
     end
 
     def reflections
@@ -29,6 +29,8 @@ module SmoothOperator
     end
 
     protected ###################### PROTECTED ###################
+
+    # TODO: THIS MUST GO TO A HELPER_METHODS MODULE
 
     def accepts_nested_objects(association, macro, options = {})
       options = parse_options(options, { macro: macro })

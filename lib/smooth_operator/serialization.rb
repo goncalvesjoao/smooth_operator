@@ -6,7 +6,6 @@ module SmoothOperator
       Helpers.symbolyze_keys(serializable_hash(options) || {})
     end
 
-    # alias :attributes :to_hash
     def attributes; to_hash; end
 
     def to_json(options = nil)
@@ -34,8 +33,9 @@ module SmoothOperator
       hash
     end
 
-
     protected ##################### PROTECTED ###################
+
+    # TODO: THIS MUST GO TO A HELPER_METHODS MODULE
 
     # TODO: COMPLEX METHOD
     def _attribute_names(options)
