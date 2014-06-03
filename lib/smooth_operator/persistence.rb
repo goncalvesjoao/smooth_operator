@@ -49,19 +49,15 @@ module SmoothOperator
     end
 
     def save(relative_path = nil, data = {}, options = {})
-      data = resource_attributes(data, options)
+      data = resource_body(data, options)
 
       method = new_record? ? :create : :update
 
-      send(method, relative_path, data, options) do |remote_call|
+      make_a_persistence_call(method, relative_path, data, options) do |remote_call|
+        @new_record = false if method == :create && remote_call.status
+
         block_given? ? yield(remote_call) : remote_call.status
       end
-    end
-
-    def save!(relative_path = nil, data = {}, options = {})
-      save(relative_path, data, options) do |remote_call|
-        block_given? ? yield(remote_call) : remote_call.status
-      end || raise('RecordNotSaved')
     end
 
     def destroy(relative_path = nil, data = {}, options = {})
@@ -74,23 +70,15 @@ module SmoothOperator
       end
     end
 
+    def save!(relative_path = nil, data = {}, options = {})
+      save(relative_path, data, options) do |remote_call|
+        block_given? ? yield(remote_call) : remote_call.status
+      end || raise('RecordNotSaved')
+    end
+
     protected ######################### PROTECTED ##################
 
-    def create(relative_path, data, options)
-      make_a_persistence_call(:create, relative_path, data, options) do |remote_call|
-        @new_record = false if remote_call.status
-
-        block_given? ? yield(remote_call) : remote_call
-      end
-    end
-
-    def update(relative_path, data, options)
-      make_a_persistence_call(:update, relative_path, data, options) do |remote_call|
-        block_given? ? yield(remote_call) : remote_call
-      end
-    end
-
-    def resource_attributes(data, options)
+    def resource_body(data, options)
       data = Helpers.stringify_keys(data)
 
       hash = serializable_hash(options[:serializable_options]).dup

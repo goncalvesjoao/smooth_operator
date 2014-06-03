@@ -1,5 +1,6 @@
-module SmoothOperator
+require "smooth_operator/cookie_jar"
 
+module SmoothOperator
   module RemoteCall
 
     class Base
@@ -64,6 +65,10 @@ module SmoothOperator
 
       def data
         object.nil? ? parsed_response : object
+      end
+
+      def cookie(header_field = 'set-cookie')
+        CookieJar.new.parse(headers[header_field])
       end
 
     end

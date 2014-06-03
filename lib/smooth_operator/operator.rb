@@ -20,7 +20,9 @@ module SmoothOperator
         options[:resources_name] ||= "#{parent_object.class.resources_name}/#{id}/#{self.class.resources_name}"
       end
 
-      self.class.make_the_call(http_verb, relative_path, data, options) do |remote_call|
+      call_args = before_request(http_verb, relative_path, data, options)
+
+      self.class.make_the_call(*call_args) do |remote_call|
         yield(remote_call)
       end
     end
@@ -41,9 +43,15 @@ module SmoothOperator
       base.extend(ClassMethods)
     end
 
+    protected ################# PROTECTED ####################
+
+    def before_request(http_verb, relative_path, data, options)
+      [http_verb, relative_path, data, options]
+    end
+
     module ClassMethods
 
-      OPTIONS = [:endpoint, :endpoint_user, :endpoint_pass, :timeout]
+      OPTIONS = [:endpoint, :endpoint_user, :endpoint_pass, :timeout, :server_name]
 
       OPTIONS.each do |option|
         define_method(option) { Helpers.get_instance_variable(self, option, '') }
@@ -61,6 +69,8 @@ module SmoothOperator
         options = HelperMethods.populate_options(self, options)
 
         resource_path = resource_path(relative_path, options)
+
+        http_verb, resource_path, data, options = before_request(http_verb, resource_path, data, options)
 
         params, data = *HelperMethods.strip_params(self, http_verb, data)
 
@@ -83,6 +93,12 @@ module SmoothOperator
         else
           relative_path.to_s
         end
+      end
+
+      protected ################# PROTECTED ####################
+
+      def before_request(http_verb, relative_path, data, options)
+        [http_verb, relative_path, data, options]
       end
 
     end
