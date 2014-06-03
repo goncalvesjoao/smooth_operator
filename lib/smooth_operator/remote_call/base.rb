@@ -54,7 +54,7 @@ module SmoothOperator
         begin
           JSON.parse(body)
         rescue JSON::ParserError
-          nil
+          body
         end
       end
 

@@ -31,4 +31,6 @@ post = Post.new(comments: [{ id: 1, name: '1' }, { id: 2, name: '2' }], address:
 
 comments_attributes = { "0" => { id: 1, name: '3' }, "1" => { name: '4' } }
 
+comments_with_errors = { "0" => { id: 1, name: '3', errors: { body: ["can't be blank"] } }, "1" => { name: '4', errors: { body: ["can't be blank"] } } }
+
 binding.pry

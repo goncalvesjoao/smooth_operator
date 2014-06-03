@@ -247,7 +247,7 @@ describe SmoothOperator::RemoteCall do
 
   context "when the connection exceeds the timeout" do
     subject { User::TimeoutConnection.new }
-    
+
     before { subject.save('/timeout') }
 
     it "#ok? should return false" do
@@ -291,8 +291,8 @@ describe SmoothOperator::RemoteCall do
     context "when the server response's body does not contains valid json data" do
       let(:remote_call) { User::Base.find('bad_json') }
 
-      it "should return nil" do
-        expect(remote_call.data).to be nil
+      it "it should return what the server has returned" do
+        expect(remote_call.data).to eq('ok')
       end
     end
   end
@@ -308,7 +308,7 @@ describe SmoothOperator::RemoteCall do
 
     context "when a server connection fails" do
       subject { User::TimeoutConnection.new }
-    
+
       before { subject.save('/timeout') }
 
       it "should return 0" do

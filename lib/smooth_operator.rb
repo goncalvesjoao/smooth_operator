@@ -38,6 +38,8 @@ module SmoothOperator
       include ActiveModel::Validations::Callbacks
       include ActiveModel::Conversion
 
+      self.unknown_hash_class = SmoothOperator::OpenStruct
+
       validate :validate_induced_errors, :validate_nested_objects
 
       def column_for_attribute(attribute_name)
@@ -77,7 +79,10 @@ module SmoothOperator
       end
 
       def validate_nested_objects
-        # nested_objects.map { |reflection, nested_object| nested_object.valid? }.all?
+        all_nested_objects = self.class.reflections.keys
+          .map { |association| send(association) }.flatten.compact
+
+        all_nested_objects.map { |nested_object| nested_object.valid? }.all?
       end
 
     end

@@ -25,11 +25,7 @@ module SmoothOperator
       attributes.each do |name, value|
         next unless allowed_attribute(name)
 
-        if respond_to?("#{name}=")
-          send("#{name}=", value)
-        else
-          internal_data_push(name, value)
-        end
+        send("#{name}=", value)
       end
     end
 

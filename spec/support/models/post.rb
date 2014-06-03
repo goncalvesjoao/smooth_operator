@@ -8,6 +8,8 @@ class Post < SmoothOperator::Base
 
   self.rails_serialization = true
 
+  self.unknown_hash_class = SmoothOperator::OpenStruct
+
   has_many :comments#, rails_serialization: true
 
   belongs_to :address#, rails_serialization: true
