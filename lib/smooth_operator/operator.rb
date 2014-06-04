@@ -2,6 +2,7 @@ require "smooth_operator/remote_call/base"
 require "smooth_operator/operators/faraday"
 require "smooth_operator/operators/typhoeus"
 require "smooth_operator/remote_call/errors/timeout"
+require "smooth_operator/operators/connection_wrapper"
 require "smooth_operator/remote_call/errors/connection_failed"
 
 module SmoothOperator
@@ -95,6 +96,10 @@ module SmoothOperator
         end
       end
 
+      def generate_parallel_connection
+        Operators::Typhoeus.generate_parallel_connection
+      end
+
       protected ################# PROTECTED ####################
 
       def before_request(http_verb, relative_path, data, options)
@@ -111,6 +116,7 @@ module SmoothOperator
         if options[:parallel_connection].nil?
           Operators::Faraday
         else
+          options[:connection] = options.delete(:parallel_connection)
           Operators::Typhoeus
         end
       end

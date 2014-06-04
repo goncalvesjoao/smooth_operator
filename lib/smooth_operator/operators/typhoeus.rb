@@ -9,26 +9,37 @@ module SmoothOperator
 
       extend self
 
+      def generate_parallel_connection
+        generate_connection
+      end
+
+      def generate_connection(adapter = nil, options = nil)
+        ConnectionWrapper.new(::Typhoeus::Hydra::hydra)
+      end
+
       def make_the_call(http_verb, resource_path, params, body, options)
         request = ::Typhoeus::Request.new *typhoeus_request_args(http_verb, resource_path, params, body, options)
-        
-        hydra = options[:hydra] || ::Typhoeus::Hydra::hydra
 
-        _remote_call = nil
+        hydra = (options[:connection] || generate_connection).connection
+
+        request_result = nil
 
         hydra.queue(request)
 
-        request.on_complete do |typhoeus_response|          
-          _remote_call = remote_call(typhoeus_response)
+        request.on_complete do |typhoeus_response|
+          remote_call = remote_call(typhoeus_response)
 
-          yield(_remote_call) if block_given?
+          if block_given?
+            request_result = yield(remote_call)
+          else
+            request_result = remote_call
+          end
         end
 
-        hydra.run if Helpers.blank?(options[:hydra])
+        hydra.run if Helpers.blank?(options[:connection])
 
-        _remote_call
+        request_result
       end
-
 
       protected ################ PROTECTED ################
 
@@ -46,7 +57,6 @@ module SmoothOperator
         end.new(typhoeus_response)
       end
 
-
       private ################### PRIVATE ###############
 
       def build_typhoeus_options(http_verb, params, body, options)
@@ -55,7 +65,7 @@ module SmoothOperator
         typhoeus_options[:timeout] = options[:timeout] if Helpers.present?(options[:timeout])
 
         typhoeus_options[:body] = body if Helpers.present?(body)
-        
+
         typhoeus_options[:params] = params if Helpers.present?(params)
 
         typhoeus_options[:userpwd] = "#{options[:endpoint_user]}:#{options[:endpoint_pass]}" if Helpers.present?(options[:endpoint_user])
@@ -65,7 +75,7 @@ module SmoothOperator
 
       def url(options, relative_path)
         url = options[:endpoint]
-        
+
         slice = url[-1] != '/' ? '/' : ''
 
         url = "#{url}#{slice}#{relative_path}" if Helpers.present?(relative_path)

@@ -17,11 +17,11 @@ module SmoothOperator
       def generate_connection(adapter = nil, options = nil)
         adapter ||= :net_http
 
-        ::Faraday.new(url: options[:endpoint]) do |builder|
+        ConnectionWrapper.new(::Faraday.new(url: options[:endpoint]) do |builder|
           builder.options[:timeout] = options[:timeout].to_i unless Helpers.blank?(options[:timeout])
           builder.request :url_encoded
           builder.adapter adapter
-        end
+        end)
       end
 
       def make_the_call(http_verb, resource_path, params, body, options)
@@ -49,8 +49,8 @@ module SmoothOperator
 
       def strip_options(options)
         request_options = options.delete(:request_options) || {}
-        
-        connection = options.delete(:connection) || generate_connection(nil, options)
+
+        connection = (options.delete(:connection) || generate_connection(nil, options)).connection
 
         [connection, request_options, options]
       end
@@ -61,9 +61,9 @@ module SmoothOperator
 
       def request_configuration(request, request_options, options, params, body)
         request_options.each { |key, value| request.options.send("#{key}=", value) }
-        
+
         options[:headers].each { |key, value| request.headers[key] = value }
-        
+
         params.each { |key, value| request.params[key] = value }
 
         request.body = body

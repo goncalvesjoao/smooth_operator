@@ -38,7 +38,7 @@ class TestServer < Sinatra::Base
 
   get '/users' do
     users = [FactoryGirl.attributes_for(:user_with_address_and_posts), FactoryGirl.attributes_for(:user_with_address_and_posts)]
-    
+
     users[0][:id] = 1
     users[1][:id] = 2
 
@@ -63,10 +63,10 @@ class TestServer < Sinatra::Base
     users = [{ id: 1, users: nested_users}, { id: 2, users: nested_users}]
 
     data = { page: 1, total: 6, users: users }
-    
+
     json data
   end
-  
+
   get '/users/bad_json' do
     'ok'
   end
@@ -79,7 +79,7 @@ class TestServer < Sinatra::Base
     user_data = { user: FactoryGirl.attributes_for(:user_with_address_and_posts), status: 1 }
     json user_data
   end
-  
+
 
   put '/users/:id/send_error' do
     data_with_error = { id: 1, errors: [{ first_name: ["can't be blank"] }] }
@@ -90,7 +90,7 @@ class TestServer < Sinatra::Base
   post '/users' do
     common_response
   end
-  
+
   post '/users/timeout' do
     # sleep 2 # for typhoeus tests
     sleep 1
@@ -100,7 +100,7 @@ class TestServer < Sinatra::Base
   put '/users/:id' do
     common_response
   end
-  
+
   patch '/users/:id' do
     common_response
   end
@@ -123,7 +123,7 @@ class TestServer < Sinatra::Base
     data.delete('id')
 
     query_params = (params[:query_string_param] == 'true')
-    
+
     internal_data_match = params[:user] ? (params[:user] == data) : true
 
     json({ user: { server_response: true }, http_verb: env["REQUEST_METHOD"].downcase, internal_data_match: internal_data_match, query_params: query_params })
