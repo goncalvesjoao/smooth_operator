@@ -65,7 +65,8 @@ module SmoothOperator
       def serialize_normal_or_rails_way(object, attribute_name, options)
         _attribute_name, attribute_sym = attribute_name, attribute_name.to_sym
 
-        reflection = object.class.reflect_on_association(attribute_sym)
+        reflection = object.class.respond_to?(:reflect_on_association) &&
+          object.class.reflect_on_association(attribute_sym)
 
         attribute_options = options[attribute_sym]
 

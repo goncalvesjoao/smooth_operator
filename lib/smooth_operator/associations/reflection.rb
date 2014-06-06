@@ -14,7 +14,7 @@ module SmoothOperator
         if options.include?(:class_name) && options[:class_name].nil?
           @klass = nil
         elsif @klass.is_a?(String)
-          @klass = @klass.constantize
+          @klass = @klass.constantize rescue OpenStruct
         end
       end
 
