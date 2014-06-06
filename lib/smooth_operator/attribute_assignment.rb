@@ -14,9 +14,9 @@ module SmoothOperator
     attr_reader :_options, :_meta_data
 
     def assign_attributes(attributes = {}, options = {})
-      return nil unless attributes.is_a?(Hash)
-
       attributes = _extract_attributes(attributes)
+
+      return nil unless attributes.is_a?(Hash)
 
       induce_errors(attributes.delete(self.class.errors_key))
 
@@ -32,6 +32,8 @@ module SmoothOperator
     protected ################# PROTECTED METHODS DOWN BELOW ###################
 
     def _extract_attributes(attributes)
+      return nil unless attributes.is_a?(Hash)
+
       _attributes = Helpers.stringify_keys(attributes)
 
       if _attributes.include?(self.class.resource_name)
