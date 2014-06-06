@@ -18,28 +18,32 @@ module SmoothOperator
     attr_writer :resource_name
 
     def model_name
-      return '' if @_model_name == :none
+      return '' if custom_model_name == :none
 
       if defined? ActiveModel
-        rails_model_name_method
+        smooth_model_name
       else
-        @_model_name ||= name.split('::').last.underscore.capitalize
+        custom_model_name ||= name.split('::').last.underscore.capitalize
       end
     end
 
     def model_name=(name)
-      @_model_name = name
+      @custom_model_name = name
+    end
+
+    def custom_model_name
+      Helpers.get_instance_variable(self, :custom_model_name, nil)
     end
 
     protected ############## PROTECTED #############
 
-    def rails_model_name_method
-      @model_name ||= begin
+    def smooth_model_name
+      @_model_name ||= begin
         namespace ||= self.parents.detect do |n|
           n.respond_to?(:use_relative_model_naming?) && n.use_relative_model_naming?
         end
 
-        ActiveModel::Name.new(self, namespace, @_model_name).tap do |model_name|
+        ActiveModel::Name.new(self, namespace, custom_model_name).tap do |model_name|
           def model_name.human(options = {}); SmoothOperator::Translation::HelperMethods.translate("models.#{i18n_key}", options); end
         end
       end

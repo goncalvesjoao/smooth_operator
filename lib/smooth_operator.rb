@@ -66,6 +66,10 @@ module SmoothOperator
 
       def after_save; end
 
+      def self.model_name
+        smooth_model_name
+      end
+
       protected ################# PROTECTED ###################
 
       def validate_induced_errors
