@@ -117,10 +117,16 @@ post = Post.new(id: 2, body: 'editing my second page')
 post.new_record? # false
 post.persisted?  # true
 
-post.save("#{post.id}/save_and_add_to_list", { admin: true, post: { author: 'Agent Smith', list_id: 1 } }, { timeout: 1 })
+post.save("save_and_add_to_list", { admin: true, post: { author: 'Agent Smith', list_id: 1 } }, { timeout: 1 })
 # Will make a PUT to 'http://myblog.com/api/v0/posts/2/save_and_add_to_list'
 # with { admin: true, post: { body: 'editing my second page', list_id: 1 } }
 # and will only wait 1sec for the server to respond.
+
+post.save('/#{post.id}/save_and_add_to_list')
+# Will make a PUT to 'http://myblog.com/api/v0/posts/2/save_and_add_to_list'
+
+post.save('/save_and_add_to_list')
+# Will make a PUT to 'http://myblog.com/api/v0/posts/save_and_add_to_list'
 ```
 
 ---
@@ -149,7 +155,7 @@ remote_call = Page.find(:all) # Will make a GET call to 'http://myblog.com/api/v
 
 pages = remote_call.data
 
-# If the server response is positive (http code between 200 and 299):
+# If the server response is positive (http code between 200 and 299, or 304):
   remote_call.ok? # true
   remote_call.not_processed? # false
   remote_call.error? # false
@@ -187,6 +193,8 @@ pages = remote_call.data
 remote_call = Page.find(2) # Will make a GET call to 'http://myblog.com/api/v0/pages/2'
                            # and will return a SmoothOperator::RemoteCall instance
 
+service_down = remote_call.error?
+
 page = remote_call.data
 ```
 
@@ -198,23 +206,58 @@ remote_call = Page.find('my_pages', { q: body_contains: 'link' }, { endpoint_use
 # will make a GET call to 'http://myblog.com/api/v0/pages/my_pages?q={body_contains="link"}'
 # and will change the HTTP BASIC AUTH credentials to user: 'admin' and pass: 'new_password' for this connection only.
 
+@service_down = remote_call.error?
+
 # If the server json response is an Array [{ id: 1 }, { id: 2 }]
-  pages = remote.data # will return an array with 2 Page's instances
-  pages[0].id # 1
-  pages[1].id # 2
+  @pages = remote.data # will return an array with 2 Page's instances
+  @pages[0].id # 1
+  @pages[1].id # 2
 
 # If the server json response is a Hash { id: 3 }
-  page = remote.data # will return a single Page instance
-  page.id # 3
+  @page = remote.data # will return a single Page instance
+  @page.id # 3
 
-# If the server json response is Hash with a key called 'pages' { page: 1, total: 3, pages: [{ id: 4 }, { id: 5 }] }
-  pages = remote.data # will return a single ArrayWithMetaData instance, that will allow you to access to both the Page's instances array and the metadata.
-  pages.page # 1
-  pages.total # 3
+# If the server json response is Hash with a key called 'pages' { current_page: 1, total_pages: 3, limit_value: 10, pages: [{ id: 4 }, { id: 5 }] }
+  @pages = remote.data # will return a single ArrayWithMetaData instance, that will allow you to access to both the Page's instances array and the metadata.
 
-  pages[0].id # 4
-  pages[1].id # 5
+  # @pages is now a valid object to work with kaminari
+  @pages.total_pages # 3
+  @pages.current_page # 1
+  @pages.limit_value # 10
+
+  @pages[0].id # 4
+  @pages[1].id # 5
 ```
+
+### 2.8) Keeping your session alive - custom HTTP Headers
+
+Controllers
+  ApplicationController
+  ```ruby
+  ```
+
+Models
+  SmoothResource
+  ```ruby
+  class SmoothResource < SmoothOperator::Rails
+
+    def self.headers
+      headers = super
+
+      headers.merge({
+        cookie: current_user.blog_cookie,
+        "X_CSRF_TOKEN" => current_user.blog_auth_token
+      })
+    end
+
+    protected ############## PROTECTED #################
+
+    def self.current_user
+      User.current_user
+    end
+
+  end
+  ```
 
 ---
 

@@ -32,7 +32,7 @@ module SmoothOperator
       end
 
       method_names.each do |method_name|
-        hash[method_name.to_s] = send(method_name)
+        hash[method_name.to_s] = HelperMethods.serialize_normal_attribute(send(method_name), method_name, options[method_name])
       end
 
       hash
@@ -96,7 +96,11 @@ module SmoothOperator
       end
 
       def serialize_normal_attribute(parent_object, attribute_name, options)
-        object = parent_object.read_attribute_for_serialization(attribute_name)
+        if parent_object.respond_to?(:read_attribute_for_serialization)
+          object = parent_object.read_attribute_for_serialization(attribute_name)
+        else
+          object = parent_object
+        end
 
         if object.is_a?(Array)
           object.map { |array_entry| attribute_to_hash(array_entry, options) }
