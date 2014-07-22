@@ -28,10 +28,8 @@ module SmoothOperator
     module ClassMethods
 
       def errors_key
-        Helpers.get_instance_variable(self, :errors_key, 'errors')
+        get_option :errors_key, 'errors'
       end
-
-      attr_writer :errors_key
 
     end
 

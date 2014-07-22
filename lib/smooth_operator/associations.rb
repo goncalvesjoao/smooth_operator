@@ -29,10 +29,8 @@ module SmoothOperator
     end
 
     def rails_serialization
-      Helpers.get_instance_variable(self, :rails_serialization, false)
+      get_option :rails_serialization, false
     end
-
-    attr_writer :rails_serialization
 
     protected ###################### PROTECTED ###################
 

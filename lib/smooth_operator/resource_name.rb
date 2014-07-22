@@ -1,21 +1,13 @@
 module SmoothOperator
   module ResourceName
 
-    def resources_name(default_bypass = nil)
-      return @resources_name if defined?(@resources_name)
-
-      (Helpers.super_method(self, :resources_name, true) || (default_bypass ? nil : self.resource_name.pluralize))
+    def resources_name
+      get_option :resources_name, self.resource_name.pluralize
     end
 
-    attr_writer :resources_name
-
-    def resource_name(default_bypass = nil)
-      return @resource_name if defined?(@resource_name)
-
-      (Helpers.super_method(self, :resource_name, true) || (default_bypass ? nil : self.model_name.to_s.underscore))
+    def resource_name
+      get_option :resource_name, self.model_name.to_s.underscore
     end
-
-    attr_writer :resource_name
 
     def model_name
       return '' if custom_model_name == :none

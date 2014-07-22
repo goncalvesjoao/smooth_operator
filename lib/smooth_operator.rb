@@ -23,7 +23,7 @@ module SmoothOperator
     include Persistence
     include FinderMethods
 
-    self.strict_behaviour = true
+    options strict_behaviour: true
 
     def self.smooth_operator?
       true
@@ -38,7 +38,7 @@ module SmoothOperator
       include ActiveModel::Validations::Callbacks
       include ActiveModel::Conversion
 
-      self.unknown_hash_class = SmoothOperator::OpenStruct
+      options unknown_hash_class: SmoothOperator::OpenStruct
 
       validate :validate_induced_errors, :validate_nested_objects
 

@@ -89,7 +89,7 @@ describe SmoothOperator::AttributeAssignment do
         end
       end
 
-      context "when the .unknown_hash_class is set to :none" do
+      context "when the .unknown_hash_class is set to nil" do
         subject { User::UnknownHashClass::None.new(creator: { first_name: 'admin', address: { street: 'something' } }) }
 
         it "the hash will be copied as it is" do

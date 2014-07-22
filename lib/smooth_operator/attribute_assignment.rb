@@ -67,10 +67,8 @@ module SmoothOperator
 
     module ClassMethods
 
-      attr_writer :unknown_hash_class
-
       def unknown_hash_class
-        Helpers.get_instance_variable(self, :unknown_hash_class, ::OpenStruct)
+        get_option :unknown_hash_class, ::OpenStruct
       end
 
       def attributes_white_list

@@ -37,11 +37,14 @@ Or install it yourself as:
 
 ```ruby
 class MyBlogResource < SmoothOperator::Base
-  self.endpoint = 'http://myblog.com/api/v0'
 
   # HTTP BASIC AUTH
-  self.endpoint_user = 'admin'
-  self.endpoint_pass = 'admin'
+  options endpoint_user: 'admin',
+          endpoint_pass: 'admin',
+          endpoint: 'http://myblog.com/api/v0'
+
+  # OR
+  # smooth_operator_options
 end
 
 class Post < MyBlogResource
@@ -134,7 +137,9 @@ post.save('/save_and_add_to_list')
 ### 2.4) Saving using HTTP Patch verb
 ```ruby
 class Page < MyBlogResource
-  self.update_http_verb = :patch
+  options update_http_verb: 'patch'
+  # OR
+  #smooth_operator_options update_http_verb: 'patch'
 end
 
 page = Page.find(2)
@@ -241,13 +246,13 @@ Models
   ```ruby
   class SmoothResource < SmoothOperator::Rails
 
-    def self.headers
-      headers = super
+    options headers: :custom_headers
 
-      headers.merge({
+    def self.custom_headers
+      {
         cookie: current_user.blog_cookie,
         "X_CSRF_TOKEN" => current_user.blog_auth_token
-      })
+      }
     end
 
     protected ############## PROTECTED #################

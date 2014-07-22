@@ -1,3 +1,4 @@
+require "smooth_operator/options"
 require "smooth_operator/delegation"
 require "smooth_operator/validations"
 require "smooth_operator/resource_name"
@@ -8,6 +9,7 @@ require "smooth_operator/attribute_assignment"
 module SmoothOperator
   class OpenStruct
 
+    extend Options
     extend ResourceName
 
     include Delegation

@@ -2,13 +2,10 @@ module User
 
   class Base < SmoothOperator::Base
 
-    self.resource_name = 'user'
-
-    self.endpoint_user = 'admin'
-
-    self.endpoint_pass = 'admin'
-
-    self.endpoint = 'http://localhost:4567/'
+    options resource_name: 'user',
+            endpoint_user: 'admin',
+            endpoint_pass: 'admin',
+            endpoint: 'http://localhost:4567/'
 
     def self.query_string(params)
       params['query_string_param'] = true
@@ -21,21 +18,21 @@ module User
   module UnknownHashClass
 
     class OpenStructBase < User::Base
-      self.unknown_hash_class = SmoothOperator::OpenStruct
+      options unknown_hash_class: SmoothOperator::OpenStruct
     end
 
     class None < User::Base
-      self.unknown_hash_class = :none
+      options unknown_hash_class: nil
     end
 
   end
 
   class BrokenConnection < SmoothOperator::Base
-    self.endpoint = 'http://localhost:1234/'
+    options endpoint: 'http://localhost:1234/'
   end
 
   class TimeoutConnection < Base
-    self.timeout = 1
+    options timeout: 1
   end
 
 end

@@ -55,16 +55,12 @@ module SmoothOperator
       OPTIONS = [:endpoint, :endpoint_user, :endpoint_pass, :timeout, :server_name]
 
       OPTIONS.each do |option|
-        define_method(option) { Helpers.get_instance_variable(self, option, '') }
+        define_method(option) { get_option option, '' }
       end
-
-      attr_writer *OPTIONS
 
       def headers
-        Helpers.get_instance_variable(self, :headers, {})
+        get_option :headers, {}
       end
-
-      attr_writer :headers
 
       def make_the_call(http_verb, relative_path = '', data = {}, options = {})
         options = HelperMethods.populate_options(self, options)

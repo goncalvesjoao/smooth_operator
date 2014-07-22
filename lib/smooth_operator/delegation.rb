@@ -24,10 +24,8 @@ module SmoothOperator
     module ClassMethods
 
       def strict_behaviour
-        Helpers.get_instance_variable(self, :strict_behaviour, false)
+        get_option :strict_behaviour, false
       end
-
-      attr_writer :strict_behaviour
 
     end
 

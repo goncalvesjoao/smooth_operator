@@ -1,12 +1,12 @@
 class Address < SmoothOperator::Base
 
-  self.resource_name = ''
-
-  self.endpoint_user = 'admin'
-  self.endpoint_pass = 'admin'
-
-  self.endpoint = 'http://localhost:4567/'
-
-  self.headers = { "X-APPTOKEN" => "joaquim_app_token", "X-LAYERTOKEN" => "joaquim_layer_token" }
+  options resource_name: '',
+          endpoint_user: 'admin',
+          endpoint_pass: 'admin',
+          endpoint: 'http://localhost:4567/',
+          headers: {
+            "X-APPTOKEN" => "app_token",
+            "X-LAYERTOKEN" => "layer_token"
+          }
 
 end

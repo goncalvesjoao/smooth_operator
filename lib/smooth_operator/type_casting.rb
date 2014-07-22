@@ -103,7 +103,7 @@ module SmoothOperator
     end
 
     def new_unknown_hash(hash, unknown_hash_class, parent_object)
-      if unknown_hash_class == :none
+      if unknown_hash_class.nil?
         hash
       else
         unknown_hash_class.new(cast_params(hash, unknown_hash_class, parent_object))

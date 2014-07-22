@@ -49,11 +49,11 @@ module SmoothOperator
     end
 
     def save(relative_path = nil, data = {}, options = {})
-      data = resource_body(data, options)
+      resource_data = resource_data_for_server(data)
 
       method = new_record? ? :create : :update
 
-      make_a_persistence_call(method, relative_path, data, options) do |remote_call|
+      make_a_persistence_call(method, relative_path, resource_data, options) do |remote_call|
         @new_record = false if method == :create && remote_call.status
 
         block_given? ? yield(remote_call) : remote_call.status
@@ -78,14 +78,28 @@ module SmoothOperator
 
     protected ######################### PROTECTED ##################
 
-    def resource_body(data, options)
-      data = Helpers.stringify_keys(data)
+    def internal_data_for_server
+      data = self.class.get_option(:internal_data_for_server, false)
 
-      hash = serializable_hash(options[:serializable_options]).dup
+      if data == false
+        serializable_hash.dup.tap { |hash| hash.delete(self.class.primary_key) }
+      else
+        data
+      end
+    end
 
-      hash.delete(self.class.primary_key)
+    def resource_data_for_server(data)
+      resource_data =
+        self.class.get_option(:resource_data_for_server, false, data)
 
-      { self.class.resource_name => hash }.merge(data)
+      if resource_data == false
+        data = Helpers.stringify_keys(data)
+        resource_data = Helpers.stringify_keys(internal_data_for_server)
+
+        { self.class.resource_name.to_s => resource_data }.merge(data)
+      else
+        resource_data
+      end
     end
 
     private ##################### PRIVATE ##################
@@ -93,7 +107,7 @@ module SmoothOperator
     def make_a_persistence_call(method, relative_path, data, options)
       options ||= {}
 
-      http_verb = options[:http_verb] || self.class.methods_vs_http_verbs[method]
+      http_verb = options[:http_verb] || self.class.http_verb_for(method)
 
       make_the_call(http_verb, relative_path, data, options) do |remote_call|
         @last_remote_call = remote_call
@@ -110,26 +124,16 @@ module SmoothOperator
 
       METHODS_VS_HTTP_VERBS = { reload: :get, create: :post, update: :put, destroy: :delete }
 
-      def methods_vs_http_verbs
-        Helpers.get_instance_variable(self, :methods_vs_http_verbs, METHODS_VS_HTTP_VERBS.dup)
+      def http_verb_for(method)
+        get_option "#{method}_http_verb".to_sym, METHODS_VS_HTTP_VERBS[method]
       end
 
       def primary_key
-        Helpers.get_instance_variable(self, :primary_key, 'id')
+        get_option :primary_key, 'id'
       end
-
-      attr_writer :primary_key
 
       def destroy_key
-        Helpers.get_instance_variable(self, :destroy_key, '_destroy')
-      end
-
-      attr_writer :destroy_key
-
-      METHODS_VS_HTTP_VERBS.keys.each do |method|
-        define_method("#{method}_http_verb=") do |http_verb|
-          methods_vs_http_verbs[method] = http_verb
-        end
+        get_option :destroy_key, '_destroy'
       end
 
       def create(attributes = nil, relative_path = nil, data = {}, options = {})
