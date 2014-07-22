@@ -17,13 +17,19 @@ module SmoothOperator
       end
 
       def build(attributes = {})
-        new_array, new_array_entry = get_array, new(attributes)
+        new_entries = if attributes.is_a?(Array)
+          attributes.map { |attrs| new(attrs) }
+        else
+          [new(attributes)]
+        end
 
-        new_array.push new_array_entry
+        new_array = get_array
+
+        new_array.push *new_entries
 
         object.send("#{association}=", new_array)
 
-        new_array_entry
+        attributes.is_a?(Array) ? new_entries : new_entries.first
       end
 
       undef :is_a?

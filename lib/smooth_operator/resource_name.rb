@@ -19,12 +19,8 @@ module SmoothOperator
       end
     end
 
-    def model_name=(name)
-      @custom_model_name = name
-    end
-
     def custom_model_name
-      Helpers.get_instance_variable(self, :custom_model_name, nil)
+      get_option :model_name, nil
     end
 
     protected ############## PROTECTED #############
