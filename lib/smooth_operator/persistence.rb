@@ -63,7 +63,9 @@ module SmoothOperator
     def destroy(relative_path = nil, data = {}, options = {})
       return false unless persisted?
 
-      make_a_persistence_call(:destroy, relative_path, data, options) do |remote_call|
+      resource_data = resource_data_for_server(data)
+
+      make_a_persistence_call(:destroy, relative_path, resource_data, options) do |remote_call|
         @destroyed = true if remote_call.status
 
         block_given? ? yield(remote_call) : remote_call.status
