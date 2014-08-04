@@ -1,4 +1,4 @@
-# SmoothOperator [![Code Climate](https://codeclimate.com/repos/536a7b9f6956801228014b02/badges/13f79897976274a9de33/gpa.png)](https://codeclimate.com/repos/536a7b9f6956801228014b02/feed)
+# SmoothOperator [![Code Climate](https://codeclimate.com/github/goncalvesjoao/smooth_operator/badges/gpa.svg)](https://codeclimate.com/github/goncalvesjoao/smooth_operator)
 
 Ruby gem, that mimics the ActiveRecord behaviour but through external API's.
 It's a lightweight and flexible alternative to ActiveResource, that responds to a REST API like you expect it too.
