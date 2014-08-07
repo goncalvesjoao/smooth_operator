@@ -49,7 +49,7 @@ module SmoothOperator
     end
 
     def save(relative_path = nil, data = {}, options = {})
-      resource_data = resource_data_for_server(data)
+      resource_data = resource_data_for_server(data, options)
 
       method = new_record? ? :create : :update
 
@@ -63,7 +63,7 @@ module SmoothOperator
     def destroy(relative_path = nil, data = {}, options = {})
       return false unless persisted?
 
-      resource_data = resource_data_for_server(data)
+      resource_data = resource_data_for_server(data, options)
 
       make_a_persistence_call(:destroy, relative_path, resource_data, options) do |remote_call|
         @destroyed = true if remote_call.status
@@ -90,15 +90,25 @@ module SmoothOperator
       end
     end
 
-    def resource_data_for_server(data)
+    def resource_data_for_server(data, options)
+      data ||= {}
+      options ||= {}
+
       resource_data =
-        self.class.get_option(:resource_data_for_server, false, data)
+        self.class.get_option(:resource_data_for_server, false, data, options)
 
       if resource_data == false
         data = Helpers.stringify_keys(data)
+
         resource_data = Helpers.stringify_keys(internal_data_for_server)
 
-        { self.class.resource_name.to_s => resource_data }.merge(data)
+        resource_name = options[:resource_name] || self.class.resource_name.to_s
+
+        if Helpers.present?(resource_name)
+          { resource_name => resource_data }.merge(data)
+        else
+          resource_data.merge(data)
+        end
       else
         resource_data
       end
