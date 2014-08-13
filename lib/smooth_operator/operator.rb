@@ -13,7 +13,7 @@ module SmoothOperator
 
       relative_path = resource_path(relative_path)
 
-      parent_object = _options[:parent_object]
+      parent_object = options[:parent_object] || _options[:parent_object]
 
       if !parent_object.nil? && options[:ignore_parent] != true
         id = Helpers.primary_key(parent_object)
