@@ -17,11 +17,15 @@ module SmoothOperator
       def generate_connection(adapter = nil, options = nil)
         adapter ||= :net_http
 
-        ConnectionWrapper.new(::Faraday.new(url: options[:endpoint]) do |builder|
+        # new_connection = ::Faraday.new(url: options[:endpoint]) do |builder|
+        new_connection = ::Faraday::Connection.new(options[:endpoint], options[:connection_options]) do |builder|
           builder.options[:timeout] = options[:timeout].to_i unless Helpers.blank?(options[:timeout])
+
           builder.request :url_encoded
           builder.adapter adapter
-        end)
+        end
+
+        ConnectionWrapper.new new_connection
       end
 
       def make_the_call(http_verb, resource_path, params, body, options)

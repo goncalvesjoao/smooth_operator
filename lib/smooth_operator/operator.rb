@@ -52,10 +52,11 @@ module SmoothOperator
 
     module ClassMethods
 
-      OPTIONS = [:endpoint, :endpoint_user, :endpoint_pass, :timeout, :server_name]
+      OPTIONS = { endpoint: '', endpoint_user: '', endpoint_pass: '',
+                  timeout: '', server_name: '', connection_options: {} }
 
-      OPTIONS.each do |option|
-        define_method(option) { get_option option, '' }
+      OPTIONS.each do |option, default|
+        define_method(option) { get_option option, default }
       end
 
       def headers
@@ -120,7 +121,7 @@ module SmoothOperator
       def populate_options(object, options)
         options ||= {}
 
-        ClassMethods::OPTIONS.each do |option|
+        ClassMethods::OPTIONS.each do |option, default|
           options[option] ||= object.send(option)
         end
 
