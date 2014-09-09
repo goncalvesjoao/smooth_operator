@@ -42,6 +42,13 @@ module SmoothOperator
 
       validate :validate_induced_errors, :validate_nested_objects
 
+      def self.human_attribute_name(attribute_key_name, options = {})
+        HelperMethods.translate(
+          "attributes.#{model_name.i18n_key}.#{attribute_key_name}",
+          options
+        )
+      end
+
       def column_for_attribute(attribute_name)
         type = self.class.attribute_type(attribute_name)
 
