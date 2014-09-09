@@ -43,7 +43,7 @@ module SmoothOperator
       validate :validate_induced_errors, :validate_nested_objects
 
       def self.human_attribute_name(attribute_key_name, options = {})
-        HelperMethods.translate(
+        SmoothOperator::Translation::HelperMethods.translate(
           "attributes.#{model_name.i18n_key}.#{attribute_key_name}",
           options
         )
