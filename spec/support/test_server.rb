@@ -23,8 +23,16 @@ class TestServer < Sinatra::Base
     status test_hash_with_array
   end
 
+  get '/users/test_complex_hash' do
+    status test_complex_hash
+  end
+
   post '/users/test_hash_with_array' do
     status test_hash_with_array
+  end
+
+  post '/users/test_complex_hash' do
+    status test_complex_hash
   end
 
   get '/users/test_query_string' do
@@ -134,6 +142,12 @@ class TestServer < Sinatra::Base
 
     params.delete("query_string_param")
 
+    (params == data) ? 200 : 422
+  end
+
+  def test_complex_hash
+    data = stringify_data FactoryGirl.attributes_for(:user_with_complex_hash)
+binding.pry
     (params == data) ? 200 : 422
   end
 

@@ -32,6 +32,10 @@ module SmoothOperator
         attributes.is_a?(Array) ? new_entries : new_entries.first
       end
 
+      def attributes
+        get_array.map(&:attributes)
+      end
+
       undef :is_a?
 
       protected ############### PROTECTED ###############

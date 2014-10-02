@@ -9,7 +9,17 @@ describe SmoothOperator::Operator do
 
       it 'should correctly encode that hash' do
         remote_call = subject.get('test_hash_with_array', attributes_for(:user_with_address_and_posts))
-        
+
+        expect(remote_call.status).to eq(true)
+      end
+
+    end
+
+    context "submiting a complex hash" do
+
+      it 'should correctly encode that hash' do
+        remote_call = subject.get('test_complex_hash', attributes_for(:user_with_complex_hash))
+
         expect(remote_call.status).to eq(true)
       end
 
@@ -29,6 +39,16 @@ describe SmoothOperator::Operator do
 
       it 'should correctly encode that hash' do
         remote_call = subject.post('test_hash_with_array', attributes_for(:user_with_address_and_posts))
+
+        expect(remote_call.status).to eq(true)
+      end
+
+    end
+
+    context "submiting a complex hash", current: true do
+
+      it 'should correctly encode that hash' do
+        remote_call = subject.post('test_complex_hash', attributes_for(:user_with_complex_hash))
 
         expect(remote_call.status).to eq(true)
       end

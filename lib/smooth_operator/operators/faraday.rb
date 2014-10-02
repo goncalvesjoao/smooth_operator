@@ -1,12 +1,15 @@
 require 'faraday'
 require 'typhoeus/adapters/faraday'
 require "smooth_operator/remote_call/faraday"
+require "smooth_operator/operators/faraday_encoder"
 
 module SmoothOperator
 
   module Operators
 
     module Faraday
+
+      # ::Faraday::Utils.default_params_encoder = FaradayEncoder
 
       extend self
 
