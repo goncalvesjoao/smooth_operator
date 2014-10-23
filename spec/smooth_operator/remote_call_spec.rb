@@ -260,7 +260,7 @@ describe SmoothOperator::RemoteCall do
     end
   end
 
-  context "when the connection exceeds the timeout", current: true do
+  context "when the connection exceeds the timeout" do
     before(:all) do
       @subject = User::TimeoutConnection.new
       @subject.save('/timeout')

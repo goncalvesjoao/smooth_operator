@@ -13,13 +13,7 @@ module SmoothOperator
 
       relative_path = resource_path(relative_path)
 
-      parent_object = options[:parent_object] || _options[:parent_object]
-
-      if !parent_object.nil? && options[:ignore_parent] != true
-        id = Helpers.primary_key(parent_object)
-
-        options[:resources_name] ||= "#{parent_object.class.resources_name}/#{id}/#{self.class.resources_name}"
-      end
+      options[:parent_object] ||= _options[:parent_object]
 
       call_args = before_request(http_verb, relative_path, data, options)
 
@@ -126,6 +120,16 @@ module SmoothOperator
         end
 
         options[:headers] = object.headers.merge(options[:headers] || {})
+
+        parent_object = options[:parent_object]
+
+        if !parent_object.nil? && options[:ignore_parent] != true
+          id = Helpers.primary_key(parent_object)
+
+          id = "#{id}/" if Helpers.present?(id)
+
+          options[:resources_name] ||= "#{parent_object.class.resources_name}/#{id}#{object.resources_name}"
+        end
 
         options
       end

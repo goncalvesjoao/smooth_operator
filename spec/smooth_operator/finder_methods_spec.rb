@@ -33,6 +33,16 @@ describe SmoothOperator::FinderMethods do
   # end
 
   describe ".find" do
+    context "when using parent_object option", current: true do
+      it "should return nested data" do
+        user = User::Base.new(id: 1)
+        remote_call = Post.find(5, nil, parent_object: user)
+
+        expect(remote_call.parsed_response)
+          .to eq({ 'id' => 1, 'body' => 'from_nested_url' })
+      end
+    end
+
     context "when the server returns a single hash" do
       let(:user) { subject.find(5).data }
 

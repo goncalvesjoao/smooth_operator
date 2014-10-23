@@ -17,7 +17,7 @@ describe SmoothOperator::Operator do
 
     context "submiting a complex hash" do
 
-      it 'should correctly encode that hash' do
+      xit 'should correctly encode that hash' do
         remote_call = subject.get('test_complex_hash', attributes_for(:user_with_complex_hash))
 
         expect(remote_call.status).to eq(true)
@@ -45,9 +45,9 @@ describe SmoothOperator::Operator do
 
     end
 
-    context "submiting a complex hash", current: true do
+    context "submiting a complex hash" do
 
-      it 'should correctly encode that hash' do
+      xit 'should correctly encode that hash' do
         remote_call = subject.post('test_complex_hash', attributes_for(:user_with_complex_hash))
 
         expect(remote_call.status).to eq(true)

@@ -61,7 +61,7 @@ describe SmoothOperator::AttributeAssignment do
     end
 
     context "when one of the attribute's value, is an hash and is unknown to the schema" do
-      context "when the .unknown_hash_class is unused", current: true do
+      context "when the .unknown_hash_class is unused" do
         subject { User::Base.new(address: { street: 'something', postal_code: { code: '123' } }) }
 
         it "a new instance of OpenStruct will be initialized with that hash" do

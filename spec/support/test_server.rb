@@ -147,7 +147,7 @@ class TestServer < Sinatra::Base
 
   def test_complex_hash
     data = stringify_data FactoryGirl.attributes_for(:user_with_complex_hash)
-binding.pry
+
     (params == data) ? 200 : 422
   end
 
