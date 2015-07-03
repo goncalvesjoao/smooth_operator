@@ -8,11 +8,16 @@ require "smooth_operator/remote_call/errors/connection_failed"
 module SmoothOperator
   module Operator
 
+    def headers
+      {}
+    end
+
     def make_the_call(http_verb, relative_path = '', data = {}, options = {})
       options ||= {}
 
       relative_path = resource_path(relative_path)
 
+      options[:headers]         = headers.merge(options[:headers] || {})
       options[:parent_object] ||= _options[:parent_object]
 
       call_args = before_request(http_verb, relative_path, data, options)

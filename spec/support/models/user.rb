@@ -13,6 +13,10 @@ module User
       params
     end
 
+    def headers
+      { 'PING' => 'PONG' }
+    end
+
   end
 
   module UnknownHashClass

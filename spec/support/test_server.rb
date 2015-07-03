@@ -18,6 +18,9 @@ class TestServer < Sinatra::Base
     json post_data
   end
 
+  get '/users/test_headers' do
+    status request.env['HTTP_PING'] == 'PONG' ? 200 : 422
+  end
 
   get '/users/test_hash_with_array' do
     status test_hash_with_array

@@ -3,6 +3,14 @@ require "spec_helper"
 describe SmoothOperator::Operator do
   subject { User::Base }
 
+  describe "#headers" do
+    it 'should send the costum headers' do
+      remote_call = subject.new.get('test_headers')
+
+      expect(remote_call.status).to eq(true)
+    end
+  end
+
   describe "#get" do
 
     context "submiting a hash, with an array" do
