@@ -8,6 +8,10 @@ describe SmoothOperator::Operator do
       remote_call = subject.new.get('test_headers')
 
       expect(remote_call.status).to eq(true)
+
+      result = subject.new.save('test_headers')
+
+      expect(result).to eq(true)
     end
   end
 

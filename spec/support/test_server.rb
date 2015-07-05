@@ -18,7 +18,12 @@ class TestServer < Sinatra::Base
     json post_data
   end
 
+
   get '/users/test_headers' do
+    status request.env['HTTP_PING'] == 'PONG' ? 200 : 422
+  end
+
+  post '/users/test_headers' do
     status request.env['HTTP_PING'] == 'PONG' ? 200 : 422
   end
 
